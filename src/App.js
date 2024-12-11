@@ -1,6 +1,6 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Lottie from "react-lottie";
-import animationData from "./animations/sending.json";
+import shrugAnimationData from "./animations/shrug.json";
 import axios from 'axios';
 import { User, Plus, Settings, Columns3, Trash2 } from 'lucide-react';
 import './App.css';
@@ -83,19 +83,21 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, webAppData, h
   );
 }
 
-function Animation() {
+
+function ShrugAnimation() {
     const options = {
-      loop: true,           // Set to false if you don't want the animation to loop
-      autoplay: true,       // Autoplay the animation
-      animationData: animationData, // The JSON data of the sticker
+      loop: true, // Set to false if you don't want the animation to loop
+      autoplay: true, // Autoplay the animation
+      animationData: shrugAnimationData, // The JSON data of the sticker
       rendererSettings: {
         preserveAspectRatio: "xMidYMid slice", // You can adjust this based on your layout
       },
     };
   
     return (
-      <div style={{ width: "100px", height: "100px" }}>
+      <div className='size-7/12  mx-auto'>
         <Lottie options={options} />
+        <p className='text-center dark:text-white'>День не найден :(</p>
       </div>
     );
   };
@@ -517,7 +519,8 @@ function App() {
           )}
         </div>
 
-        <div className='hours-grid'>
+        {rotaData !== null
+        ? <div className='hours-grid'>
           {Object.entries(rotaData).map(([timeRange, usersDict], index) => (
             <RotaHour
               key={index}
@@ -531,8 +534,8 @@ function App() {
             />
           ))}
         </div>
-
-        {/* <Animation /> */}
+        : <ShrugAnimation/>
+        }
 
         {showUserManagement && (
           <UserSearchPopUp
