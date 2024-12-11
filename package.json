@@ -20,7 +20,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build --repo https://github.com/b-gleb/Inforgiy_Web.git",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
