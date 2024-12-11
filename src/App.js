@@ -9,6 +9,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
+let today = new Date().toISOString().split("T")[0];
+
 function catchResponseError(error){
   console.error(error.code, error.status,  error.response.data);
   toast.error(`ERROR ${error.status}: ${error.response.data}`);
@@ -16,19 +18,18 @@ function catchResponseError(error){
 }
 
 
+function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
   const [showSearch, setShowSearch] = useState(false);
   let hourContainerClass = "hour-container";
-  let today = new Date().toISOString().split("T")[0];
 
   if (Object.keys(usersDict).length === 0 && usersDict.constructor === Object) {
     hourContainerClass = "hour-container empty"
-  }
+  };
 
 
   return (
     <div className={hourContainerClass}>
       <span className="hour-label">{timeRange}</span>
-
       <div className="usernames-container">
         {Object.entries(usersDict).map(([user_id, userObj], index) => {
           // Determine the appropriate class based on value
@@ -63,7 +64,7 @@ function catchResponseError(error){
           </button>
         )}
 
-        {date >= today && !Object.keys(usersDict).includes(webAppData.initDataUnsafe.user.id) && (
+        {date >= today && !(initDataUnsafe.user.id in usersDict) && Object.keys(usersDict).length < maxDuties && (
           <button
             className='p-1'
             onClick={() => handleUpdateRota('add', branch, date, timeRange, webAppData.initDataUnsafe.user.id, webAppData)}
@@ -537,7 +538,7 @@ function App() {
               timeRange={timeRange}
               usersDict={usersDict}
               rotaAdmin={rotaAdmin.includes(branch)}
-              webAppData={webAppData}
+              maxDuties={userBranches[branch].maxDuties}
               handleUpdateRota={handleUpdateRota}
             />
           ))}
