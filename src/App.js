@@ -44,7 +44,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
               {rotaAdmin && (
                 <button
                   className="ml-2"
-                  onClick={() => handleUpdateRota('remove', branch, date, timeRange, user_id, webAppData)}
+                    onClick={() => handleUpdateRota('remove', branch, date, timeRange, user_id, initDataUnsafe)}
                 >
                   ✕
                 </button>
@@ -67,7 +67,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
         {date >= today && !(initDataUnsafe.user.id in usersDict) && Object.keys(usersDict).length < maxDuties && (
           <button
             className='p-1'
-            onClick={() => handleUpdateRota('add', branch, date, timeRange, webAppData.initDataUnsafe.user.id, webAppData)}
+            onClick={() => handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe)}
           >
               <Plus size={15} className="icon-text"/>
           </button>
@@ -80,7 +80,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
         branch={branch}
         date={date}
         timeRange={timeRange}
-        webAppData={webAppData}
+        initDataUnsafe={initDataUnsafe}
         handleUpdateRota={handleUpdateRota}
         onClose={() => setShowSearch(false)}
       />
@@ -113,15 +113,13 @@ function ShrugAnimation() {
 function UserSearchPopUp({ 
   mode,
   branch,
-  webAppData,
+  initDataUnsafe,
 
   date,
   timeRange,
   
   onClose,
-  // handleUpdateRota,
   handleUpdateRota,
-  onAddNewUser
 }) {
   // States for fetching users and managing fuzzy search
   const [allUsers, setAllUsers] = useState([]);
@@ -137,8 +135,7 @@ function UserSearchPopUp({
         const response = await axios.get("/api/users", {
           params: { 
             branch: branch,
-            user_id: webAppData.initDataUnsafe.user.id,
-            // initData: webAppData.initData
+            initDataUnsafe: initDataUnsafe
           },
         });
         setAllUsers(Object.entries(response.data));
@@ -149,7 +146,7 @@ function UserSearchPopUp({
     };
 
     fetchUsers();
-  }, [branch, webAppData.initDataUnsafe.user.id]); 
+  }, [branch, initDataUnsafe]); 
 
 
   // Fuzzy search
@@ -196,7 +193,7 @@ function UserSearchPopUp({
                   key={user_id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, user_id, webAppData);
+                      handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
                       onClose();
                     } else if (mode === 'user_management'){
                       setEditingUser({id: user_id, username: Object.keys(userObj)[0], level: String(Object.values(userObj)[0])});
@@ -216,7 +213,7 @@ function UserSearchPopUp({
             branch={branch}
             editingUser={editingUser}
             setEditingUser={setEditingUser}
-            webAppData={webAppData}
+            initDataUnsafe={initDataUnsafe}
           />
         </>
         
@@ -226,7 +223,7 @@ function UserSearchPopUp({
 }
 
 
-function UserEditForm({ branch, editingUser, setEditingUser, webAppData }){
+function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
   const userLevels = {"null": 'Обычный', "0": "Новичок", "1": "Эксперт"};
 
   const handleChange = (e) => {
@@ -238,13 +235,12 @@ function UserEditForm({ branch, editingUser, setEditingUser, webAppData }){
     }));
   };
 
-  const handleRemoveUser = async (branch, user_id, webAppData) => {
+  const handleRemoveUser = async (branch, user_id, initDataUnsafe) => {
     try {
       const response = await axios.post("api/removeUser", {
         branch: branch,
         modifyUserId: user_id,
-        user_id: webAppData.initDataUnsafe.user.id,
-        initData: webAppData.initData
+        initDataUnsafe: initDataUnsafe
       })
     } catch (error) {
       catchResponseError(error);
@@ -259,8 +255,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, webAppData }){
       modifyUserId: editingUser.id,
       modifyUsername: editingUser.username,
       level: editingUser.level === 'null' ? null : editingUser.level, // Server expects level to be of type null not string "null"
-      user_id: webAppData.initDataUnsafe.user.id,
-      initData: webAppData.initData
+      initDataUnsafe: initDataUnsafe
     };
 
     console.log(data)
@@ -318,7 +313,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, webAppData }){
             type="button"
             className="button-secondary w-auto"
             onClick={() => {
-              handleRemoveUser(branch, editingUser.id, webAppData);
+              handleRemoveUser(branch, editingUser.id, initDataUnsafe);
               setEditingUser(null);
             }}
           >
@@ -337,7 +332,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, webAppData }){
 
 
 function App() {
-  const [webAppData, setWebAppData] = useState(null);
+  const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [rotaData, setRotaData] = useState({});
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -347,55 +342,19 @@ function App() {
   const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-web-app.js?56";
-    script.async = true;
-
-    script.onload = () => {
-      console.log("Telegram WebApp script loaded.");
-      
-      // Add dummy data if Telegram is not available
-      if (!window.Telegram.WebApp.initData) {
-        console.log("Using mock Telegram WebApp data for testing.");
-        window.Telegram = {
-          WebApp: {
-            initData: "auth_date=<auth_date>\nquery_id=<query_id>\nuser=<user>",
-            initDataUnsafe: {
-              query_id: "AAEPArgZAAAAAA8CuBmz-HCb",
-              user: {
-                id: 431489551,
-                first_name: "Test",
-                last_name: "User",
-                username: "b_gleb",
-              },
-              start_param: null,
-              auth_date: "1732642375",
-              signature:
-                "Ktaufo799peWDD1AQdhCivW3zbLTvT9IWd0EQ-zZVN7jG7Yz59RV69WHIYR3NztYQI5Ybw_WCdmUX-XYsdvyBA",
-              hash: "f81325eeb51805bb6a89fe3ff87ec7d32f71a743c9bf44a64021dae382e9ee95",
-            },
-            version: "8.0",
-            platform: "ios",
-            colorScheme: "light",
-            isActive: true,
-          },
-        };
-      }
-
-      // Update the state with Telegram WebApp data
-      setWebAppData(window.Telegram.WebApp);
-    };
-
-    script.onerror = () => {
-      console.error("Failed to load the Telegram WebApp script.");
-    };
-
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup script if needed
-      document.head.removeChild(script);
-    };
+    if (! window.Telegram.WebApp){
+      console.warn('Telegram WebApp is not avaliable')
+      return
+    } else if (Object.keys(window.Telegram.WebApp.initDataUnsafe).length === 0) {
+      console.log('Using mock Telegram data')
+      console.log(process.env.REACT_APP_INIT_DATA_UNSAFE)
+        setInitDataUnsafe(JSON.parse(process.env.REACT_APP_INIT_DATA_UNSAFE))
+    } else {
+      console.log('Using real Telegram data');
+      setInitDataUnsafe(window.Telegram.WebApp.initDataUnsafe);
+      window.Telegram.WebApp.disableVerticalSwipes();
+      window.Telegram.WebApp.expand();
+    }
   }, []);
 
 
@@ -404,8 +363,7 @@ function App() {
       try {
         const response = await axios.get("/api/auth", {
           params: {
-            initData: webAppData.initData,
-            user_id: webAppData.initDataUnsafe.user.id
+            initDataUnsafe: initDataUnsafe,
           }
         });
 
@@ -419,8 +377,10 @@ function App() {
       }
     };
 
-    fetchAuthData();
-  }, [webAppData]);
+    if (initDataUnsafe !== null){
+      fetchAuthData()
+    };
+  }, [initDataUnsafe]);
 
   
   useEffect(() => {
@@ -454,7 +414,7 @@ function App() {
   
 
 
-  const handleUpdateRota = async (type, branch, date, timeRange, modifyUserId, webAppData) => {
+  const handleUpdateRota = async (type, branch, date, timeRange, modifyUserId, initDataUnsafe) => {
     try {
       // Send the POST request using async/await
       const response = await axios.post("api/updateRota", {
@@ -462,8 +422,8 @@ function App() {
         branch: branch,
         date: date,
         timeRange: timeRange,
-        user_id: modifyUserId,
-        initData: webAppData.initData
+        modifyUserId: modifyUserId,
+        initDataUnsafe: initDataUnsafe
       });
   
       setRotaData(response.data);
@@ -539,6 +499,7 @@ function App() {
               usersDict={usersDict}
               rotaAdmin={rotaAdmin.includes(branch)}
               maxDuties={userBranches[branch].maxDuties}
+              initDataUnsafe={initDataUnsafe}
               handleUpdateRota={handleUpdateRota}
             />
           ))}
@@ -550,7 +511,7 @@ function App() {
           <UserSearchPopUp
             mode='user_management'
             branch={branch}
-            webAppData={webAppData}
+            initDataUnsafe={initDataUnsafe}
             onClose={() => setShowUserManagement(false)}
           />
         )}
