@@ -5,9 +5,17 @@ import axios from 'axios';
 import { User, Plus, Settings, Columns3, Trash2 } from 'lucide-react';
 import './App.css';
 import './tailwind.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
-function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, webAppData, handleUpdateRota}) {
+function catchResponseError(error){
+  console.error(error.code, error.status,  error.response.data);
+  toast.error(`ERROR ${error.status}: ${error.response.data}`);
+  window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+}
+
+
   const [showSearch, setShowSearch] = useState(false);
   let hourContainerClass = "hour-container";
   let today = new Date().toISOString().split("T")[0];
@@ -78,8 +86,6 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, webAppData, h
     )}
 
     </div>
-
-
   );
 }
 
@@ -122,7 +128,6 @@ function UserSearchPopUp({
   const [searchQuery, setSearchQuery] = useState("");
   // States for user management
   const [editingUser, setEditingUser] = useState(null);
-  // const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch all users
   useEffect(() => {
@@ -138,7 +143,7 @@ function UserSearchPopUp({
         setAllUsers(Object.entries(response.data));
         setFilteredUsers(Object.entries(response.data));
       } catch (error) {
-        console.error("Error fetching user list", error);
+        catchResponseError(error);
       }
     };
 
@@ -240,11 +245,8 @@ function UserEditForm({ branch, editingUser, setEditingUser, webAppData }){
         user_id: webAppData.initDataUnsafe.user.id,
         initData: webAppData.initData
       })
-
-      console.log(response)
-
     } catch (error) {
-      console.error('Error removing user: ', error.status, error.code, error.response.data)
+      catchResponseError(error);
     }
   };
 
@@ -267,7 +269,8 @@ function UserEditForm({ branch, editingUser, setEditingUser, webAppData }){
       const response = await axios.post('/api/updateUser', data);
       if (response.status === 200){setEditingUser(null)}
     } catch (error) {
-      console.error('Error saving user:', error.response?.data);
+      //TODO: Handle error 404 separately
+      catchResponseError(error);
     }
 
   }
@@ -411,7 +414,7 @@ function App() {
 
       }
       catch (error) {
-        console.error("Auth error", error)
+        catchResponseError(error);
       }
     };
 
@@ -435,7 +438,13 @@ function App() {
         });
         setRotaData({ ...response.data });
       } catch (error) {
-        console.error("Error fetching rota", error);
+
+        if (error.response.status === 404){
+          setRotaData(null);
+        } else {
+        catchResponseError(error);
+        }
+
       }
     };
   
@@ -458,8 +467,7 @@ function App() {
   
       setRotaData(response.data);
     } catch (error) {
-      // Handle any errors that may occur during the request
-      console.error('Error updating rota:', error.status, error.code, error.response.data);
+      catchResponseError(error);
     }
   };
   
@@ -547,8 +555,15 @@ function App() {
         )}
 
 
-
-        <pre className='overflow-x-auto dark:text-white'>{JSON.stringify(webAppData, null, 2)}</pre>
+        <ToastContainer
+          position='bottom-center'
+          newestOnTop
+          closeOnClick
+          pauseOnFocusLoss={false}
+          draggable={false}
+          theme={window.Telegram.WebApp.colorScheme}
+          limit={4}
+        />
 
     </div>
   );
