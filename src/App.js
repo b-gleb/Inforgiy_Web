@@ -237,7 +237,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
   const handleRemoveUser = async (branch, user_id, initDataUnsafe) => {
     try {
-      const response = await axios.post("api/removeUser", {
+      await axios.post("api/removeUser", {
         branch: branch,
         modifyUserId: user_id,
         initDataUnsafe: initDataUnsafe
@@ -258,17 +258,17 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
       initDataUnsafe: initDataUnsafe
     };
 
-    console.log(data)
-    
-
     try {
       const response = await axios.post('/api/updateUser', data);
       if (response.status === 200){setEditingUser(null)}
     } catch (error) {
-      //TODO: Handle error 404 separately
-      catchResponseError(error);
+      // Handle error 404 separately
+      if (error.response && error.response.status === 404){
+        toast.warn('Пользователь не найден!')
+      } else {
+        catchResponseError(error)
+      };
     }
-
   }
 
   return(
