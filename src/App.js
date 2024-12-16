@@ -8,7 +8,7 @@ import './tailwind.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
+const apiUrl = process.env.REACT_APP_PROXY_URL;
 let today = new Date().toISOString().split("T")[0];
 
 function catchResponseError(error){
@@ -132,7 +132,7 @@ function UserSearchPopUp({
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("/api/users", {
+        const response = await axios.get(`${apiUrl}/api/users`, {
           params: { 
             branch: branch,
             initDataUnsafe: initDataUnsafe
@@ -237,7 +237,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
   const handleRemoveUser = async (branch, user_id, initDataUnsafe) => {
     try {
-      await axios.post("api/removeUser", {
+      await axios.post(`${apiUrl}/api/removeUser`, {
         branch: branch,
         modifyUserId: user_id,
         initDataUnsafe: initDataUnsafe
@@ -259,7 +259,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
     };
 
     try {
-      const response = await axios.post('/api/updateUser', data);
+      const response = await axios.post(`${apiUrl}/api/updateUser`, data);
       if (response.status === 200){setEditingUser(null)}
     } catch (error) {
       // Handle error 404 separately
@@ -361,7 +361,7 @@ function App() {
   useEffect(() => {
     const fetchAuthData = async () => {
       try {
-        const response = await axios.get("/api/auth", {
+        const response = await axios.get(`${apiUrl}/api/auth`, {
           params: {
             initDataUnsafe: initDataUnsafe,
           }
@@ -391,7 +391,7 @@ function App() {
       }
 
       try {
-        const response = await axios.get("/api/rota", {
+        const response = await axios.get(`${apiUrl}/api/rota`, {
           params: {
             branch: branch,
             date: date,
@@ -417,7 +417,7 @@ function App() {
   const handleUpdateRota = async (type, branch, date, timeRange, modifyUserId, initDataUnsafe) => {
     try {
       // Send the POST request using async/await
-      const response = await axios.post("api/updateRota", {
+      const response = await axios.post(`${apiUrl}/api/updateRota`, {
         type: type,
         branch: branch,
         date: date,
