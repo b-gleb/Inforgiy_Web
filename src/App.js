@@ -3,6 +3,7 @@ import Lottie from "react-lottie";
 import shrugAnimationData from "./animations/shrug.json";
 import axios from 'axios';
 import { User, Plus, Settings, Columns3, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 import './tailwind.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -38,7 +39,15 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
             userObj.level === 0 ? "dark-green" : "light-red";
 
           return (
-            <div key={index} className={`username-box ${boxClass}`}>
+            <AnimatePresence key={index}>
+              <motion.div
+                key={index}
+                className={`username-box ${boxClass}`}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+              >
               <span>{userObj.username}</span>
 
               {rotaAdmin && (
@@ -49,7 +58,8 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
                   ✕
                 </button>
               )}
-            </div>
+              </motion.div>
+            </AnimatePresence>
           );
         })}
       </div>
@@ -189,7 +199,10 @@ function UserSearchPopUp({
 
           <div className="search_results_container">
               {filteredUsers.map(([user_id, userObj]) => (
-                <button
+                <motion.button
+                  initial={{ opacity: 0.5, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1, transition: { ease: 'easeOut', duration: 0.2}}}
+
                   key={user_id}
                   onClick={() => {
                     if (mode === 'rota'){
@@ -202,7 +215,7 @@ function UserSearchPopUp({
                   className="search_results_button"
                 >
                   {Object.keys(userObj)[0]}
-                </button>
+                </motion.button>
               ))}
           </div>
         </>
