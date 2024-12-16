@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Inforgiy_Web/static/css/main.47468872.css",
-    "main.js": "/Inforgiy_Web/static/js/main.95bde66e.js",
+    "main.js": "/Inforgiy_Web/static/js/main.80e9f7fa.js",
     "static/js/453.258b012d.chunk.js": "/Inforgiy_Web/static/js/453.258b012d.chunk.js",
     "index.html": "/Inforgiy_Web/index.html",
     "main.47468872.css.map": "/Inforgiy_Web/static/css/main.47468872.css.map",
-    "main.95bde66e.js.map": "/Inforgiy_Web/static/js/main.95bde66e.js.map",
+    "main.80e9f7fa.js.map": "/Inforgiy_Web/static/js/main.80e9f7fa.js.map",
     "453.258b012d.chunk.js.map": "/Inforgiy_Web/static/js/453.258b012d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.47468872.css",
-    "static/js/main.95bde66e.js"
+    "static/js/main.80e9f7fa.js"
   ]
 }
