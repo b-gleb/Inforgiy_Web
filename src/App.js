@@ -114,7 +114,7 @@ function ShrugAnimation() {
     return (
       <div className='size-7/12  mx-auto'>
         <Lottie options={options} />
-        <p className='text-center dark:text-white'>День не найден :(</p>
+        <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
       </div>
     );
   };
@@ -277,7 +277,8 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
     } catch (error) {
       // Handle error 404 separately
       if (error.response && error.response.status === 404){
-        toast.warn('Пользователь не найден!')
+        toast.warn('Пользователь не найден!');
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
       } else {
         catchResponseError(error)
       };
@@ -539,6 +540,8 @@ function App() {
           theme={window.Telegram.WebApp.colorScheme}
           limit={4}
         />
+
+        <pre className='overflow-x-scroll'>{JSON.stringify(initDataUnsafe, null, 2)}</pre>
 
     </div>
   );
