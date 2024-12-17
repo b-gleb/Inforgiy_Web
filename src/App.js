@@ -9,6 +9,7 @@ import './tailwind.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 let today = new Date().toISOString().split("T")[0];
 
@@ -21,8 +22,16 @@ function catchResponseError(error){
 
 function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
   const [showSearch, setShowSearch] = useState(false);
-  let hourContainerClass = "hour-container";
 
+  useEffect(() => {
+    if (showSearch) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [showSearch]);
+
+  let hourContainerClass = "hour-container";
   if (Object.keys(usersDict).length === 0 && usersDict.constructor === Object) {
     hourContainerClass = "hour-container empty"
   };
@@ -353,8 +362,15 @@ function App() {
   const [userBranches, setUserBranches] = useState({});
   const [branch, setBranch] = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
-  const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
+  useEffect(() => {
+    if (showUserManagement) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [showUserManagement]);
 
+  
   useEffect(() => {
     if (! window.Telegram.WebApp){
       console.warn('Telegram WebApp is not avaliable')
