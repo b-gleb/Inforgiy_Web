@@ -63,19 +63,10 @@ export default function WeeklyView({ branch, setShowWeekly }){
     return (
       <div className='flex gap-1'>
         {Object.values(hourData).map((user, index) => (
-          <div key={index} className='w-2 h-2 rounded-sm bg-blue-500'></div>
+          <div key={index} className={`w-2 h-2 rounded-sm color-${user.color}`}></div>
         ))}
       </div>
-  )
-  
-  
-    // return (
-    //   <div className='flex'>
-    //     Object.values(hourData).map((user, index) => (
-    //       <div key={index} className={`level-${user.level} w-2 h-2 rounded-sm bg-blue-600`}></div>
-    //     )
-    //   </div>
-    //   ));
+    )
   };
   
   
