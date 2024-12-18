@@ -35,16 +35,11 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
       <span className="hour-label">{timeRange}</span>
       <div className="usernames-container">
         {Object.entries(usersDict).map(([user_id, userObj], index) => {
-          // Determine the appropriate class based on value
-          const boxClass =
-            userObj.level === null ? "light-blue" :
-            userObj.level === 0 ? "dark-green" : "light-red";
-
           return (
             <AnimatePresence key={index}>
               <motion.div
                 key={index}
-                className={`username-box ${boxClass}`}
+                className={`username-box color-${userObj.color}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
@@ -193,7 +188,7 @@ function UserSearchPopUp({
           {mode === 'user_management' && (
             <button
               className='button-primary'
-              onClick={() => setEditingUser({id: null, username: "@", level: "null"})}
+              onClick={() => setEditingUser({id: null, username: "@", color: 0})}
             >
               + Добавить пользователя
             </button>
@@ -211,7 +206,7 @@ function UserSearchPopUp({
                       handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
                       onClose();
                     } else if (mode === 'user_management'){
-                      setEditingUser({id: user_id, username: Object.keys(userObj)[0], level: String(Object.values(userObj)[0])});
+                      setEditingUser({id: user_id, username: Object.keys(userObj)[0], color: String(Object.values(userObj)[0])});
                     }
                   }}
                   className="search_results_button"
@@ -239,7 +234,7 @@ function UserSearchPopUp({
 
 
 function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
-  const userLevels = {"null": 'Обычный', "0": "Новичок", "1": "Эксперт"};
+  const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный"};
 
   const handleChange = (e) => {
     const {name, value} = e.target;
@@ -269,7 +264,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
       branch: branch,
       modifyUserId: editingUser.id,
       modifyUsername: editingUser.username,
-      level: editingUser.level === 'null' ? null : editingUser.level, // Server expects level to be of type null not string "null"
+      color: editingUser.color,
       initDataUnsafe: initDataUnsafe
     };
 
@@ -308,16 +303,16 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
         />
       </div>
       <div>
-        <label htmlFor="level" className="form-label">Уровень</label>
+        <label htmlFor="color" className="form-label">Цвет</label>
         <select
-          id="level"
-          name="level"
-          value={editingUser.level}
+          id="color"
+          name="color"
+          value={editingUser.color}
           onChange={handleChange}
           className="input-field"
         >
-          {Object.entries(userLevels).map(([level_value, level_display]) => (
-            <option key={level_value} value={level_value}>{level_display}</option>
+          {Object.entries(userColors).map(([color_value, color_display]) => (
+            <option key={color_value} value={color_value}>{color_display}</option>
           ))}
         </select>
       </div>

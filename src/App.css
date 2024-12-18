@@ -174,19 +174,19 @@
 }
 
 /* Color Variants */
-.light-blue { @apply
+.username-box.color-0 { @apply
   bg-[#e0f3ff] dark:bg-[#1b2f3a]
   text-[#007acc] dark:text-[#4aa3df]
   border-[#007acc] dark:border-[#4aa3df]
 }
 
-.dark-green { @apply
+.username-box.color-1 { @apply
   bg-[#e6f7e5] dark:bg-[#1f4030]
   text-[#228b22] dark:text-[#32a869]
   border-[#228b22] dark:border-[#32a869]
 }
 
-.light-red { @apply
+.username-box.color-2 { @apply
   bg-[#fdecea] dark:bg-[#3a1b1b]
   text-[#d9534f] dark:text-[#e57373]
   border-[#d9534f] dark:border-[#e57373]
