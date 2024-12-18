@@ -8,10 +8,12 @@ import './App.css';
 import './tailwind.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import WeeklyView from './WeeklyView'
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 let today = new Date().toISOString().split("T")[0];
 
+// TODO: Move catch response error to separate file
 function catchResponseError(error){
   console.error(error.code, error.status,  error.response.data);
   toast.error(`ERROR ${error.status}: ${error.response.data}`);
@@ -353,6 +355,7 @@ function App() {
   const [userBranches, setUserBranches] = useState({});
   const [branch, setBranch] = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
+  const [showWeekly, setShowWeekly] = useState(false);
   const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 
   useEffect(() => {
@@ -488,7 +491,10 @@ function App() {
             />
           </div>
 
-          <button className='button-icon'>
+          <button
+            className='button-icon'
+            onClick={() => setShowWeekly(true)}
+          >
             <Columns3 size={25} className="icon-text"/>
           </button>
 
@@ -530,6 +536,10 @@ function App() {
           />
         )}
 
+        {showWeekly && <WeeklyView
+          branch={branch}
+          setShowWeekly={setShowWeekly}
+        />}
 
         <ToastContainer
           position='bottom-center'
