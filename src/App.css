@@ -192,6 +192,31 @@
   border-[#d9534f] dark:border-[#e57373]
 }
 
+.username-box.color-3 { @apply 
+  bg-white dark:bg-[#1c1c1c] 
+  text-black dark:text-[#d1d1d1] 
+  border-black dark:border-[#d1d1d1]; 
+}
+
+.username-box.color-4 { @apply 
+  bg-[#f3e8ff] dark:bg-[#2d1b3a] 
+  text-[#8a2be2] dark:text-[#c5a6d9] 
+  border-[#8a2be2] dark:border-[#a879c7]; 
+}
+
+.username-box.color-5 { @apply 
+  bg-[#fff4e6] dark:bg-[#402c1f] 
+  text-[#b16100] dark:text-[#f4a261] 
+  border-[#ff8c00] dark:border-[#f4a261]; 
+}
+
+.username-box.color-6 { @apply 
+  bg-[#fffde6] dark:bg-[#403f1f] 
+  text-[#746204] dark:text-[#eac54f] 
+  border-[#ffd700] dark:border-[#eac54f]; 
+}
+
+
 .popup { @apply
   max-w-[600px]
   mx-auto my-0

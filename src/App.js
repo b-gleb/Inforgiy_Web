@@ -234,7 +234,7 @@ function UserSearchPopUp({
 
 
 function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
-  const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный"};
+  const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный", 3: "Чёрный", 4: "Фиолетовый", 5: "Оранжевый", 6: "Жёлтый"};
 
   const handleChange = (e) => {
     const {name, value} = e.target;
