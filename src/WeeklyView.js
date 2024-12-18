@@ -140,27 +140,25 @@ const closePopup = () => {
           </table>
         )}
 
-      {/* Dark Overlay */}
-      {selectedCellData && <DarkOverlay closePopup={closePopup}/>}
-
-
-      {/* Slide-in Pop-up */}
-      {selectedCellData && <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup}/>}
+      <DarkOverlay selectedCellData={selectedCellData} closePopup={closePopup}/>
+      <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup}/>
 
     </div>
   );
 };
 
-function DarkOverlay({ closePopup }) {
+function DarkOverlay({ selectedCellData, closePopup }) {
   return (
     <AnimatePresence>
-      <motion.div 
-        className="fixed inset-0 bg-black bg-opacity-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={closePopup}
-      />
+      {selectedCellData && (
+        <motion.div 
+          className="fixed inset-0 bg-black bg-opacity-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={closePopup}
+        />
+      )}
     </AnimatePresence>
   )
 }
@@ -168,6 +166,7 @@ function DarkOverlay({ closePopup }) {
 function CellPopUp({ selectedCellData, closePopup }) {
   return(
     <AnimatePresence>
+      {selectedCellData && (
         <motion.div 
           className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg p-6 max-h-[70%] overflow-y-auto"
           initial={{ y: '100%' }}
@@ -190,7 +189,6 @@ function CellPopUp({ selectedCellData, closePopup }) {
                 Object.values(selectedCellData).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 rounded-lg">
                     <span className="font-medium">{user.username}</span>
-                    <span className={`text-sm text-gray-500`}>Level: {user.level ?? 'N/A'}</span>
                   </div>
                 ))
             ) : (
@@ -199,6 +197,7 @@ function CellPopUp({ selectedCellData, closePopup }) {
 
           </div>
         </motion.div>
+      )}
       </AnimatePresence>
   )
 }
