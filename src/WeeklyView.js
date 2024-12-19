@@ -39,12 +39,13 @@ export default function WeeklyView({ branch, setShowWeekly }){
 
   useEffect(() => {
     const fetchRotaData = async () => {
+      setIsLoading(true);
+      const startTime = Date.now(); 
+
       const newRotaData = [];
       const days = getNext7Days();
       setDates(days);
 
-      const timer = setTimeout(() => setIsLoading(true), 50); // Delay showing loading spinner to prevent flickering
-        
       for (const day of days) {
           try {
               const response = await axios.get(`${apiUrl}/api/rota`, {
@@ -59,9 +60,14 @@ export default function WeeklyView({ branch, setShowWeekly }){
               newRotaData.push({}); // Push empty data for that day to avoid breaking the table
           }
       }
-      clearTimeout(timer);
-      setIsLoading(false);
-      setRotaData(newRotaData);
+
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 300 - elapsedTime);
+
+      setTimeout(() => {
+        setRotaData(newRotaData);
+        setIsLoading(false);
+      }, remainingTime);
     };
     fetchRotaData();
   }, [branch]);
@@ -132,8 +138,9 @@ export default function WeeklyView({ branch, setShowWeekly }){
   };
   
   return (
-    <div className='w-screen fixed inset-0'>
-        {isLoading ? <div className="w-full h-full bg-red-950">Loading...</div> : (
+    <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
+        {isLoading ? <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
+        : (
           <table className='w-full h-full table-fixed'>
               {renderTableHeader()}
               {renderTableBody()}
