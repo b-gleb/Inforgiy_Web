@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Lottie from "react-lottie";
 import shrugAnimationData from "./animations/shrug.json";
 import axios from 'axios';
-import { User, Plus, Settings, Columns3, Trash2 } from 'lucide-react';
+import { User, Plus, Settings, CalendarDays, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 import './tailwind.css';
@@ -501,7 +501,7 @@ function App() {
             className='button-icon'
             onClick={() => setShowWeekly(true)}
           >
-            <Columns3 size={25} className="icon-text"/>
+            <CalendarDays size={25} className="icon-text"/>
           </button>
 
           {rotaAdmin.includes(branch) && (
