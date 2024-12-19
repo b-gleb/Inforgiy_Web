@@ -17,7 +17,20 @@ export default function WeeklyView({ branch, setShowWeekly }){
   const [dates, setDates] = useState([]);
   const [rotaData, setRotaData] = useState([]);
   const [selectedCellData, setSelectedCellData] = useState(null);
+
+  useEffect(() => {
+    window.Telegram.WebApp.BackButton.onClick(() => {setShowWeekly(false)});
+    window.Telegram.WebApp.BackButton.show();
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      window.Telegram.WebApp.BackButton.offClick();
+      window.Telegram.WebApp.BackButton.hide();
+    };
   
+  }, [setShowWeekly]);
+  
+
   const getNext7Days = () => {
     const days = [];
     const today = new Date();
@@ -29,6 +42,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
     return days;
   };
   
+
   useEffect(() => {
     const fetchRotaData = async () => {
       const newRotaData = [];
@@ -90,6 +104,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
     );
   };
   
+
   const renderTableBody = () => {
     const timeSlots = rotaData.length > 0 ? Object.keys(rotaData[0]) : [];
   
