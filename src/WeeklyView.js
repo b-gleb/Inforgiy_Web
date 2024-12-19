@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import catchResponseError from './responseError';
+import './WeeklyView.css';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
@@ -68,9 +69,9 @@ export default function WeeklyView({ branch, setShowWeekly }){
   
   const renderUserDivs = (hourData) => {
     return (
-      <div className='flex gap-1'>
+      <div className='flex justify-center gap-1'>
         {Object.values(hourData).map((user, index) => (
-          <div key={index} className={`w-2 h-2 rounded-sm color-${user.color}`}></div>
+          <div key={index} className={`user-box color-${user.color}`}></div>
         ))}
       </div>
     )
@@ -81,12 +82,12 @@ export default function WeeklyView({ branch, setShowWeekly }){
     return (
       <thead>
         <tr>
-          <th className='border border-gray-300 bg-gray-200 text-xs p-1'>
+          <th className='cell header'>
             <button onClick={() => setShowWeekly(false)}>✕</button>
           </th>
           {dates.map((day, index) => (
               <th
-                className='border border-gray-300 bg-gray-200 text-xs p-1'
+                className='cell header'
                 key={index}
               >
                 {`${String(day.getDate()).padStart(2, '0')}.${String(day.getMonth() + 1).padStart(2, '0')}`} {day.toLocaleDateString('ru-RU', { weekday: 'short' })}
@@ -105,14 +106,14 @@ export default function WeeklyView({ branch, setShowWeekly }){
       <tbody>
         {timeSlots.map((timeSlot, rowIndex) => (
           <tr key={rowIndex}>
-            <td className='border border-gray-300 bg-gray-200 text-xs p-1 text-center'>
+            <td className='cell header'>
               {timeSlot.split('-')[0]}
             </td>
   
             {rotaData.map((dayData, colIndex) => (
               <td
                 key={colIndex}
-                className={`border border-gray-300 p-1 ${Object.keys(dayData[timeSlot]).length > 0 ? 'bg-white' : 'bg-red-100'}`}
+                className={`cell ${Object.keys(dayData[timeSlot]).length > 0 ? 'full' : 'empty'}`}
                 onClick={() => setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot})}
               >
                   {dayData[timeSlot] ? renderUserDivs(dayData[timeSlot]) : null}
@@ -167,14 +168,14 @@ function CellPopUp({ selectedCellData, closePopup }) {
     <AnimatePresence>
       {selectedCellData && (
         <motion.div 
-          className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg p-6 max-h-[70%] overflow-y-auto"
+          className="pop-up"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Дежурные</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
             <button 
               className="text-red-500 text-lg font-bold"
               onClick={closePopup}
@@ -188,7 +189,7 @@ function CellPopUp({ selectedCellData, closePopup }) {
           <div>
             {Object.values(selectedCellData.duties).length > 0 ? (
                 Object.values(selectedCellData.duties).map((user, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.username}</span>
                   </div>
                 ))
