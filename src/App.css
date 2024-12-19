@@ -70,9 +70,6 @@
   dark:text-gray-400
 }
 
-/* CALENDAR */
-
-
 
 /* BRANCHES */
 .branches-container { @apply
@@ -174,23 +171,48 @@
 }
 
 /* Color Variants */
-.light-blue { @apply
+.username-box.color-0 { @apply
   bg-[#e0f3ff] dark:bg-[#1b2f3a]
   text-[#007acc] dark:text-[#4aa3df]
   border-[#007acc] dark:border-[#4aa3df]
 }
 
-.dark-green { @apply
+.username-box.color-1 { @apply
   bg-[#e6f7e5] dark:bg-[#1f4030]
   text-[#228b22] dark:text-[#32a869]
   border-[#228b22] dark:border-[#32a869]
 }
 
-.light-red { @apply
+.username-box.color-2 { @apply
   bg-[#fdecea] dark:bg-[#3a1b1b]
   text-[#d9534f] dark:text-[#e57373]
   border-[#d9534f] dark:border-[#e57373]
 }
+
+.username-box.color-3 { @apply 
+  bg-white dark:bg-[#1c1c1c] 
+  text-black dark:text-[#d1d1d1] 
+  border-black dark:border-[#d1d1d1]; 
+}
+
+.username-box.color-4 { @apply 
+  bg-[#f3e8ff] dark:bg-[#2d1b3a] 
+  text-[#8a2be2] dark:text-[#c5a6d9] 
+  border-[#8a2be2] dark:border-[#a879c7]; 
+}
+
+.username-box.color-5 { @apply 
+  bg-[#fff4e6] dark:bg-[#402c1f] 
+  text-[#b16100] dark:text-[#f4a261] 
+  border-[#ff8c00] dark:border-[#f4a261]; 
+}
+
+.username-box.color-6 { @apply 
+  bg-[#fffde6] dark:bg-[#403f1f] 
+  text-[#746204] dark:text-[#eac54f] 
+  border-[#ffd700] dark:border-[#eac54f]; 
+}
+
 
 .popup { @apply
   max-w-[600px]

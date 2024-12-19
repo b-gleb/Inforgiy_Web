@@ -2,27 +2,31 @@ import React, { useEffect, useState } from 'react';
 import Lottie from "react-lottie";
 import shrugAnimationData from "./animations/shrug.json";
 import axios from 'axios';
-import { User, Plus, Settings, Columns3, Trash2 } from 'lucide-react';
+import { User, Plus, Settings, CalendarDays, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 import './tailwind.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import WeeklyView from './WeeklyView'
+import catchResponseError from './responseError';
 
+const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 let today = new Date().toISOString().split("T")[0];
 
-function catchResponseError(error){
-  console.error(error.code, error.status,  error.response.data);
-  toast.error(`ERROR ${error.status}: ${error.response.data}`);
-  window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-}
-
-
 function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
   const [showSearch, setShowSearch] = useState(false);
-  let hourContainerClass = "hour-container";
 
+  useEffect(() => {
+    if (showSearch) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [showSearch]);
+
+  let hourContainerClass = "hour-container";
   if (Object.keys(usersDict).length === 0 && usersDict.constructor === Object) {
     hourContainerClass = "hour-container empty"
   };
@@ -33,16 +37,11 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
       <span className="hour-label">{timeRange}</span>
       <div className="usernames-container">
         {Object.entries(usersDict).map(([user_id, userObj], index) => {
-          // Determine the appropriate class based on value
-          const boxClass =
-            userObj.level === null ? "light-blue" :
-            userObj.level === 0 ? "dark-green" : "light-red";
-
           return (
             <AnimatePresence key={index}>
               <motion.div
                 key={index}
-                className={`username-box ${boxClass}`}
+                className={`username-box color-${userObj.color}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
@@ -191,7 +190,7 @@ function UserSearchPopUp({
           {mode === 'user_management' && (
             <button
               className='button-primary'
-              onClick={() => setEditingUser({id: null, username: "@", level: "null"})}
+              onClick={() => setEditingUser({id: null, username: "@", color: 0})}
             >
               + Добавить пользователя
             </button>
@@ -209,7 +208,7 @@ function UserSearchPopUp({
                       handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
                       onClose();
                     } else if (mode === 'user_management'){
-                      setEditingUser({id: user_id, username: Object.keys(userObj)[0], level: String(Object.values(userObj)[0])});
+                      setEditingUser({id: user_id, username: Object.keys(userObj)[0], color: String(Object.values(userObj)[0])});
                     }
                   }}
                   className="search_results_button"
@@ -237,7 +236,7 @@ function UserSearchPopUp({
 
 
 function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
-  const userLevels = {"null": 'Обычный', "0": "Новичок", "1": "Эксперт"};
+  const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный", 3: "Чёрный", 4: "Фиолетовый", 5: "Оранжевый", 6: "Жёлтый"};
 
   const handleChange = (e) => {
     const {name, value} = e.target;
@@ -267,7 +266,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
       branch: branch,
       modifyUserId: editingUser.id,
       modifyUsername: editingUser.username,
-      level: editingUser.level === 'null' ? null : editingUser.level, // Server expects level to be of type null not string "null"
+      color: editingUser.color,
       initDataUnsafe: initDataUnsafe
     };
 
@@ -306,16 +305,16 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
         />
       </div>
       <div>
-        <label htmlFor="level" className="form-label">Уровень</label>
+        <label htmlFor="color" className="form-label">Цвет</label>
         <select
-          id="level"
-          name="level"
-          value={editingUser.level}
+          id="color"
+          name="color"
+          value={editingUser.color}
           onChange={handleChange}
           className="input-field"
         >
-          {Object.entries(userLevels).map(([level_value, level_display]) => (
-            <option key={level_value} value={level_value}>{level_display}</option>
+          {Object.entries(userColors).map(([color_value, color_display]) => (
+            <option key={color_value} value={color_value}>{color_display}</option>
           ))}
         </select>
       </div>
@@ -353,8 +352,18 @@ function App() {
   const [userBranches, setUserBranches] = useState({});
   const [branch, setBranch] = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
-  const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
+  const [showWeekly, setShowWeekly] = useState(false);
 
+
+  useEffect(() => {
+    if (showUserManagement || showWeekly) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [showUserManagement, showWeekly]);
+
+  
   useEffect(() => {
     if (! window.Telegram.WebApp){
       console.warn('Telegram WebApp is not avaliable')
@@ -488,8 +497,11 @@ function App() {
             />
           </div>
 
-          <button className='button-icon'>
-            <Columns3 size={25} className="icon-text"/>
+          <button
+            className='button-icon'
+            onClick={() => setShowWeekly(true)}
+          >
+            <CalendarDays size={25} className="icon-text"/>
           </button>
 
           {rotaAdmin.includes(branch) && (
@@ -530,6 +542,10 @@ function App() {
           />
         )}
 
+        {showWeekly && <WeeklyView
+          branch={branch}
+          setShowWeekly={setShowWeekly}
+        />}
 
         <ToastContainer
           position='bottom-center'
