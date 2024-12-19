@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
+import catchResponseError from './responseError';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
-
-//TODO: Move catchResponseError to separate file
-function catchResponseError(error){
-    console.error(error.code, error.status,  error.response.data);
-    toast.error(`ERROR ${error.status}: ${error.response.data}`);
-    window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-}
 
 export default function WeeklyView({ branch, setShowWeekly }){
   const [isLoading, setIsLoading] = useState(false);

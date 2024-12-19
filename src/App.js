@@ -9,18 +9,11 @@ import './tailwind.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WeeklyView from './WeeklyView'
+import catchResponseError from './responseError';
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 let today = new Date().toISOString().split("T")[0];
-
-// TODO: Move catch response error to separate file
-function catchResponseError(error){
-  console.error(error.code, error.status,  error.response.data);
-  toast.error(`ERROR ${error.status}: ${error.response.data}`);
-  window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-}
-
 
 function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
   const [showSearch, setShowSearch] = useState(false);
