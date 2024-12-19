@@ -120,7 +120,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
               <td
                 key={colIndex}
                 className={`border border-gray-300 p-1 ${Object.keys(dayData[timeSlot]).length > 0 ? 'bg-white' : 'bg-red-100'}`}
-                onClick={() => setSelectedCellData(dayData[timeSlot] || {})}
+                onClick={() => setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot})}
               >
                   {dayData[timeSlot] ? renderUserDivs(dayData[timeSlot]) : null}
               </td>
@@ -133,9 +133,9 @@ export default function WeeklyView({ branch, setShowWeekly }){
   };
 
 
-const closePopup = () => {
-  setSelectedCellData(null);
-};
+  const closePopup = () => {
+    setSelectedCellData(null);
+  };
   
   return (
     <div className='w-screen fixed inset-0'>
@@ -146,15 +146,17 @@ const closePopup = () => {
           </table>
         )}
 
-      <DarkOverlay selectedCellData={selectedCellData} closePopup={closePopup}/>
       <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup}/>
 
     </div>
   );
 };
 
-function DarkOverlay({ selectedCellData, closePopup }) {
-  return (
+
+function CellPopUp({ selectedCellData, closePopup }) {
+  return(
+    <>
+    {/* Dark overlay */}
     <AnimatePresence>
       {selectedCellData && (
         <motion.div 
@@ -166,11 +168,9 @@ function DarkOverlay({ selectedCellData, closePopup }) {
         />
       )}
     </AnimatePresence>
-  )
-}
 
-function CellPopUp({ selectedCellData, closePopup }) {
-  return(
+    
+    {/* Pop up */}
     <AnimatePresence>
       {selectedCellData && (
         <motion.div 
@@ -181,7 +181,7 @@ function CellPopUp({ selectedCellData, closePopup }) {
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Users on Duty</h2>
+            <h2 className="text-xl font-bold">Дежурные</h2>
             <button 
               className="text-red-500 text-lg font-bold"
               onClick={closePopup}
@@ -190,20 +190,23 @@ function CellPopUp({ selectedCellData, closePopup }) {
             </button>
           </div>
 
+          <h3 className="text-sm font-medium mb-2 text-gray-500">{selectedCellData.date.toLocaleDateString('ru-RU', { weekday: 'long' })}, {selectedCellData.time}</h3>
+
           <div>
-            {Object.values(selectedCellData).length > 0 ? (
-                Object.values(selectedCellData).map((user, index) => (
+            {Object.values(selectedCellData.duties).length > 0 ? (
+                Object.values(selectedCellData.duties).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 rounded-lg">
                     <span className="font-medium">{user.username}</span>
                   </div>
                 ))
             ) : (
-                <p className="text-center text-gray-500">No users on duty for this time slot.</p>
+                <p className="text-center text-gray-500">В это время нет дежурных</p>
             )}
 
           </div>
         </motion.div>
       )}
       </AnimatePresence>
+      </>
   )
 }
