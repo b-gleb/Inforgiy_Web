@@ -363,12 +363,12 @@ function App() {
 
 
   useEffect(() => {
-    if (showUserManagement) {
+    if (showUserManagement || showWeekly) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement]);
+  }, [showUserManagement, showWeekly]);
 
   
   useEffect(() => {
