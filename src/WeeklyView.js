@@ -120,7 +120,10 @@ export default function WeeklyView({ branch, setShowWeekly }){
               <td
                 key={colIndex}
                 className={`cell ${Object.keys(dayData[timeSlot]).length > 0 ? 'full' : 'empty'}`}
-                onClick={() => setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot})}
+                onClick={() => {
+                  setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot});
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                }}
               >
                   {dayData[timeSlot] ? renderUserDivs(dayData[timeSlot]) : null}
               </td>

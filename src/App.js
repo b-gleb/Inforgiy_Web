@@ -52,7 +52,10 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
               {rotaAdmin && (
                 <button
                   className="ml-2"
-                    onClick={() => handleUpdateRota('remove', branch, date, timeRange, user_id, initDataUnsafe)}
+                    onClick={() => {
+                      handleUpdateRota('remove', branch, date, timeRange, user_id, initDataUnsafe);
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    }}
                 >
                   ✕
                 </button>
@@ -67,7 +70,10 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
         {rotaAdmin && (
           <button
             className="p-1"
-            onClick={() => setShowSearch(true)}
+            onClick={() => {
+              setShowSearch(true);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }}
           >
             <User size={15} className="icon-text" />
           </button>
@@ -76,7 +82,10 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
         {date >= today && !(initDataUnsafe.user.id in usersDict) && Object.keys(usersDict).length < maxDuties && (
           <button
             className='p-1'
-            onClick={() => handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe)}
+            onClick={() => {
+              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }}
           >
               <Plus size={15} className="icon-text"/>
           </button>
@@ -201,7 +210,10 @@ function UserSearchPopUp({
           {mode === 'user_management' && (
             <button
               className='button-primary'
-              onClick={() => setEditingUser({id: null, username: "@", color: 0})}
+              onClick={() => {
+                setEditingUser({id: null, username: "@", color: 0});
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              }}
             >
               + Добавить пользователя
             </button>
@@ -217,9 +229,11 @@ function UserSearchPopUp({
                   onClick={() => {
                     if (mode === 'rota'){
                       handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
                       setEditingUser({id: user_id, username: Object.keys(userObj)[0], color: String(Object.values(userObj)[0])});
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }
                   }}
                   className="search_results_button"
@@ -252,6 +266,10 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
   const handleChange = (e) => {
     const {name, value} = e.target;
 
+    if (name === 'color'){
+      window.Telegram.WebApp.HapticFeedback.selectionChanged()
+    }
+
     setEditingUser((prevUser) => ({
       ...prevUser,
       [name]: value
@@ -260,11 +278,16 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
   const handleRemoveUser = async (branch, user_id, initDataUnsafe) => {
     try {
-      await axios.post(`${apiUrl}/api/removeUser`, {
+      const response = await axios.post(`${apiUrl}/api/removeUser`, {
         branch: branch,
         modifyUserId: user_id,
         initDataUnsafe: initDataUnsafe
       })
+
+      if (response.status === 200){
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      };
+
     } catch (error) {
       catchResponseError(error);
     }
@@ -283,7 +306,11 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
     try {
       const response = await axios.post(`${apiUrl}/api/updateUser`, data);
-      if (response.status === 200){setEditingUser(null)}
+
+      if (response.status === 200){
+        setEditingUser(null);
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      };
     } catch (error) {
       // Handle error 404 separately
       if (error.response && error.response.status === 404){
@@ -344,7 +371,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
             <Trash2 color='red' size={25}/>
           </button>
         )}
-        <button type="button" onClick={() => {setEditingUser(null)}} className="button-secondary">Отменить</button>
+        <button type="button" onClick={() => {setEditingUser(null); window.Telegram.WebApp.HapticFeedback.impactOccurred('light');}} className="button-secondary">Отменить</button>
         <button type="submit" className="button-primary">Сохранить</button>
       </div>
     </form>
@@ -478,15 +505,12 @@ function App() {
               {Object.entries(userBranches).map(([dept_key, dept_value]) => (
                 <button
                   key={dept_key}
-                  onClick={() => setBranch(dept_key)}
-                  className={`branch-button ${
-                    branch === dept_key
-                      ? 'selected'
-                      : ''
-                  }`}
-                  style={{
-                    WebkitTapHighlightColor: 'transparent',
+                  onClick={() => {
+                    setBranch(dept_key);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                   }}
+                  className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
+                  style={{WebkitTapHighlightColor: 'transparent'}}
                 >
                   {departments[dept_key]}
                 </button>
@@ -503,14 +527,17 @@ function App() {
               value={date}
               min={"2024-01-01"}
               max={"2025-12-31"}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged()}}
               className='input-field '
             />
           </div>
 
           <button
             className='button-icon'
-            onClick={() => setShowWeekly(true)}
+            onClick={() => {
+              setShowWeekly(true);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }}
           >
             <CalendarDays size={25} className="icon-text"/>
           </button>
@@ -518,7 +545,10 @@ function App() {
           {rotaAdmin.includes(branch) && (
             <button
               className='button-icon'
-              onClick={() => setShowUserManagement(true)}
+              onClick={() => {
+                setShowUserManagement(true);
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              }}
             >
               <Settings size={25} className="icon-text"/>
             </button>
