@@ -52,7 +52,10 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
               {rotaAdmin && (
                 <button
                   className="ml-2"
-                    onClick={() => handleUpdateRota('remove', branch, date, timeRange, user_id, initDataUnsafe)}
+                    onClick={() => {
+                      handleUpdateRota('remove', branch, date, timeRange, user_id, initDataUnsafe);
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    }}
                 >
                   ✕
                 </button>
@@ -67,7 +70,10 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
         {rotaAdmin && (
           <button
             className="p-1"
-            onClick={() => setShowSearch(true)}
+            onClick={() => {
+              setShowSearch(true);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }}
           >
             <User size={15} className="icon-text" />
           </button>
@@ -76,7 +82,10 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
         {date >= today && !(initDataUnsafe.user.id in usersDict) && Object.keys(usersDict).length < maxDuties && (
           <button
             className='p-1'
-            onClick={() => handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe)}
+            onClick={() => {
+              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }}
           >
               <Plus size={15} className="icon-text"/>
           </button>
@@ -209,9 +218,11 @@ function UserSearchPopUp({
                   onClick={() => {
                     if (mode === 'rota'){
                       handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
                       setEditingUser({id: user_id, username: Object.keys(userObj)[0], color: String(Object.values(userObj)[0])});
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }
                   }}
                   className="search_results_button"
@@ -349,7 +360,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
             <Trash2 color='red' size={25}/>
           </button>
         )}
-        <button type="button" onClick={() => {setEditingUser(null)}} className="button-secondary">Отменить</button>
+        <button type="button" onClick={() => {setEditingUser(null); window.Telegram.WebApp.HapticFeedback.impactOccurred('light');}} className="button-secondary">Отменить</button>
         <button type="submit" className="button-primary">Сохранить</button>
       </div>
     </form>
