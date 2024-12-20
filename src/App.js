@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import Lottie from "react-lottie";
-import shrugAnimationData from "./animations/shrug.json";
 import axios from 'axios';
-import { User, Plus, Settings, CalendarDays, Trash2 } from 'lucide-react';
+import Lottie from "react-lottie";
 import { motion, AnimatePresence } from 'framer-motion';
-import './App.css';
+import { User, Plus, Settings, CalendarDays, Trash2 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
+// Custom components
 import WeeklyView from './WeeklyView'
 import catchResponseError from './responseError';
+
+// CSS
+import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Animations
+import shrugAnimationData from "./animations/shrug.json";
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
