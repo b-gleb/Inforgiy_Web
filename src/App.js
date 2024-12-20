@@ -190,7 +190,10 @@ function UserSearchPopUp({
           {mode === 'user_management' && (
             <button
               className='button-primary'
-              onClick={() => setEditingUser({id: null, username: "@", color: 0})}
+              onClick={() => {
+                setEditingUser({id: null, username: "@", color: 0});
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              }}
             >
               + Добавить пользователя
             </button>
@@ -241,6 +244,10 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
   const handleChange = (e) => {
     const {name, value} = e.target;
 
+    if (name === 'color'){
+      window.Telegram.WebApp.HapticFeedback.selectionChanged()
+    }
+
     setEditingUser((prevUser) => ({
       ...prevUser,
       [name]: value
@@ -249,11 +256,16 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
   const handleRemoveUser = async (branch, user_id, initDataUnsafe) => {
     try {
-      await axios.post(`${apiUrl}/api/removeUser`, {
+      const response = await axios.post(`${apiUrl}/api/removeUser`, {
         branch: branch,
         modifyUserId: user_id,
         initDataUnsafe: initDataUnsafe
       })
+
+      if (response.status === 200){
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      };
+
     } catch (error) {
       catchResponseError(error);
     }
@@ -272,7 +284,11 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
     try {
       const response = await axios.post(`${apiUrl}/api/updateUser`, data);
-      if (response.status === 200){setEditingUser(null)}
+
+      if (response.status === 200){
+        setEditingUser(null);
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      };
     } catch (error) {
       // Handle error 404 separately
       if (error.response && error.response.status === 404){
@@ -467,15 +483,12 @@ function App() {
               {Object.entries(userBranches).map(([dept_key, dept_value]) => (
                 <button
                   key={dept_key}
-                  onClick={() => setBranch(dept_key)}
-                  className={`branch-button ${
-                    branch === dept_key
-                      ? 'selected'
-                      : ''
-                  }`}
-                  style={{
-                    WebkitTapHighlightColor: 'transparent',
+                  onClick={() => {
+                    setBranch(dept_key);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                   }}
+                  className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
+                  style={{WebkitTapHighlightColor: 'transparent'}}
                 >
                   {departments[dept_key]}
                 </button>
@@ -492,14 +505,17 @@ function App() {
               value={date}
               min={"2024-01-01"}
               max={"2025-12-31"}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged()}}
               className='input-field '
             />
           </div>
 
           <button
             className='button-icon'
-            onClick={() => setShowWeekly(true)}
+            onClick={() => {
+              setShowWeekly(true);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }}
           >
             <CalendarDays size={25} className="icon-text"/>
           </button>
@@ -507,7 +523,10 @@ function App() {
           {rotaAdmin.includes(branch) && (
             <button
               className='button-icon'
-              onClick={() => setShowUserManagement(true)}
+              onClick={() => {
+                setShowUserManagement(true);
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              }}
             >
               <Settings size={25} className="icon-text"/>
             </button>
