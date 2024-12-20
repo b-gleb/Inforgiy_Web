@@ -5,7 +5,6 @@ import axios from 'axios';
 import { User, Plus, Settings, CalendarDays, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
-import './tailwind.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WeeklyView from './WeeklyView'
