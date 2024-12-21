@@ -504,64 +504,63 @@ function App() {
 
   return (
     <div className="app">
+      <h1 className='text-3xl font-bold dark:text-slate-100'>График</h1>
 
-        <h1 className='text-3xl font-bold dark:text-slate-100'>График</h1>
-
-        {Object.keys(userBranches).length > 0 && (
-          <div className="branches-container">
-            <div className="branches-flexbox">
-              {Object.entries(userBranches).map(([dept_key, dept_value]) => (
-                <button
-                  key={dept_key}
-                  onClick={() => {
-                    setBranch(dept_key);
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                  }}
-                  className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
-                  style={{WebkitTapHighlightColor: 'transparent'}}
-                >
-                  {departments[dept_key]}
-                </button>
-              ))}
-            </div>
+      {Object.keys(userBranches).length > 0 && (
+        <div className="branches-container">
+          <div className="branches-flexbox">
+            {Object.entries(userBranches).map(([dept_key, dept_value]) => (
+              <button
+                key={dept_key}
+                onClick={() => {
+                  setBranch(dept_key);
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }}
+                className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
+                style={{WebkitTapHighlightColor: 'transparent'}}
+              >
+                {departments[dept_key]}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
 
-        <div className='flex justify-between items-center space-x-4'>
-          <div className="button-icon p-2 flex-1">
-            <input
-              type="date"
-              value={date}
-              min={"2024-01-01"}
-              max={"2025-12-31"}
-              onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged()}}
-              className='input-field '
-            />
-          </div>
+      <div className='flex justify-between items-center space-x-4'>
+        <div className="button-icon p-2 flex-1">
+          <input
+            type="date"
+            value={date}
+            min={"2024-01-01"}
+            max={"2025-12-31"}
+            onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged()}}
+            className='input-field '
+          />
+        </div>
 
+        <button
+          className='button-icon'
+          onClick={() => {
+            setShowWeekly(true);
+            window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+          }}
+        >
+          <CalendarDays size={25} className="icon-text"/>
+        </button>
+
+        {rotaAdmin.includes(branch) && (
           <button
             className='button-icon'
             onClick={() => {
-              setShowWeekly(true);
+              setShowUserManagement(true);
               window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
             }}
           >
-            <CalendarDays size={25} className="icon-text"/>
+            <Settings size={25} className="icon-text"/>
           </button>
-
-          {rotaAdmin.includes(branch) && (
-            <button
-              className='button-icon'
-              onClick={() => {
-                setShowUserManagement(true);
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-              }}
-            >
-              <Settings size={25} className="icon-text"/>
-            </button>
-          )}
-        </div>
+        )}
+      </div>
 
       {rotaData !== null
       ? <div className='hours-grid'>
@@ -596,33 +595,33 @@ function App() {
         </div>
       )}
 
-        {showUserManagement && (
-          <UserSearchPopUp
-            mode='user_management'
-            branch={branch}
-            initDataUnsafe={initDataUnsafe}
-            onClose={() => setShowUserManagement(false)}
-          />
-        )}
-
-        {showWeekly && <WeeklyView
+      {showUserManagement && (
+        <UserSearchPopUp
+          mode='user_management'
           branch={branch}
-          setShowWeekly={setShowWeekly}
-        />}
-
-        <ToastContainer
-          position='bottom-center'
-          newestOnTop
-          closeOnClick
-          pauseOnFocusLoss={false}
-          draggable={false}
-          theme={window.Telegram.WebApp.colorScheme}
-          limit={4}
+          initDataUnsafe={initDataUnsafe}
+          onClose={() => setShowUserManagement(false)}
         />
+      )}
 
-        <pre className='overflow-x-scroll'>{JSON.stringify(initDataUnsafe, null, 2)}</pre>
+      {showWeekly && <WeeklyView
+        branch={branch}
+        setShowWeekly={setShowWeekly}
+      />}
 
-    </div>
+      <ToastContainer
+        position='bottom-center'
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss={false}
+        draggable={false}
+        theme={window.Telegram.WebApp.colorScheme}
+        limit={4}
+      />
+
+      <pre className='overflow-x-scroll'>{JSON.stringify(initDataUnsafe, null, 2)}</pre>
+
+  </div>
   );
 }
 
