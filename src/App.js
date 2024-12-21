@@ -15,6 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
 import shrugAnimationData from "./animations/shrug.json";
+import deniedAnimationData from "./animations/denied.json"
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
@@ -114,21 +115,18 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
 }
 
 
-function ShrugAnimation() {
+function Animation({ animationData }) {
     const options = {
       loop: true, // Set to false if you don't want the animation to loop
       autoplay: true, // Autoplay the animation
-      animationData: shrugAnimationData, // The JSON data of the sticker
+      animationData: animationData, // The JSON data of the sticker
       rendererSettings: {
         preserveAspectRatio: "xMidYMid slice", // You can adjust this based on your layout
       },
     };
   
     return (
-      <div className='size-7/12  mx-auto'>
-        <Lottie options={options} />
-        <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
-      </div>
+      <Lottie options={options} />
     );
   };
 
@@ -396,15 +394,16 @@ function App() {
   const [branch, setBranch] = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showWeekly, setShowWeekly] = useState(false);
+  const [showForbidden, setShowForbidden] = useState(false)
 
 
   useEffect(() => {
-    if (showUserManagement || showWeekly) {
+    if (showUserManagement || showWeekly || showForbidden) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement, showWeekly]);
+  }, [showUserManagement, showWeekly, showForbidden]);
 
   
   useEffect(() => {
@@ -439,7 +438,11 @@ function App() {
 
       }
       catch (error) {
-        catchResponseError(error);
+        if (error.response.status === 404 || error.response.status === 403){
+          setShowForbidden(true);
+        } else {
+          catchResponseError(error);
+        }
       }
     };
 
@@ -560,24 +563,38 @@ function App() {
           )}
         </div>
 
-        {rotaData !== null
-        ? <div className='hours-grid'>
-          {Object.entries(rotaData).map(([timeRange, usersDict], index) => (
-            <RotaHour
-              key={index}
-              branch={branch}
-              date={date}
-              timeRange={timeRange}
-              usersDict={usersDict}
-              rotaAdmin={rotaAdmin.includes(branch)}
-              maxDuties={userBranches[branch].maxDuties}
-              initDataUnsafe={initDataUnsafe}
-              handleUpdateRota={handleUpdateRota}
-            />
-          ))}
+      {rotaData !== null
+      ? <div className='hours-grid'>
+        {Object.entries(rotaData).map(([timeRange, usersDict], index) => (
+          <RotaHour
+            key={index}
+            branch={branch}
+            date={date}
+            timeRange={timeRange}
+            usersDict={usersDict}
+            rotaAdmin={rotaAdmin.includes(branch)}
+            maxDuties={userBranches[branch].maxDuties}
+            initDataUnsafe={initDataUnsafe}
+            handleUpdateRota={handleUpdateRota}
+          />
+        ))}
+      </div>
+      : (
+        <div className='size-7/12  mx-auto'>
+          <Animation animationData={shrugAnimationData} />
+          <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
         </div>
-        : <ShrugAnimation/>
-        }
+      )
+      }
+
+      {showForbidden && (
+        <div className='popup flex justify-center items-center'>
+          <div className='w-[50%]'>
+            <Animation animationData={deniedAnimationData} />
+            <p className='text-center dark:text-white'>Недостаточно прав!</p>
+          </div>
+        </div>
+      )}
 
         {showUserManagement && (
           <UserSearchPopUp
