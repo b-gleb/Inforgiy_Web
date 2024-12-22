@@ -21,9 +21,8 @@ export default function WeeklyView({ branch, setShowWeekly }){
       window.Telegram.WebApp.BackButton.offClick();
       window.Telegram.WebApp.BackButton.hide();
     };
-  
   }, [setShowWeekly]);
-  
+
 
   const getDays = () => {
     const days = [];
@@ -45,25 +44,25 @@ export default function WeeklyView({ branch, setShowWeekly }){
   useEffect(() => {
     const fetchRotaData = async () => {
       setIsLoading(true);
-      const startTime = Date.now(); 
+      const startTime = Date.now();
 
       const newRotaData = [];
       const days = getDays();
       setDates(days);
 
       for (const day of days) {
-          try {
-              const response = await axios.get(`${apiUrl}/api/rota`, {
-                params: {
-                  branch: branch,
-                  date: day.toISOString().split("T")[0]
-                }
-              });
-              newRotaData.push(response.data);
-          } catch (error) {
-              catchResponseError(error);
-              newRotaData.push({}); // Push empty data for that day to avoid breaking the table
-          }
+        try {
+          const response = await axios.get(`${apiUrl}/api/rota`, {
+            params: {
+              branch: branch,
+              date: day.toISOString().split("T")[0]
+            }
+          });
+          newRotaData.push(response.data);
+        } catch (error) {
+          catchResponseError(error);
+          newRotaData.push({}); // Push empty data for that day to avoid breaking the table
+        }
       }
 
       const elapsedTime = Date.now() - startTime;
@@ -85,7 +84,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
           <div key={index} className={`user-box color-${user.color}`}></div>
         ))}
       </div>
-    )
+    );
   };
   
   
@@ -97,12 +96,9 @@ export default function WeeklyView({ branch, setShowWeekly }){
             <button onClick={() => setShowWeekly(false)}>✕</button>
           </th>
           {dates.map((day, index) => (
-              <th
-                className='cell header'
-                key={index}
-              >
-                {`${String(day.getDate()).padStart(2, '0')}.${String(day.getMonth() + 1).padStart(2, '0')}`} {day.toLocaleDateString('ru-RU', { weekday: 'short' })}
-              </th>
+            <th className='cell header' key={index}>
+              {`${String(day.getDate()).padStart(2, '0')}.${String(day.getMonth() + 1).padStart(2, '0')}`} {day.toLocaleDateString('ru-RU', { weekday: 'short' })}
+            </th>
           ))}
         </tr>
       </thead>
@@ -112,7 +108,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
 
   const renderTableBody = () => {
     const timeSlots = rotaData.length > 0 ? Object.keys(rotaData[0]) : [];
-  
+
     return (
       <tbody>
         {timeSlots.map((timeSlot, rowIndex) => (
@@ -120,7 +116,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
             <td className='cell header'>
               {timeSlot.split('-')[0]}
             </td>
-  
+
             {rotaData.map((dayData, colIndex) => (
               <td
                 key={colIndex}
@@ -130,33 +126,31 @@ export default function WeeklyView({ branch, setShowWeekly }){
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                 }}
               >
-                  {dayData[timeSlot] ? renderUserDivs(dayData[timeSlot]) : null}
+                {dayData[timeSlot] ? renderUserDivs(dayData[timeSlot]) : null}
               </td>
             ))}
-  
           </tr>
         ))}
       </tbody>
     );
   };
 
-
   const closePopup = () => {
     setSelectedCellData(null);
   };
-  
+
   return (
     <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
-        {isLoading ? <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
-        : (
+      {isLoading ? (
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
+      ) : (
           <table className='w-full h-full table-fixed'>
-              {renderTableHeader()}
-              {renderTableBody()}
+            {renderTableHeader()}
+            {renderTableBody()}
           </table>
-        )}
+      )}
 
       <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup}/>
-
     </div>
   );
 };
