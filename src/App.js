@@ -390,7 +390,7 @@ function App() {
   const [rotaData, setRotaData] = useState({});
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [userBranches, setUserBranches] = useState({});
+  const [userBranches, setUserBranches] = useState(null);
   const [branch, setBranch] = useState(null);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showWeekly, setShowWeekly] = useState(false);
@@ -506,7 +506,7 @@ function App() {
     <div className="app">
       <h1 className='text-3xl font-bold dark:text-slate-100'>График</h1>
 
-      {Object.keys(userBranches).length > 0 && (
+      {userBranches && (
         <div className="branches-container">
           <div className="branches-flexbox">
             {Object.entries(userBranches).map(([dept_key, dept_value]) => (
@@ -528,16 +528,19 @@ function App() {
 
 
       <div className='flex justify-between items-center space-x-4'>
-        <div className="button-icon p-2 flex-1">
-          <input
-            type="date"
-            value={date}
-            min={"2024-01-01"}
-            max={"2025-12-31"}
-            onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged()}}
-            className='input-field '
-          />
-        </div>
+
+        {userBranches && (
+          <div className="button-icon p-2 flex-1">
+            <input
+              type="date"
+              value={date}
+              min={userBranches[branch].minDate}
+              max={userBranches[branch].maxDate}
+              onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged();}}
+              className='input-field '
+            />
+          </div>
+        )}
 
         <button
           className='button-icon'
