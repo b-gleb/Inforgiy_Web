@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import catchResponseError from './responseError';
@@ -11,17 +11,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
   const [dates, setDates] = useState([]);
   const [rotaData, setRotaData] = useState([]);
   const [selectedCellData, setSelectedCellData] = useState(null);
-
-  useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => {setShowWeekly(false)});
-    window.Telegram.WebApp.BackButton.show();
-
-    // Cleanup the event listener when the component unmounts
-    return () => {
-      window.Telegram.WebApp.BackButton.offClick();
-      window.Telegram.WebApp.BackButton.hide();
-    };
-  }, [setShowWeekly]);
+  const tableContainerRef = useRef(null);
 
 
   const getDays = () => {
@@ -39,6 +29,32 @@ export default function WeeklyView({ branch, setShowWeekly }){
 
     return days;
   };
+
+
+  // Telegram UI BackButton
+  useEffect(() => {
+    window.Telegram.WebApp.BackButton.onClick(() => {setShowWeekly(false)});
+    window.Telegram.WebApp.BackButton.show();
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      window.Telegram.WebApp.BackButton.offClick();
+      window.Telegram.WebApp.BackButton.hide();
+    };
+  }, [setShowWeekly]);
+
+
+  // Scroll table
+  useEffect(() => {
+    if (!isLoading && tableContainerRef.current) {
+      const today = new Date();
+      const container = tableContainerRef.current;
+
+      const columnWidth = (12 / 100) * window.innerWidth; // Calculate column width
+      const targetScrollPosition = columnWidth * ((today.getDay() + 6) % 7); // Calculate scroll based on days since last monday
+      container.scrollLeft = targetScrollPosition;
+    }
+  }, [isLoading]);
 
 
   useEffect(() => {
@@ -144,7 +160,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
       {isLoading ? (
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
-        <div className='w-full h-full overflow-x-auto'>
+        <div className='w-full h-full overflow-x-auto' ref={tableContainerRef}>
           <table className='w-full h-full table-fixed'>
             {renderTableHeader()}
             {renderTableBody()}
