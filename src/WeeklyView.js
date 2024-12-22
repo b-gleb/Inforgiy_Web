@@ -92,7 +92,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
     return (
       <thead>
         <tr>
-          <th className='cell header'>
+          <th className='cell header sticky left-0'>
             <button onClick={() => setShowWeekly(false)}>✕</button>
           </th>
           {dates.map((day, index) => (
@@ -113,7 +113,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
       <tbody>
         {timeSlots.map((timeSlot, rowIndex) => (
           <tr key={rowIndex}>
-            <td className='cell header'>
+            <td className='cell header sticky left-0'>
               {timeSlot.split('-')[0]}
             </td>
 
@@ -144,10 +144,12 @@ export default function WeeklyView({ branch, setShowWeekly }){
       {isLoading ? (
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
+        <div className='w-full h-full overflow-x-auto'>
           <table className='w-full h-full table-fixed'>
             {renderTableHeader()}
             {renderTableBody()}
           </table>
+        </div>
       )}
 
       <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup}/>
