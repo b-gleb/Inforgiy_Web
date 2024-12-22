@@ -1,4 +1,5 @@
 .cell { @apply 
+    w-[12vw]
     p-1
     border
     border-gray-300 dark:border-[#4f4f4f]
