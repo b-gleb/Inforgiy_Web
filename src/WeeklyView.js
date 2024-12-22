@@ -25,17 +25,22 @@ export default function WeeklyView({ branch, setShowWeekly }){
   }, [setShowWeekly]);
   
 
-  const getNext7Days = () => {
+  const getDays = () => {
     const days = [];
     const today = new Date();
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        days.push(date)
+    const dayOfWeek = today.getDay();
+    const lastMonday = new Date(today);
+    lastMonday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+
+    for (let i = 0; i < 14; i++) {
+      const date = new Date(lastMonday);
+      date.setDate(lastMonday.getDate() + i);
+      days.push(date);
     }
+
     return days;
   };
-  
+
 
   useEffect(() => {
     const fetchRotaData = async () => {
@@ -43,7 +48,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
       const startTime = Date.now(); 
 
       const newRotaData = [];
-      const days = getNext7Days();
+      const days = getDays();
       setDates(days);
 
       for (const day of days) {
