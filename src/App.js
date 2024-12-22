@@ -405,6 +405,18 @@ function App() {
     }
   }, [showUserManagement, showWeekly, showForbidden]);
 
+
+  const storeLastLogin = () => {
+    const currentDateTime = new Date().toISOString();
+    window.Telegram.WebApp.CloudStorage.setItem("lastLogin", currentDateTime, (err, success) => {
+      if (err) {
+        console.error("Error storing last login:", err);
+      } else if (success) {
+        console.log("Last login time successfully stored:", currentDateTime);
+      }
+    });
+  };
+
   
   useEffect(() => {
     if (! window.Telegram.WebApp){
@@ -419,6 +431,8 @@ function App() {
       setInitDataUnsafe(window.Telegram.WebApp.initDataUnsafe);
       window.Telegram.WebApp.disableVerticalSwipes();
       window.Telegram.WebApp.expand();
+
+      storeLastLogin();
     }
   }, []);
 
