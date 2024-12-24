@@ -20,6 +20,10 @@
     bg-red-100 dark:bg-[#404040]
 }
 
+.cell.empty.gp { @apply
+    bg-[#fbe4a2] dark:bg-[#404040]
+}
+
 .pop-up { @apply
     fixed
     bottom-0 left-0 right-0 

@@ -136,7 +136,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
             {rotaData.map((dayData, colIndex) => (
               <td
                 key={colIndex}
-                className={`cell ${Object.keys(dayData[timeSlot]).length > 0 ? 'full' : 'empty'}`}
+                className={`cell ${Object.keys(dayData[timeSlot]).length > 0 ? 'full' : 'empty'} ${branch}`}
                 onClick={() => {
                   setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot});
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('light');

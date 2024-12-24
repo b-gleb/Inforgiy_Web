@@ -139,8 +139,11 @@
 }
 
 .hour-container.empty { @apply
-  bg-red-300
-  dark:bg-[#8B2C2C]
+  bg-red-300 dark:bg-[#8B2C2C]
+}
+
+.hour-container.empty.gp { @apply
+  bg-[#fbe4a2] dark:bg-[#543e00]
 }
 
 .hour-label { @apply

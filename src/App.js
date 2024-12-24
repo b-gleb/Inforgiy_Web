@@ -34,7 +34,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
 
   let hourContainerClass = "hour-container";
   if (Object.keys(usersDict).length === 0 && usersDict.constructor === Object) {
-    hourContainerClass = "hour-container empty"
+    hourContainerClass = `hour-container empty ${branch}`
   };
 
 
