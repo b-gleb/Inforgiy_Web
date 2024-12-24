@@ -392,6 +392,7 @@ function App() {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [userBranches, setUserBranches] = useState(null);
   const [branch, setBranch] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showWeekly, setShowWeekly] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false)
@@ -435,6 +436,29 @@ function App() {
       storeLastLogin();
     }
   }, []);
+
+
+  useEffect(() => {
+    let showLoadingTimeout;
+    let minimumLoadingTimer;
+
+    if (userBranches === null) {
+      // Start a timeout to delay showing the loader
+      showLoadingTimeout = setTimeout(() => {setIsLoading(true)}, 170);
+    } else {
+      if (isLoading) {
+        clearTimeout(minimumLoadingTimer);
+        setTimeout(() => setIsLoading(false), 1000);
+      } else {
+        clearTimeout(showLoadingTimeout);
+      }
+    }
+
+    return () => {
+      clearTimeout(showLoadingTimeout);
+      clearTimeout(minimumLoadingTimer);
+    };
+  }, [userBranches, isLoading]);
 
 
   useEffect(() => {
@@ -520,64 +544,71 @@ function App() {
     <div className="app">
       <h1 className='text-3xl font-bold dark:text-slate-100'>График</h1>
 
-      {userBranches && (
-        <div className="branches-container">
-          <div className="branches-flexbox">
-            {Object.entries(userBranches).map(([dept_key, dept_value]) => (
-              <button
-                key={dept_key}
-                onClick={() => {
-                  setBranch(dept_key);
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                }}
-                className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
-                style={{WebkitTapHighlightColor: 'transparent'}}
-              >
-                {departments[dept_key]}
-              </button>
-            ))}
-          </div>
+
+      {isLoading && (
+        <div className='flex items-center justify-center w-full h-full fixed inset-0 z-20 bg-gray-100 dark:bg-neutral-900'>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
         </div>
       )}
 
-
-      <div className='flex justify-between items-center space-x-4'>
-
-        {userBranches && (
-          <div className="button-icon p-2 flex-1">
-            <input
-              type="date"
-              value={date}
-              min={userBranches[branch].minDate}
-              max={userBranches[branch].maxDate}
-              onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged();}}
-              className='input-field '
-            />
+      {!isLoading && userBranches && (
+        <>
+          <div className="branches-container">
+            <div className="branches-flexbox">
+              {Object.entries(userBranches).map(([dept_key, dept_value]) => (
+                <button
+                  key={dept_key}
+                  onClick={() => {
+                    setBranch(dept_key);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                  }}
+                  className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
+                  style={{WebkitTapHighlightColor: 'transparent'}}
+                >
+                  {departments[dept_key]}
+                </button>
+              ))}
+            </div>
           </div>
-        )}
 
-        <button
-          className='button-icon'
-          onClick={() => {
-            setShowWeekly(true);
-            window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-          }}
-        >
-          <CalendarDays size={25} className="icon-text"/>
-        </button>
+          <div className='flex justify-between items-center space-x-4'>
+            <div className="button-icon p-2 flex-1">
+              <input
+                type="date"
+                value={date}
+                min={userBranches[branch].minDate}
+                max={userBranches[branch].maxDate}
+                onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged();}}
+                className='input-field '
+              />
+            </div>
+              
 
-        {rotaAdmin.includes(branch) && (
-          <button
-            className='button-icon'
-            onClick={() => {
-              setShowUserManagement(true);
-              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-            }}
-          >
-            <Settings size={25} className="icon-text"/>
-          </button>
-        )}
-      </div>
+            <button
+              className='button-icon'
+              onClick={() => {
+                setShowWeekly(true);
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              }}
+            >
+              <CalendarDays size={25} className="icon-text"/>
+            </button>
+
+
+            {rotaAdmin.includes(branch) && (
+              <button
+                className='button-icon'
+                onClick={() => {
+                  setShowUserManagement(true);
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }}
+              >
+                <Settings size={25} className="icon-text"/>
+              </button>
+            )}
+          </div>
+        </>
+      )}
 
       {rotaData !== null
       ? <div className='hours-grid'>
