@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Lottie from "react-lottie";
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Plus, Settings, CalendarDays, Trash2 } from 'lucide-react';
+import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
@@ -538,7 +538,7 @@ function App() {
       catchResponseError(error);
     }
   };
-  
+
 
   return (
     <div className="app">
@@ -571,8 +571,8 @@ function App() {
             </div>
           </div>
 
-          <div className='flex justify-between items-center space-x-4'>
-            <div className="button-icon p-2 flex-1">
+          <div className='flex justify-between items-center space-x-2'>
+            <div className="button-icon !p-2 flex-1">
               <input
                 type="date"
                 value={date}
@@ -596,15 +596,24 @@ function App() {
 
 
             {rotaAdmin.includes(branch) && (
-              <button
-                className='button-icon'
-                onClick={() => {
-                  setShowUserManagement(true);
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                }}
-              >
-                <Settings size={25} className="icon-text"/>
-              </button>
+              <>
+                <button
+                  className='button-icon'
+                  onClick={() => {}}
+                >
+                  <ChartSpline size={25} className='icon-text'/>
+                </button>
+
+                <button
+                  className='button-icon'
+                  onClick={() => {
+                    setShowUserManagement(true);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                  }}
+                >
+                  <Settings size={25} className="icon-text"/>
+                </button>
+              </>
             )}
           </div>
         </>
