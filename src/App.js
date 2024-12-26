@@ -53,7 +53,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.2 }}
               >
-              <span>{userObj.username}</span>
+              <span>{userObj.nick}</span>
 
               {rotaAdmin && (
                 <button
@@ -184,7 +184,7 @@ function UserSearchPopUp({
   // Fuzzy search
   useEffect(() => {
     const results = allUsers.filter(([user_id, userObj]) =>
-      Object.keys(userObj)[0].toLowerCase().includes(searchQuery.toLowerCase())
+      userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredUsers(results);
   }, [searchQuery, allUsers]);
@@ -235,13 +235,13 @@ function UserSearchPopUp({
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
-                      setEditingUser({id: user_id, username: Object.keys(userObj)[0], color: String(Object.values(userObj)[0])});
+                      setEditingUser({id: user_id, username: userObj.username, nick: userObj.nick, color: userObj.color});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }
                   }}
                   className="search_results_button"
                 >
-                  {Object.keys(userObj)[0]}
+                  {userObj.nick}
                 </motion.button>
               ))}
           </div>
@@ -303,6 +303,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
       branch: branch,
       modifyUserId: editingUser.id,
       modifyUsername: editingUser.username,
+      nick: editingUser.nick,
       color: editingUser.color,
       initDataUnsafe: initDataUnsafe
     };
@@ -341,6 +342,19 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
           onChange={handleChange}
           required
           readOnly={editingUser.id !== null}
+          autoComplete='off'
+          className="input-field"
+        />
+      </div>
+      <div>
+        <label htmlFor="nick" className="form-label">Ник</label>
+        <input
+          type="text"
+          id="nick"
+          name="nick"
+          value={editingUser.nick}
+          onChange={handleChange}
+          required
           autoComplete='off'
           className="input-field"
         />

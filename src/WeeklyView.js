@@ -217,7 +217,7 @@ function CellPopUp({ selectedCellData, closePopup }) {
             {Object.values(selectedCellData.duties).length > 0 ? (
                 Object.values(selectedCellData.duties).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
-                    <span className="font-medium">{user.username}</span>
+                    <span className="font-medium">{user.nick}</span>
                   </div>
                 ))
             ) : (
