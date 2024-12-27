@@ -567,23 +567,25 @@ function App() {
 
       {!isLoading && userBranches && (
         <>
-          <div className="branches-container">
-            <div className="branches-flexbox">
-              {Object.entries(userBranches).map(([dept_key, dept_value]) => (
-                <button
-                  key={dept_key}
-                  onClick={() => {
-                    setBranch(dept_key);
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                  }}
-                  className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
-                  style={{WebkitTapHighlightColor: 'transparent'}}
-                >
-                  {departments[dept_key]}
-                </button>
-              ))}
+          {Object.keys(userBranches).length >= 1 && (
+            <div className="branches-container">
+              <div className="branches-flexbox">
+                {Object.entries(userBranches).map(([dept_key, dept_value]) => (
+                  <button
+                    key={dept_key}
+                    onClick={() => {
+                      setBranch(dept_key);
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                    }}
+                    className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
+                    style={{WebkitTapHighlightColor: 'transparent'}}
+                  >
+                    {departments[dept_key]}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className='flex justify-between items-center space-x-4'>
             <div className="button-icon p-2 flex-1">
