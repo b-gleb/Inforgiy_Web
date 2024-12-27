@@ -388,7 +388,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
             <Trash2 color='red' size={25}/>
           </button>
         )}
-        <button type="button" onClick={() => {setEditingUser(null); window.Telegram.WebApp.HapticFeedback.impactOccurred('light');}} className="button-secondary">Отменить</button>
+        <button type="button" onClick={() => {setEditingUser(null); window.Telegram.WebApp.HapticFeedback.impactOccurred('light');}} className="button-secondary w-full">Отменить</button>
         <button type="submit" className="button-primary">Сохранить</button>
       </div>
     </form>
@@ -556,7 +556,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1 className='text-3xl font-bold dark:text-slate-100'>График</h1>
+      <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
 
 
       {isLoading && (
