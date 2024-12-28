@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
 import WeeklyView from './WeeklyView'
+import Stats from './Stats';
 import catchResponseError from './responseError';
 
 // CSS
@@ -409,16 +410,17 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showWeekly, setShowWeekly] = useState(false);
-  const [showForbidden, setShowForbidden] = useState(false)
+  const [showStats, setShowStats] = useState(false);
+  const [showForbidden, setShowForbidden] = useState(false);
 
 
   useEffect(() => {
-    if (showUserManagement || showWeekly || showForbidden) {
+    if (showUserManagement || showWeekly || showForbidden || showStats) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement, showWeekly, showForbidden]);
+  }, [showUserManagement, showWeekly, showForbidden, showStats]);
 
 
   const storeLastLogin = () => {
@@ -615,7 +617,10 @@ function App() {
               <>
                 <button
                   className='button-icon'
-                  onClick={() => {}}
+                  onClick={() => {
+                    setShowStats(true);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                  }}
                 >
                   <ChartSpline size={25} className='icon-text'/>
                 </button>
@@ -680,6 +685,11 @@ function App() {
       {showWeekly && <WeeklyView
         branch={branch}
         setShowWeekly={setShowWeekly}
+      />}
+
+      {showStats && <Stats
+        branch={branch}
+        setShowStats={setShowStats}  
       />}
 
       <ToastContainer
