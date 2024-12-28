@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Lottie from "react-lottie";
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Plus, Settings, CalendarDays, Trash2 } from 'lucide-react';
+import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
 import WeeklyView from './WeeklyView'
+import Stats from './Stats';
 import catchResponseError from './responseError';
 
 // CSS
@@ -409,16 +410,17 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showWeekly, setShowWeekly] = useState(false);
-  const [showForbidden, setShowForbidden] = useState(false)
+  const [showStats, setShowStats] = useState(false);
+  const [showForbidden, setShowForbidden] = useState(false);
 
 
   useEffect(() => {
-    if (showUserManagement || showWeekly || showForbidden) {
+    if (showUserManagement || showWeekly || showForbidden || showStats) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement, showWeekly, showForbidden]);
+  }, [showUserManagement, showWeekly, showForbidden, showStats]);
 
 
   const storeLastLogin = () => {
@@ -552,7 +554,7 @@ function App() {
       catchResponseError(error);
     }
   };
-  
+
 
   return (
     <div className="app">
@@ -587,8 +589,8 @@ function App() {
             </div>
           )}
 
-          <div className='flex justify-between items-center space-x-4'>
-            <div className="button-icon p-2 flex-1">
+          <div className='flex justify-between items-center space-x-2'>
+            <div className="button-icon !p-2 flex-1">
               <input
                 type="date"
                 value={date}
@@ -612,15 +614,27 @@ function App() {
 
 
             {rotaAdmin.includes(branch) && (
-              <button
-                className='button-icon'
-                onClick={() => {
-                  setShowUserManagement(true);
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                }}
-              >
-                <Settings size={25} className="icon-text"/>
-              </button>
+              <>
+                <button
+                  className='button-icon'
+                  onClick={() => {
+                    setShowStats(true);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                  }}
+                >
+                  <ChartSpline size={25} className='icon-text'/>
+                </button>
+
+                <button
+                  className='button-icon'
+                  onClick={() => {
+                    setShowUserManagement(true);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                  }}
+                >
+                  <Settings size={25} className="icon-text"/>
+                </button>
+              </>
             )}
           </div>
         </>
@@ -671,6 +685,11 @@ function App() {
       {showWeekly && <WeeklyView
         branch={branch}
         setShowWeekly={setShowWeekly}
+      />}
+
+      {showStats && <Stats
+        branch={branch}
+        setShowStats={setShowStats}  
       />}
 
       <ToastContainer
