@@ -567,7 +567,7 @@ function App() {
 
       {!isLoading && userBranches && (
         <>
-          {Object.keys(userBranches).length >= 1 && (
+          {Object.keys(userBranches).length >= 2 && (
             <div className="branches-container">
               <div className="branches-flexbox">
                 {Object.entries(userBranches).map(([dept_key, dept_value]) => (
@@ -682,8 +682,6 @@ function App() {
         theme={window.Telegram.WebApp.colorScheme}
         limit={4}
       />
-
-      <pre className='overflow-x-scroll'>{JSON.stringify(initDataUnsafe, null, 2)}</pre>
 
   </div>
   );
