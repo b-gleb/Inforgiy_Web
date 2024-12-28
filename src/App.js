@@ -53,7 +53,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.2 }}
               >
-              <span>{userObj.username}</span>
+              <span>{userObj.nick}</span>
 
               {rotaAdmin && (
                 <button
@@ -184,7 +184,7 @@ function UserSearchPopUp({
   // Fuzzy search
   useEffect(() => {
     const results = allUsers.filter(([user_id, userObj]) =>
-      Object.keys(userObj)[0].toLowerCase().includes(searchQuery.toLowerCase())
+      userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredUsers(results);
   }, [searchQuery, allUsers]);
@@ -235,13 +235,13 @@ function UserSearchPopUp({
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
-                      setEditingUser({id: user_id, username: Object.keys(userObj)[0], color: String(Object.values(userObj)[0])});
+                      setEditingUser({id: user_id, username: userObj.username, nick: userObj.nick, color: userObj.color});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }
                   }}
                   className="search_results_button"
                 >
-                  {Object.keys(userObj)[0]}
+                  {userObj.nick}
                 </motion.button>
               ))}
           </div>
@@ -303,6 +303,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
       branch: branch,
       modifyUserId: editingUser.id,
       modifyUsername: editingUser.username,
+      nick: editingUser.nick,
       color: editingUser.color,
       initDataUnsafe: initDataUnsafe
     };
@@ -346,6 +347,19 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
         />
       </div>
       <div>
+        <label htmlFor="nick" className="form-label">Ник</label>
+        <input
+          type="text"
+          id="nick"
+          name="nick"
+          value={editingUser.nick}
+          onChange={handleChange}
+          required
+          autoComplete='off'
+          className="input-field"
+        />
+      </div>
+      <div>
         <label htmlFor="color" className="form-label">Цвет</label>
         <select
           id="color"
@@ -374,7 +388,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
             <Trash2 color='red' size={25}/>
           </button>
         )}
-        <button type="button" onClick={() => {setEditingUser(null); window.Telegram.WebApp.HapticFeedback.impactOccurred('light');}} className="button-secondary">Отменить</button>
+        <button type="button" onClick={() => {setEditingUser(null); window.Telegram.WebApp.HapticFeedback.impactOccurred('light');}} className="button-secondary w-full">Отменить</button>
         <button type="submit" className="button-primary">Сохранить</button>
       </div>
     </form>
@@ -542,7 +556,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1 className='text-3xl font-bold dark:text-slate-100'>График</h1>
+      <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
 
 
       {isLoading && (
@@ -553,23 +567,25 @@ function App() {
 
       {!isLoading && userBranches && (
         <>
-          <div className="branches-container">
-            <div className="branches-flexbox">
-              {Object.entries(userBranches).map(([dept_key, dept_value]) => (
-                <button
-                  key={dept_key}
-                  onClick={() => {
-                    setBranch(dept_key);
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                  }}
-                  className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
-                  style={{WebkitTapHighlightColor: 'transparent'}}
-                >
-                  {departments[dept_key]}
-                </button>
-              ))}
+          {Object.keys(userBranches).length >= 2 && (
+            <div className="branches-container">
+              <div className="branches-flexbox">
+                {Object.entries(userBranches).map(([dept_key, dept_value]) => (
+                  <button
+                    key={dept_key}
+                    onClick={() => {
+                      setBranch(dept_key);
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                    }}
+                    className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
+                    style={{WebkitTapHighlightColor: 'transparent'}}
+                  >
+                    {departments[dept_key]}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className='flex justify-between items-center space-x-2'>
             <div className="button-icon !p-2 flex-1">
@@ -675,8 +691,6 @@ function App() {
         theme={window.Telegram.WebApp.colorScheme}
         limit={4}
       />
-
-      <pre className='overflow-x-scroll'>{JSON.stringify(initDataUnsafe, null, 2)}</pre>
 
   </div>
   );
