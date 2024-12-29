@@ -6,7 +6,7 @@ import './WeeklyView.css';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
-export default function WeeklyView({ branch, setShowWeekly }){
+export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
   const [isLoading, setIsLoading] = useState(false);
   const [dates, setDates] = useState([]);
   const [rotaData, setRotaData] = useState([]);
@@ -50,7 +50,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
       const today = new Date();
       const container = tableContainerRef.current;
 
-      const columnWidth = (12 / 100) * window.innerWidth; // Calculate column width
+      const columnWidth = (15 / 100) * window.innerWidth; // Calculate column width
       const targetScrollPosition = columnWidth * ((today.getDay() + 6) % 7); // Calculate scroll based on days since last monday
       container.scrollLeft = targetScrollPosition;
     }
@@ -93,14 +93,22 @@ export default function WeeklyView({ branch, setShowWeekly }){
   }, [branch]);
   
   
-  const renderUserDivs = (hourData) => {
-    return (
-      <div className='flex justify-center gap-1'>
-        {Object.values(hourData).map((user, index) => (
-          <div key={index} className={`user-box color-${user.color}`}></div>
-        ))}
-      </div>
-    );
+  const renderUserDivs = (branch, hourData) => {
+    const nicks = Object.values(hourData).map(user => user.nick.split(' ')[0]).join(', ');
+
+    if (branch === 'gp'){
+      return (
+        <div className='flex justify-center gap-1'>
+          {Object.values(hourData).map((user, index) => (
+            <div key={index} className={`user-box color-${user.color}`}></div>
+          ))}
+        </div>
+      )
+    } else {
+      return (
+        <p className='text-[8px] dark:text-gray-300'>{nicks}</p>
+      );
+    }
   };
   
   
@@ -108,7 +116,7 @@ export default function WeeklyView({ branch, setShowWeekly }){
     return (
       <thead>
         <tr>
-          <th className='cell header sticky left-0'>
+          <th className='cell header sticky left-0 w-[12vw]'>
             <button onClick={() => setShowWeekly(false)}>✕</button>
           </th>
           {dates.map((day, index) => (
@@ -120,11 +128,11 @@ export default function WeeklyView({ branch, setShowWeekly }){
       </thead>
     );
   };
-  
 
-  const renderTableBody = () => {
+
+  const renderTableBody = (branch, initDataUnsafe) => {
     const timeSlots = rotaData.length > 0 ? Object.keys(rotaData[0]) : [];
-
+  
     return (
       <tbody>
         {timeSlots.map((timeSlot, rowIndex) => (
@@ -132,19 +140,23 @@ export default function WeeklyView({ branch, setShowWeekly }){
             <td className='cell header sticky left-0'>
               {timeSlot.split('-')[0]}
             </td>
-
-            {rotaData.map((dayData, colIndex) => (
-              <td
-                key={colIndex}
-                className={`cell ${Object.keys(dayData[timeSlot]).length > 0 ? 'full' : 'empty'} ${branch}`}
-                onClick={() => {
-                  setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot});
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                }}
-              >
-                {dayData[timeSlot] ? renderUserDivs(dayData[timeSlot]) : null}
-              </td>
-            ))}
+  
+            {rotaData.map((dayData, colIndex) => {
+              const isSelfUser = dayData[timeSlot].hasOwnProperty(initDataUnsafe.user.id);
+  
+              return (
+                <td
+                  key={colIndex}
+                  className={`cell ${dayData[timeSlot] ? (Object.keys(dayData[timeSlot]).length > 0 ? 'full' : 'empty') : 'empty'} ${branch} ${isSelfUser ? '!bg-gray-300 dark:!bg-[#878787]' : ''}`}
+                  onClick={() => {
+                    setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot});
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                  }}
+                >
+                  {dayData[timeSlot] ? renderUserDivs(branch, dayData[timeSlot]) : null}
+                </td>
+              );
+            })}
           </tr>
         ))}
       </tbody>
@@ -161,9 +173,9 @@ export default function WeeklyView({ branch, setShowWeekly }){
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
         <div className='w-full h-full overflow-x-auto' ref={tableContainerRef}>
-          <table className='w-full h-full table-fixed'>
+          <table className='table-auto border-collapse  w-full h-full'>
             {renderTableHeader()}
-            {renderTableBody()}
+            {renderTableBody(branch, initDataUnsafe)}
           </table>
         </div>
       )}

@@ -684,6 +684,7 @@ function App() {
 
       {showWeekly && <WeeklyView
         branch={branch}
+        initDataUnsafe={initDataUnsafe}
         setShowWeekly={setShowWeekly}
       />}
 

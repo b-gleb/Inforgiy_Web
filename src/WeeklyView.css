@@ -1,5 +1,7 @@
 .cell { @apply 
-    w-[12vw]
+    w-[20vw]
+    min-w-[5vw]
+    max-w-[50vw]
     p-1
     border
     border-gray-300 dark:border-[#4f4f4f]
