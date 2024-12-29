@@ -21,7 +21,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
     const lastMonday = new Date(today);
     lastMonday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
 
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 25; i++) {
       const date = new Date(lastMonday);
       date.setDate(lastMonday.getDate() + i);
       days.push(date);
