@@ -22,7 +22,7 @@ const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 let today = new Date().toISOString().split("T")[0];
 
-function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
+function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
   const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
   }, [showSearch]);
 
   let hourContainerClass = "hour-container";
-  if (Object.keys(usersDict).length === 0 && usersDict.constructor === Object) {
+  if (usersArray.length === 0) {
     hourContainerClass = `hour-container empty ${branch}`
   };
 
@@ -43,7 +43,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
     <div className={hourContainerClass}>
       <span className="hour-label">{timeRange}</span>
       <div className="usernames-container">
-        {Object.entries(usersDict).map(([user_id, userObj], index) => {
+        {usersArray.map((userObj, index) => {
           return (
             <AnimatePresence key={index}>
               <motion.div
@@ -60,7 +60,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
                 <button
                   className="ml-2"
                     onClick={() => {
-                      handleUpdateRota('remove', branch, date, timeRange, user_id, initDataUnsafe);
+                      handleUpdateRota('remove', branch, date, timeRange, userObj.id, initDataUnsafe);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }}
                 >
@@ -86,7 +86,7 @@ function RotaHour({ branch, date, timeRange, usersDict, rotaAdmin, maxDuties, in
           </button>
         )}
 
-        {date >= today && !(initDataUnsafe.user.id in usersDict) && Object.keys(usersDict).length < maxDuties && (
+        {date >= today && !(usersArray.some(user => user.id === initDataUnsafe.user.id)) && usersArray.length < maxDuties && (
           <button
             className='p-1'
             onClick={() => {
@@ -642,13 +642,13 @@ function App() {
 
       {rotaData !== null
       ? <div className='hours-grid'>
-        {Object.entries(rotaData).map(([timeRange, usersDict], index) => (
+        {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
           <RotaHour
             key={index}
             branch={branch}
             date={date}
             timeRange={timeRange}
-            usersDict={usersDict}
+            usersArray={usersArray}
             rotaAdmin={rotaAdmin.includes(branch)}
             maxDuties={userBranches[branch].maxDuties}
             initDataUnsafe={initDataUnsafe}

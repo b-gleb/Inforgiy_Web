@@ -142,7 +142,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
             </td>
   
             {rotaData.map((dayData, colIndex) => {
-              const isSelfUser = dayData[timeSlot].hasOwnProperty(initDataUnsafe.user.id);
+              const isSelfUser = dayData[timeSlot].some(user => user.id === initDataUnsafe.user.id);
   
               return (
                 <td
