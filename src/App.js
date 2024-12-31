@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Lottie from "react-lottie";
+import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -534,8 +535,21 @@ function App() {
   
     fetchRotaData();
   }, [branch, date]);
-  
 
+
+  const addDate = (dateString, delta) => {
+    let date = new Date(dateString);
+    date.setDate(date.getDate() + delta);
+    return date.toISOString().split('T')[0];
+  }
+
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => setDate(addDate(date, 1)),
+    onSwipedRight: () => setDate(addDate(date, -1)),
+    delta: 50,
+  });
+  
 
   const handleUpdateRota = async (type, branch, date, timeRange, modifyUserId, initDataUnsafe) => {
     try {
@@ -641,7 +655,7 @@ function App() {
       )}
 
       {rotaData !== null
-      ? <div className='hours-grid'>
+      ? <div {...swipeHandlers} className='hours-grid'>
         {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
           <RotaHour
             key={index}
