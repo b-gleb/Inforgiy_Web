@@ -6,6 +6,7 @@ import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-
 import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
+import MyDutiesCard from './MyDuties';
 import WeeklyView from './WeeklyView'
 import Stats from './Stats';
 import catchResponseError from './responseError';
@@ -560,7 +561,6 @@ function App() {
     <div className="app">
       <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
 
-
       {isLoading && (
         <div className='flex items-center justify-center w-full h-full fixed inset-0 z-20 bg-gray-100 dark:bg-neutral-900'>
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
@@ -589,7 +589,7 @@ function App() {
             </div>
           )}
 
-          <div className='flex justify-between items-center space-x-2'>
+          <div className='flex justify-between items-center space-x-2 mb-3'>
             <div className="button-icon !p-2 flex-1">
               <input
                 type="date"
@@ -639,6 +639,11 @@ function App() {
           </div>
         </>
       )}
+
+      <MyDutiesCard 
+        branch={branch}
+        initDataUnsafe={initDataUnsafe}
+      />
 
       {rotaData !== null
       ? <div className='hours-grid'>
