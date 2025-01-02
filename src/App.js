@@ -6,6 +6,7 @@ import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-
 import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
+import { handleUpdateRota } from './rota/handleUpdateRota';
 import MyDutiesCard from './MyDuties';
 import WeeklyView from './WeeklyView'
 import Stats from './Stats';
@@ -23,7 +24,7 @@ const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 let today = new Date().toISOString().split("T")[0];
 
-function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
+function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
   const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
                 <button
                   className="ml-2"
                     onClick={() => {
-                      handleUpdateRota('remove', branch, date, timeRange, userObj.id, initDataUnsafe);
+                      handleUpdateRota('remove', branch, date, timeRange, userObj.id, initDataUnsafe, setRotaData);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }}
                 >
@@ -91,7 +92,7 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
           <button
             className='p-1'
             onClick={() => {
-              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe);
+              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe, setRotaData);
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
             }}
           >
@@ -107,7 +108,7 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
         date={date}
         timeRange={timeRange}
         initDataUnsafe={initDataUnsafe}
-        handleUpdateRota={handleUpdateRota}
+        setRotaData={setRotaData}
         onClose={() => setShowSearch(false)}
       />
     )}
@@ -119,11 +120,11 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
 
 function Animation({ animationData }) {
     const options = {
-      loop: true, // Set to false if you don't want the animation to loop
-      autoplay: true, // Autoplay the animation
-      animationData: animationData, // The JSON data of the sticker
+      loop: true,
+      autoplay: true,
+      animationData: animationData,
       rendererSettings: {
-        preserveAspectRatio: "xMidYMid slice", // You can adjust this based on your layout
+        preserveAspectRatio: "xMidYMid slice",
       },
     };
   
@@ -140,7 +141,7 @@ function UserSearchPopUp({
   date,
   timeRange,
   onClose,
-  handleUpdateRota,
+  setRotaData,
 }) {
   // States for fetching users and managing fuzzy search
   const [allUsers, setAllUsers] = useState([]);
@@ -233,7 +234,7 @@ function UserSearchPopUp({
                   key={user_id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
+                      handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe, setRotaData);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
@@ -535,26 +536,6 @@ function App() {
   
     fetchRotaData();
   }, [branch, date]);
-  
-
-
-  const handleUpdateRota = async (type, branch, date, timeRange, modifyUserId, initDataUnsafe) => {
-    try {
-      // Send the POST request using async/await
-      const response = await axios.post(`${apiUrl}/api/updateRota`, {
-        type: type,
-        branch: branch,
-        date: date,
-        timeRange: timeRange,
-        modifyUserId: modifyUserId,
-        initDataUnsafe: initDataUnsafe
-      });
-  
-      setRotaData(response.data);
-    } catch (error) {
-      catchResponseError(error);
-    }
-  };
 
 
   return (
@@ -657,7 +638,7 @@ function App() {
             rotaAdmin={rotaAdmin.includes(branch)}
             maxDuties={userBranches[branch].maxDuties}
             initDataUnsafe={initDataUnsafe}
-            handleUpdateRota={handleUpdateRota}
+            setRotaData={setRotaData}
           />
         ))}
       </div>
