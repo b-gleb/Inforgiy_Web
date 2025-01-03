@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Lottie from "react-lottie";
+import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -413,6 +414,9 @@ function App() {
   const [showWeekly, setShowWeekly] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
+  const [showRota, setShowRota] = useState(true);
+  const isFirstMount = useRef(true);
+  const [swipeDirection, setSwipeDirection] = useState(null);
 
 
   useEffect(() => {
@@ -535,8 +539,56 @@ function App() {
   
     fetchRotaData();
   }, [branch, date]);
-  
 
+
+  const addDate = (dateString, delta) => {
+    let date = new Date(dateString);
+    date.setDate(date.getDate() + delta);
+    return date.toISOString().split('T')[0];
+  }
+
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      setDate(addDate(date, 1));
+      setSwipeDirection('left');
+      setShowRota(false);
+      setTimeout(() => {
+        setShowRota(true);
+      }, 400);
+      isFirstMount.current = false;
+    },
+
+    onSwipedRight: () => {
+      setDate(addDate(date, -1));
+      setSwipeDirection('right');
+      setShowRota(false);
+      setTimeout(() => {
+        setShowRota(true);
+      }, 400);
+      isFirstMount.current = false;
+    },
+    delta: 100,
+  });
+
+
+  const animationVariants = {
+    initial: (direction) => (isFirstMount.current ? false : {
+      x: direction === 'left' ? '100%' : '-100%',
+      opacity: 0,
+    }),
+    animate: {
+      x: 0,
+      opacity: 1,
+      transition: { duration: 0.4, ease: 'easeOut' },
+    },
+    exit: (direction) => ({
+      x: direction === 'left' ? '-100%' : '100%',
+      opacity: 0,
+      transition: { duration: 0.4, ease: 'easeOut' },
+    }),
+  };
+  
 
   const handleUpdateRota = async (type, branch, date, timeRange, modifyUserId, initDataUnsafe) => {
     try {
@@ -646,21 +698,34 @@ function App() {
       />
 
       {rotaData !== null
-      ? <div className='hours-grid'>
-        {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
-          <RotaHour
-            key={index}
-            branch={branch}
-            date={date}
-            timeRange={timeRange}
-            usersArray={usersArray}
-            rotaAdmin={rotaAdmin.includes(branch)}
-            maxDuties={userBranches[branch].maxDuties}
-            initDataUnsafe={initDataUnsafe}
-            handleUpdateRota={handleUpdateRota}
-          />
-        ))}
-      </div>
+      ? <AnimatePresence custom={swipeDirection}>
+          {showRota && (
+            <motion.div 
+              {...swipeHandlers}
+              className='hours-grid'
+              key={date}
+              custom={swipeDirection}
+              variants={animationVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
+                <RotaHour
+                  key={index}
+                  branch={branch}
+                  date={date}
+                  timeRange={timeRange}
+                  usersArray={usersArray}
+                  rotaAdmin={rotaAdmin.includes(branch)}
+                  maxDuties={userBranches[branch].maxDuties}
+                  initDataUnsafe={initDataUnsafe}
+                  handleUpdateRota={handleUpdateRota}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       : (
         <div className='size-7/12  mx-auto'>
           <Animation animationData={shrugAnimationData} />
