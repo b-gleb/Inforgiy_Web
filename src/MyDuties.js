@@ -1,4 +1,5 @@
 import React, { useEffect, useState} from 'react';
+import { format } from 'date-fns';
 import axios from 'axios';
 import catchResponseError from './responseError';
 
@@ -32,19 +33,6 @@ function convertToDutyString(hours) {
 }
 
 
-function convertISOToDDMMYYYY(isoString) {
-  const date = new Date(isoString);
-  
-  const formattedDate = [
-    String(date.getDate()).padStart(2, '0'),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    date.getFullYear()
-  ].join('.');
-  
-  return formattedDate;
-}
-
-
 export default function MyDutiesCard({ branch, initDataUnsafe }) {
   const [nextDuties, setNextDuties] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,8 +48,8 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
           params: {
             branch: branch,
             user_id: initDataUnsafe.user.id,
-            startDate: today.toISOString().split("T")[0],
-            endDate: endDate.toISOString().split("T")[0]
+            startDate: format(today, 'yyyy-MM-dd'),
+            endDate: format(endDate, 'yyyy-MM-dd')
           }
         });
         setNextDuties(response.data)
@@ -88,7 +76,7 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
               ? 
               nextDuties.map((duty, index) => (
                 <p key={index} className="text-sm text-white">
-                  <span className="font-semibold">{convertISOToDDMMYYYY(duty.date)}:</span> {convertToDutyString(duty.hours)}
+                  <span className="font-semibold">{format(duty.date, 'dd.MM.yyyy')}:</span> {convertToDutyString(duty.hours)}
                 </p>
               ))
               : <p className='text-sm text-white'>Смен нет :(</p>

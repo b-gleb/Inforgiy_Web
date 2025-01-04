@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { format } from 'date-fns';
 import axios from 'axios';
 import Lottie from "react-lottie";
 import { useSwipeable } from 'react-swipeable';
@@ -22,7 +23,7 @@ import deniedAnimationData from "./animations/denied.json"
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
-let today = new Date().toISOString().split("T")[0];
+let today = format(new Date(), 'yyyy-MM-dd');
 
 function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, initDataUnsafe, handleUpdateRota}) {
   const [showSearch, setShowSearch] = useState(false);
@@ -408,7 +409,7 @@ function App() {
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [rotaData, setRotaData] = useState({});
   const [rotaAdmin, setRotaAdmin] = useState([]);
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(today);
   const [userBranches, setUserBranches] = useState(null);
   const [branch, setBranch] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -546,7 +547,7 @@ function App() {
   const addDate = (dateString, delta) => {
     let date = new Date(dateString);
     date.setDate(date.getDate() + delta);
-    return date.toISOString().split('T')[0];
+    return format(date, 'yyyy-MM-dd');
   }
 
 

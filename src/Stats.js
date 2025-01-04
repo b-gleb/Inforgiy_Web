@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import axios from 'axios';
 import catchResponseError from './responseError';
 import { DataTable } from 'primereact/datatable';
@@ -15,18 +16,16 @@ export default function Stats({ branch, setShowStats }){
   // Prefil start and end date
   useEffect(() => {
     const today = new Date();
+    const diff = (today.getDay() === 0 ? 6 : today.getDay() - 1);
+
     const firstDayOfWeek = new Date(today);
-    const lastDayOfWeek = new Date(today);
+    firstDayOfWeek.setDate(today.getDate() - diff);
 
-    firstDayOfWeek.setDate(today.getDate() - today.getDay() + 1);
-    lastDayOfWeek.setDate(today.getDate() - today.getDay() + 7);
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
 
-    // Format the dates as YYYY-MM-DD
-    const formatDate = (date) => date.toISOString().split('T')[0];
-
-    // Update state
-    setStartDate(formatDate(firstDayOfWeek));
-    setEndDate(formatDate(lastDayOfWeek));
+    setStartDate(format(firstDayOfWeek, 'yyyy-MM-dd'));
+    setEndDate(format(lastDayOfWeek, 'yyyy-MM-dd'));
   }, []);
 
 
