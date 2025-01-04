@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Lottie from "react-lottie";
+import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -292,6 +293,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
       if (response.status === 200){
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        toast.success('Пользователь удален');
       };
 
     } catch (error) {
@@ -317,6 +319,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
       if (response.status === 200){
         setEditingUser(null);
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        toast.success('Пользователь обновлен!')
       };
     } catch (error) {
       // Handle error 404 separately
@@ -414,6 +417,9 @@ function App() {
   const [showWeekly, setShowWeekly] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
+  const [showRota, setShowRota] = useState(true);
+  const isFirstMount = useRef(true);
+  const [swipeDirection, setSwipeDirection] = useState(null);
 
 
   useEffect(() => {
@@ -538,6 +544,57 @@ function App() {
   }, [branch, date]);
 
 
+  const addDate = (dateString, delta) => {
+    let date = new Date(dateString);
+    date.setDate(date.getDate() + delta);
+    return date.toISOString().split('T')[0];
+  }
+
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      setDate(addDate(date, 1));
+      setSwipeDirection('left');
+      setShowRota(false);
+      setTimeout(() => {
+        setShowRota(true);
+      }, 400);
+      isFirstMount.current = false;
+    },
+
+    onSwipedRight: () => {
+      setDate(addDate(date, -1));
+      setSwipeDirection('right');
+      setShowRota(false);
+      setTimeout(() => {
+        setShowRota(true);
+      }, 400);
+      isFirstMount.current = false;
+    },
+    delta: 100,
+  });
+
+
+  const animationVariants = {
+    initial: (direction) => (isFirstMount.current ? false : {
+      x: direction === 'left' ? '100%' : '-100%',
+      opacity: 0,
+    }),
+    animate: {
+      x: 0,
+      opacity: 1,
+      transition: { duration: 0.4, ease: 'easeOut' },
+    },
+    exit: (direction) => ({
+      x: direction === 'left' ? '-100%' : '100%',
+      opacity: 0,
+      transition: { duration: 0.4, ease: 'easeOut' },
+    }),
+  };
+  
+
+
+
   return (
     <div className="app">
       <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
@@ -627,21 +684,34 @@ function App() {
       />
 
       {rotaData !== null
-      ? <div className='hours-grid'>
-        {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
-          <RotaHour
-            key={index}
-            branch={branch}
-            date={date}
-            timeRange={timeRange}
-            usersArray={usersArray}
-            rotaAdmin={rotaAdmin.includes(branch)}
-            maxDuties={userBranches[branch].maxDuties}
-            initDataUnsafe={initDataUnsafe}
-            setRotaData={setRotaData}
-          />
-        ))}
-      </div>
+      ? <AnimatePresence custom={swipeDirection}>
+          {showRota && (
+            <motion.div 
+              {...swipeHandlers}
+              className='hours-grid'
+              key={date}
+              custom={swipeDirection}
+              variants={animationVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
+                <RotaHour
+                  key={index}
+                  branch={branch}
+                  date={date}
+                  timeRange={timeRange}
+                  usersArray={usersArray}
+                  rotaAdmin={rotaAdmin.includes(branch)}
+                  maxDuties={userBranches[branch].maxDuties}
+                  initDataUnsafe={initDataUnsafe}
+                  setRotaData={setRotaData}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       : (
         <div className='size-7/12  mx-auto'>
           <Animation animationData={shrugAnimationData} />
