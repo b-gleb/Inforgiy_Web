@@ -292,6 +292,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
       if (response.status === 200){
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        toast.success('Пользователь удален');
       };
 
     } catch (error) {
@@ -317,6 +318,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
       if (response.status === 200){
         setEditingUser(null);
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        toast.success('Пользователь обновлен!')
       };
     } catch (error) {
       // Handle error 404 separately
