@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { format } from 'date-fns';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import catchResponseError from './responseError';
@@ -71,7 +72,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
           const response = await axios.get(`${apiUrl}/api/rota`, {
             params: {
               branch: branch,
-              date: day.toISOString().split("T")[0]
+              date: format(day, 'yyyy-MM-dd')
             }
           });
           newRotaData.push(response.data);
