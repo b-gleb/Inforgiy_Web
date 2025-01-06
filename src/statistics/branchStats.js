@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import axios from 'axios';
-import catchResponseError from './responseError';
+import catchResponseError from '../responseError';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
-export default function Stats({ branch, setShowStats }){
+
+export default function BranchStats({ branch }) {
   const [isLoading, setIsLoading] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -27,19 +28,6 @@ export default function Stats({ branch, setShowStats }){
     setStartDate(format(firstDayOfWeek, 'yyyy-MM-dd'));
     setEndDate(format(lastDayOfWeek, 'yyyy-MM-dd'));
   }, []);
-
-
-  // Telegram UI BackButton
-  useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => {setShowStats(false)});
-    window.Telegram.WebApp.BackButton.show();
-
-    // Cleanup the event listener when the component unmounts
-    return () => {
-      window.Telegram.WebApp.BackButton.offClick();
-      window.Telegram.WebApp.BackButton.hide();
-    };
-  }, [setShowStats]);
 
 
   useEffect(() => {
@@ -72,33 +60,33 @@ export default function Stats({ branch, setShowStats }){
     }
   }, [branch, startDate, endDate]);
 
-
-    return (
-      <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
-        {isLoading ? (
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
-        ) : (
-          <div className='w-full h-full overflow-x-auto'>
-            <div className='flex my-3 justify-center items-center space-x-5'>
-              <input
-                  type="date"
-                  name="startDate"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-              />
-              <input
-                  type="date"
-                  name="endDate"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-            <DataTable value={statsData} sortMode="multiple">
-              <Column field="nick" header="Позывной" sortable></Column>
-              <Column field="count" header="Смен" sortable></Column>
-            </DataTable>
+  
+  return (
+    <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
+      {isLoading ? (
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
+      ) : (
+        <div className='w-full h-full overflow-x-auto'>
+          <div className='flex my-3 justify-center items-center space-x-5'>
+            <input
+                type="date"
+                name="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+            />
+            <input
+                type="date"
+                name="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+            />
           </div>
-        )}
-      </div>
+          <DataTable value={statsData} sortMode="multiple">
+            <Column field="nick" header="Позывной" sortable></Column>
+            <Column field="count" header="Смен" sortable></Column>
+          </DataTable>
+        </div>
+      )}
+    </div>
   );
 };
