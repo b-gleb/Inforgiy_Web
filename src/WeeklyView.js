@@ -1,19 +1,18 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import axios from 'axios';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { motion, AnimatePresence } from 'framer-motion';
 import catchResponseError from './responseError';
 import './WeeklyView.css';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
-export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
+export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
   const [isLoading, setIsLoading] = useState(false);
   const [dates, setDates] = useState([]);
   const [rotaData, setRotaData] = useState([]);
   const [selectedCellData, setSelectedCellData] = useState(null);
-  const tableContainerRef = useRef(null);
-
 
   const getDays = () => {
     const days = [];
@@ -31,7 +30,6 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
     return days;
   };
 
-
   // Telegram UI BackButton
   useEffect(() => {
     window.Telegram.WebApp.BackButton.onClick(() => {setShowWeekly(false)});
@@ -43,19 +41,6 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
       window.Telegram.WebApp.BackButton.hide();
     };
   }, [setShowWeekly]);
-
-
-  // Scroll table
-  useEffect(() => {
-    if (!isLoading && tableContainerRef.current) {
-      const today = new Date();
-      const container = tableContainerRef.current;
-
-      const columnWidth = (15 / 100) * window.innerWidth; // Calculate column width
-      const targetScrollPosition = columnWidth * ((today.getDay() + 6) % 7); // Calculate scroll based on days since last monday
-      container.scrollLeft = targetScrollPosition;
-    }
-  }, [isLoading]);
 
 
   useEffect(() => {
@@ -92,27 +77,17 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
     };
     fetchRotaData();
   }, [branch]);
-  
-  
+
+
   const renderUserDivs = (branch, hourData) => {
     const nicks = Object.values(hourData).map(user => user.nick.split(' ')[0]).join(', ');
 
-    if (branch === 'gp'){
-      return (
-        <div className='flex justify-center gap-1'>
-          {Object.values(hourData).map((user, index) => (
-            <div key={index} className={`user-box color-${user.color}`}></div>
-          ))}
-        </div>
-      )
-    } else {
-      return (
-        <p className='text-[8px] dark:text-gray-300'>{nicks}</p>
-      );
-    }
+    return (
+      <p className='text-[8px] dark:text-gray-300'>{nicks}</p>
+    );
   };
-  
-  
+
+
   const renderTableHeader = () => {
     return (
       <thead>
@@ -168,79 +143,95 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }){
     setSelectedCellData(null);
   };
 
+  const containerHeight = 365;
+  const tableHeight = 300;
+  const translationY = (containerHeight - tableHeight * 0.85) / 2;
+
   return (
     <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
       {isLoading ? (
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
-        <div className='w-full h-full overflow-x-auto' ref={tableContainerRef}>
-          <table className='table-auto border-collapse  w-full h-full'>
-            {renderTableHeader()}
-            {renderTableBody(branch, initDataUnsafe)}
-          </table>
-        </div>
+        <TransformWrapper
+          initialScale={0.85}
+          minScale={0.3}
+          maxScale={1.5}
+          initialPositionY={translationY}
+          disablePadding={true}
+          wheel={{
+            step: 0.1,
+          }}
+          panning={{
+            lockAxisY: true
+          }}
+        >
+          <TransformComponent>
+            <div className='w-full h-full overflow-x-auto'>
+              <table className='table-auto border-collapse w-full h-full'>
+                {renderTableHeader()}
+                {renderTableBody(branch, initDataUnsafe)}
+              </table>
+            </div>
+          </TransformComponent>
+        </TransformWrapper>
       )}
 
-      <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup}/>
+      <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup} />
     </div>
   );
 };
 
 
 function CellPopUp({ selectedCellData, closePopup }) {
-  return(
+  return (
     <>
-    {/* Dark overlay */}
-    <AnimatePresence>
-      {selectedCellData && (
-        <motion.div 
-          className="fixed inset-0 bg-black bg-opacity-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closePopup}
-        />
-      )}
-    </AnimatePresence>
+      <AnimatePresence>
+        {selectedCellData && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closePopup}
+          />
+        )}
+      </AnimatePresence>
 
-    
-    {/* Pop up */}
-    <AnimatePresence>
-      {selectedCellData && (
-        <motion.div 
-          className="pop-up"
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        >
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
-            <button 
-              className="text-red-500 text-lg font-bold"
-              onClick={closePopup}
-            >
-              ✕
-            </button>
-          </div>
+      <AnimatePresence>
+        {selectedCellData && (
+          <motion.div
+            className="pop-up"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          >
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
+              <button
+                className="text-red-500 text-lg font-bold"
+                onClick={closePopup}
+              >
+                ✕
+              </button>
+            </div>
 
-          <h3 className="text-sm font-medium mb-2 text-gray-500">{selectedCellData.date.toLocaleDateString('ru-RU', { weekday: 'long' })}, {selectedCellData.time}</h3>
+            <h3 className="text-sm font-medium mb-2 text-gray-500">{selectedCellData.date.toLocaleDateString('ru-RU', { weekday: 'long' })}, {selectedCellData.time}</h3>
 
-          <div>
-            {Object.values(selectedCellData.duties).length > 0 ? (
+            <div>
+              {Object.values(selectedCellData.duties).length > 0 ? (
                 Object.values(selectedCellData.duties).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.nick}</span>
                   </div>
                 ))
-            ) : (
+              ) : (
                 <p className="text-center text-gray-500">В это время нет дежурных</p>
-            )}
-
-          </div>
-        </motion.div>
-      )}
+              )}
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
-      </>
-  )
+    </>
+  );
 }
