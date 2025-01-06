@@ -80,10 +80,25 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
 
 
   const renderUserDivs = (branch, hourData) => {
-    const nicks = Object.values(hourData).map(user => user.nick.split(' ')[0]).join(', ');
+    const nicks = Object.values(hourData).map(user => {
+      const nickName = user.nick.split(' ')[0];
+  
+      if (branch === 'gp' && user.color === 1) {
+        return <span key={user.id} className="gp-green">{nickName}</span>;
+      }
+  
+      return nickName;
+    });
 
     return (
-      <p className='text-[8px] dark:text-gray-300'>{nicks}</p>
+      <p className={`text-[8px] dark:text-gray-300`}>
+        {nicks.map((nick, index) => (
+        <React.Fragment key={index}>
+          {index > 0 && ', '}
+          {nick}
+        </React.Fragment>
+      ))}
+      </p>
     );
   };
 
