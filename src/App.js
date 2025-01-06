@@ -571,7 +571,7 @@ function App() {
       }, 400);
       isFirstMount.current = false;
     },
-    delta: 100,
+    delta: 75,
   });
 
 
