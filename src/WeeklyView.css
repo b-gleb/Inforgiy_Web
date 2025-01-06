@@ -37,37 +37,6 @@
     bg-white dark:bg-black
 }
 
-.user-box { @apply
-    w-2
-    h-2
-    rounded-sm
-}
-
-/* Color Variants */
-.user-box.color-0 { @apply
-    bg-[#007acc] dark:bg-[#0055cc]
-}
-
-.user-box.color-1 { @apply
-    bg-[#228b22] dark:bg-[#1a871a]
-}
-
-.user-box.color-2 { @apply 
-    bg-[#d9534f] dark:bg-[#b3221c]
-}
-
-.user-box.color-3 { @apply
-    bg-black dark:bg-[#0f0f0f]
-}
-
-.user-box.color-4 { @apply
-    bg-[#8a2be2] dark:bg-[#9945f1]
-}
-
-.user-box.color-5 { @apply 
-    bg-[#ff8c00] dark:bg-[#cc6e00]
-}
-
-.user-box.color-6 { @apply 
-    bg-[#ffd700] dark:bg-[#bfa600]
+.gp-green { @apply 
+    text-green-700 dark:text-[#44cd77]
 }
