@@ -12,7 +12,7 @@ export default function BranchStats({ branch }) {
   const [isLoading, setIsLoading] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [statsData, setStatsData] = useState(null);
+  const [branchStatsData, setBranchStatsData] = useState(null);
 
   // Prefil start and end date
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function BranchStats({ branch }) {
 
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchBranchStats = async () => {
       setIsLoading(true);
       const startTime = Date.now();
 
@@ -43,7 +43,7 @@ export default function BranchStats({ branch }) {
             endDate: endDate
           }
         });
-        setStatsData(response.data);
+        setBranchStatsData(response.data);
       } catch (error) {
         catchResponseError(error);
       }
@@ -56,11 +56,11 @@ export default function BranchStats({ branch }) {
       }, remainingTime);
     };
     if (startDate !== null){
-      fetchStats();
+      fetchBranchStats();
     }
   }, [branch, startDate, endDate]);
 
-  
+
   return (
     <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
       {isLoading ? (
@@ -81,7 +81,7 @@ export default function BranchStats({ branch }) {
                 onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
-          <DataTable value={statsData} sortMode="multiple">
+          <DataTable value={branchStatsData} sortMode="multiple">
             <Column field="nick" header="Позывной" sortable></Column>
             <Column field="count" header="Смен" sortable></Column>
           </DataTable>

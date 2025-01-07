@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
+import PersonalStats from './personalStats';
 import BranchStats from './branchStats';
 
-export default function Stats({ branch, setShowStats }){
+export default function Stats({ branch, user_id, setShowStats }){
   // Telegram UI BackButton
   useEffect(() => {
     window.Telegram.WebApp.BackButton.onClick(() => {setShowStats(false)});
@@ -15,8 +16,14 @@ export default function Stats({ branch, setShowStats }){
   }, [setShowStats]);
 
   return (
-    <BranchStats 
-      branch={branch}
-    />
+    <>
+      <PersonalStats 
+        user_id={user_id}
+      />
+
+      <BranchStats 
+        branch={branch}
+      />
+    </>
   );
 };
