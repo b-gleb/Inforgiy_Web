@@ -305,10 +305,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
     const data = {
       branch: branch,
-      modifyUserId: editingUser.id,
-      modifyUsername: editingUser.username,
-      nick: editingUser.nick,
-      color: editingUser.color,
+      userObj: editingUser,
       initDataUnsafe: initDataUnsafe
     };
 
