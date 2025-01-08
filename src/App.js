@@ -174,20 +174,20 @@ function UserSearchPopUp({
             initDataUnsafe: initDataUnsafe
           },
         });
-        setAllUsers(Object.entries(response.data));
-        setFilteredUsers(Object.entries(response.data));
+        setAllUsers(response.data);
+        setFilteredUsers(response.data);
       } catch (error) {
         catchResponseError(error);
       }
     };
 
     fetchUsers();
-  }, [branch, initDataUnsafe]); 
+  }, [branch, initDataUnsafe]);
 
 
   // Fuzzy search
   useEffect(() => {
-    const results = allUsers.filter(([user_id, userObj]) =>
+    const results = allUsers.filter((userObj) =>
       userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredUsers(results);
@@ -227,19 +227,18 @@ function UserSearchPopUp({
           )}
 
           <div className="search_results_container">
-              {filteredUsers.map(([user_id, userObj]) => (
+              {filteredUsers.map((userObj) => (
                 <motion.button
                   initial={{ opacity: 0.5, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1, transition: { ease: 'easeOut', duration: 0.2}}}
-
-                  key={user_id}
+                  key={userObj.id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
+                      handleUpdateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
-                      setEditingUser({id: user_id, username: userObj.username, nick: userObj.nick, color: userObj.color});
+                      setEditingUser(userObj);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }
                   }}
