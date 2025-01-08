@@ -62,9 +62,9 @@ export default function BranchStats({ branch }) {
 
 
   return (
-    <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
+    <>
       {isLoading ? (
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
+        <div className="flex items-center justify-center animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
         <div className='w-full h-full overflow-x-auto'>
           <div className='flex my-3 justify-center items-center space-x-5'>
@@ -87,6 +87,6 @@ export default function BranchStats({ branch }) {
           </DataTable>
         </div>
       )}
-    </div>
+    </>
   );
 };

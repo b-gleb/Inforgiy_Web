@@ -16,7 +16,7 @@ export default function Stats({ branch, user_id, setShowStats }){
   }, [setShowStats]);
 
   return (
-    <>
+    <div className='w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
       <PersonalStats 
         user_id={user_id}
       />
@@ -24,6 +24,6 @@ export default function Stats({ branch, user_id, setShowStats }){
       <BranchStats 
         branch={branch}
       />
-    </>
+    </div>
   );
 };
