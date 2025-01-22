@@ -10,6 +10,7 @@ import { AgGridReact } from 'ag-grid-react';
 import {
   ModuleRegistry,
   ValidationModule,
+  ScrollApiModule,
   ClientSideRowModelModule,
   RowAutoHeightModule,
   CellStyleModule,
@@ -18,6 +19,7 @@ import {
 
 ModuleRegistry.registerModules([
   ValidationModule,
+  ScrollApiModule,
   ClientSideRowModelModule,
   RowAutoHeightModule,
   CellStyleModule,
@@ -98,6 +100,10 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
       return 'my-duty'
     }
   }
+
+  const handleGridReady = (params) => {
+    params.api.ensureColumnVisible(format(new Date(), 'yyyy-MM-dd'), 'start');
+  };
 
 
   const [isLoading, setIsLoading] = useState(false);
@@ -239,7 +245,8 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
       {isLoading ? (
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
-        <AgGridReact 
+        <AgGridReact
+          onGridReady={handleGridReady}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
