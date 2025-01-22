@@ -56,6 +56,13 @@ const myTheme = themeQuartz
    }, 'light');
 
 
+function rowIndexToTime(rowIndex) {
+  const start = rowIndex.toString().padStart(2, '0');
+  const end = (rowIndex + 1).toString().padStart(2, '0');
+  return `${start}:00 - ${end}:00`;
+}
+
+
 export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
   const cellRenderer = ( params ) => {
     const value = params.value;
@@ -103,6 +110,20 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
 
   const handleGridReady = (params) => {
     params.api.ensureColumnVisible(format(new Date(), 'yyyy-MM-dd'), 'start');
+  };
+
+
+  const handleCellClicked = (params) => {
+    if (params.colDef.field === 'index') {
+      setShowWeekly(false)
+    }
+    else {
+      setSelectedCellData({
+        users: params?.value ?? [],
+        date: new Date(params.colDef.field),
+        rowIndex: params.rowIndex
+      })
+    }
   };
 
 
@@ -201,11 +222,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
           field: 'index',
           pinned: 'left',
           headerName: '',
-              valueGetter: (params) => {
-                const start = (params.node.rowIndex).toString().padStart(2, '0');
-                const end = (params.node.rowIndex + 1).toString().padStart(2, '0');
-                return `${start}:00 - ${end}:00`;
-              },
+          valueGetter: (params) => rowIndexToTime(params.node.rowIndex),
           cellRenderer: null,
           cellStyle: null,
           cellClass: null
@@ -252,6 +269,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
           defaultColDef={defaultColDef}
           className='w-full h-full'
           getRowHeight={() => 13}
+          onCellClicked={handleCellClicked}
           gridOptions={{
             theme: myTheme,
             debug: true
@@ -299,11 +317,11 @@ function CellPopUp({ selectedCellData, closePopup }) {
               </button>
             </div>
 
-            <h3 className="text-sm font-medium mb-2 text-gray-500">{selectedCellData.date.toLocaleDateString('ru-RU', { weekday: 'long' })}, {selectedCellData.time}</h3>
+            <h3 className="text-sm font-medium mb-2 text-gray-500">{format(selectedCellData.date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(selectedCellData.rowIndex)}</h3>
 
             <div>
-              {Object.values(selectedCellData.duties).length > 0 ? (
-                Object.values(selectedCellData.duties).map((user, index) => (
+              {Object.values(selectedCellData.users).length > 0 ? (
+                Object.values(selectedCellData.users).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.nick}</span>
                   </div>
