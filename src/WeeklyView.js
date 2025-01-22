@@ -1,18 +1,118 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import axios from 'axios';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { motion, AnimatePresence } from 'framer-motion';
 import catchResponseError from './responseError';
 import './WeeklyView.css';
 
+import { AgGridReact } from 'ag-grid-react';
+import {
+  ModuleRegistry,
+  ValidationModule,
+  ClientSideRowModelModule,
+  RowAutoHeightModule,
+  CellStyleModule,
+  themeQuartz
+} from 'ag-grid-community';
+
+ModuleRegistry.registerModules([
+  ValidationModule,
+  ClientSideRowModelModule,
+  RowAutoHeightModule,
+  CellStyleModule,
+]);
+
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
+const myTheme = themeQuartz
+	.withParams({
+    browserColorScheme: "dark",
+    backgroundColor: "#1f2836",
+    columnBorder: true,
+    fontFamily: "inherit",
+    fontSize: 10,
+    foregroundColor: "#D6D6D6",
+    headerFontSize: 10,
+    headerFontWeight: 700,
+    iconSize: 12,
+    oddRowBackgroundColor: "#1F2836",
+    spacing: 5,
+    wrapperBorderRadius: 0
+   }, 'dark')
+  .withParams({
+    browserColorScheme: "light",
+    columnBorder: true,
+    fontFamily: "inherit",
+    fontSize: 10,
+    headerFontSize: 10,
+    headerFontWeight: 700,
+    iconSize: 12,
+    oddRowBackgroundColor: "#F9F9F9",
+    spacing: 5,
+    wrapperBorderRadius: 0
+   }, 'light');
+
+
 export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
+  const cellRenderer = ( params ) => {
+    const value = params.value;
+    if (!Array.isArray(value) || value.length === 0){return value};
+  
+    const nicks = value.map(user => {
+      const nickName = user?.nick.split(' ')[0] ?? user.username;
+  
+      if (branch === 'gp' && user.color === 1) {
+        return <span key={user.id} className="gp-green">{nickName}</span>;
+      } else {
+        return nickName;
+      }
+    });
+  
+    return (
+      <>
+        {nicks.map((nick, index) => (
+          <React.Fragment key={index}>
+            {index > 0 && ', '}
+            {nick}
+          </React.Fragment>
+        ))}
+      </>
+    )
+  };
+
+
+  const cellClass = ( params ) => {
+    const value = params.value;
+    if (!Array.isArray(value)){return ''};
+
+    if (value.length === 0){
+      if (branch === 'gp'){
+        return 'empty gp'
+      } else {
+        return 'empty'
+      }
+    }
+
+    if (value.some(user => user.id === initDataUnsafe.user.id)) {
+      return 'my-duty'
+    }
+  }
+
+
   const [isLoading, setIsLoading] = useState(false);
-  const [dates, setDates] = useState([]);
-  const [rotaData, setRotaData] = useState([]);
   const [selectedCellData, setSelectedCellData] = useState(null);
+  const [columnDefs, setColumnDefs] = useState([]);
+  const [rowData, setRowData] = useState([]);
+  const [defaultColDef] = useState({
+    sortable: false,
+    suppressMovable: true,
+    width: (window.innerWidth * 0.20),
+    cellRenderer: cellRenderer,
+    cellClass: cellClass,
+    autoHeight: true,
+    wrapText: true,
+  });
 
   const getDays = () => {
     const days = [];
@@ -30,10 +130,29 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
     return days;
   };
 
-  // Telegram UI BackButton
+  function transformColumnSchemaToRowSchema(columnDefs, data) {
+    // Extract column names from columnDefs
+    const columnNames = columnDefs.map((col) => col.field);
+  
+    // Transpose the data based on column schema to row schema
+    const arrayOfObjects = data[0].map((_, rowIndex) => {
+      const obj = {};
+      columnNames.forEach((colName, colIndex) => {
+        const cellData = data[colIndex][rowIndex];
+        obj[colName] = cellData
+      });
+      return obj;
+    });
+  
+    return arrayOfObjects;
+  }
+
+
+  // Telegram UI BackButton & Table Theme
   useEffect(() => {
     window.Telegram.WebApp.BackButton.onClick(() => {setShowWeekly(false)});
     window.Telegram.WebApp.BackButton.show();
+    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
 
     // Cleanup the event listener when the component unmounts
     return () => {
@@ -48,9 +167,8 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
       setIsLoading(true);
       const startTime = Date.now();
 
-      const newRotaData = [];
+      const fetchedRotaData = [];
       const days = getDays();
-      setDates(days);
 
       for (const day of days) {
         try {
@@ -60,18 +178,50 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
               date: format(day, 'yyyy-MM-dd')
             }
           });
-          newRotaData.push(response.data);
+          fetchedRotaData.push(response.data);
         } catch (error) {
           catchResponseError(error);
-          newRotaData.push({}); // Push empty data for that day to avoid breaking the table
+          fetchedRotaData.push({});
         }
       }
 
+      // Format the dates and add them as columns
+      const formattedDates = days.map((date) => ({
+        field: format(date, 'yyyy-MM-dd'),
+        headerName: format(date, "dd.MM EEEEEE", { locale: ru })
+      }));
+      setColumnDefs([
+        {
+          field: 'index',
+          pinned: 'left',
+          headerName: '',
+              valueGetter: (params) => {
+                const start = (params.node.rowIndex).toString().padStart(2, '0');
+                const end = (params.node.rowIndex + 1).toString().padStart(2, '0');
+                return `${start}:00 - ${end}:00`;
+              },
+          cellRenderer: null,
+          cellStyle: null,
+          cellClass: null
+        },
+        ...formattedDates
+      ])
+
+      // Generate row data
+      const updatedRotaData = []
+
+      for (const day of fetchedRotaData) {
+        updatedRotaData.push(Object.values(day))
+      };
+
+      const rowData = transformColumnSchemaToRowSchema(formattedDates, updatedRotaData);
+      setRowData(rowData)
+
+      // Check the elapsed time
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, 300 - elapsedTime);
 
       setTimeout(() => {
-        setRotaData(newRotaData);
         setIsLoading(false);
       }, remainingTime);
     };
@@ -79,116 +229,27 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
   }, [branch]);
 
 
-  const renderUserDivs = (branch, hourData) => {
-    const nicks = Object.values(hourData).map(user => {
-      const nickName = user.nick.split(' ')[0];
-  
-      if (branch === 'gp' && user.color === 1) {
-        return <span key={user.id} className="gp-green">{nickName}</span>;
-      }
-  
-      return nickName;
-    });
-
-    return (
-      <p className={`text-[8px] dark:text-gray-300`}>
-        {nicks.map((nick, index) => (
-        <React.Fragment key={index}>
-          {index > 0 && ', '}
-          {nick}
-        </React.Fragment>
-      ))}
-      </p>
-    );
-  };
-
-
-  const renderTableHeader = () => {
-    return (
-      <thead>
-        <tr>
-          <th className='cell header sticky left-0 w-[12vw]'>
-            <button onClick={() => setShowWeekly(false)}>✕</button>
-          </th>
-          {dates.map((day, index) => (
-            <th className='cell header' key={index}>
-              {`${String(day.getDate()).padStart(2, '0')}.${String(day.getMonth() + 1).padStart(2, '0')}`} {day.toLocaleDateString('ru-RU', { weekday: 'short' })}
-            </th>
-          ))}
-        </tr>
-      </thead>
-    );
-  };
-
-
-  const renderTableBody = (branch, initDataUnsafe) => {
-    const timeSlots = rotaData.length > 0 ? Object.keys(rotaData[0]) : [];
-  
-    return (
-      <tbody>
-        {timeSlots.map((timeSlot, rowIndex) => (
-          <tr key={rowIndex}>
-            <td className='cell header sticky left-0'>
-              {timeSlot.split('-')[0]}
-            </td>
-  
-            {rotaData.map((dayData, colIndex) => {
-              const isSelfUser = dayData[timeSlot].some(user => user.id === initDataUnsafe.user.id);
-  
-              return (
-                <td
-                  key={colIndex}
-                  className={`cell ${dayData[timeSlot] ? (Object.keys(dayData[timeSlot]).length > 0 ? 'full' : 'empty') : 'empty'} ${branch} ${isSelfUser ? '!bg-gray-300 dark:!bg-[#878787]' : ''}`}
-                  onClick={() => {
-                    setSelectedCellData({duties: dayData[timeSlot], date: dates[colIndex], time: timeSlot});
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                  }}
-                >
-                  {dayData[timeSlot] ? renderUserDivs(branch, dayData[timeSlot]) : null}
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-      </tbody>
-    );
-  };
-
   const closePopup = () => {
     setSelectedCellData(null);
   };
 
-  const containerHeight = 365;
-  const tableHeight = 300;
-  const translationY = (containerHeight - tableHeight * 0.85) / 2;
 
   return (
     <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
       {isLoading ? (
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
-        <TransformWrapper
-          initialScale={0.85}
-          minScale={0.3}
-          maxScale={1.5}
-          initialPositionY={translationY}
-          disablePadding={true}
-          wheel={{
-            step: 0.1,
+        <AgGridReact 
+          rowData={rowData}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          className='w-full h-full'
+          getRowHeight={() => 13}
+          gridOptions={{
+            theme: myTheme,
+            debug: true
           }}
-          panning={{
-            lockAxisY: true
-          }}
-        >
-          <TransformComponent>
-            <div className='w-full h-full overflow-x-auto'>
-              <table className='table-auto border-collapse w-full h-full'>
-                {renderTableHeader()}
-                {renderTableBody(branch, initDataUnsafe)}
-              </table>
-            </div>
-          </TransformComponent>
-        </TransformWrapper>
+        />
       )}
 
       <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup} />
