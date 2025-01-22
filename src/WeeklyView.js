@@ -110,6 +110,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
 
   const handleGridReady = (params) => {
     params.api.ensureColumnVisible(format(new Date(), 'yyyy-MM-dd'), 'start');
+    setIsLoading(false);
   };
 
 
@@ -127,10 +128,10 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
   };
 
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCellData, setSelectedCellData] = useState(null);
   const [columnDefs, setColumnDefs] = useState([]);
-  const [rowData, setRowData] = useState([]);
+  const [rowData, setRowData] = useState(null);
   const [defaultColDef] = useState({
     sortable: false,
     suppressMovable: true,
@@ -191,9 +192,6 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
 
   useEffect(() => {
     const fetchRotaData = async () => {
-      setIsLoading(true);
-      const startTime = Date.now();
-
       const fetchedRotaData = [];
       const days = getDays();
 
@@ -240,13 +238,6 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
       const rowData = transformColumnSchemaToRowSchema(formattedDates, updatedRotaData);
       setRowData(rowData)
 
-      // Check the elapsed time
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, 300 - elapsedTime);
-
-      setTimeout(() => {
-        setIsLoading(false);
-      }, remainingTime);
     };
     fetchRotaData();
   }, [branch]);
@@ -258,27 +249,32 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
 
 
   return (
-    <div className='flex items-center justify-center w-full h-full fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
-      {isLoading ? (
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
-      ) : (
-        <AgGridReact
-          onGridReady={handleGridReady}
-          rowData={rowData}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          className='w-full h-full'
-          getRowHeight={() => 13}
-          onCellClicked={handleCellClicked}
-          gridOptions={{
-            theme: myTheme,
-            debug: true
-          }}
-        />
+    <>
+      {isLoading && (
+        <div className='flex items-center justify-center fixed inset-0 bg-gray-100 dark:bg-neutral-900 z-40'>
+          <div className="fixed animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300 z-50"/>
+        </div>
+      )}
+
+      {rowData && (
+        <div className='w-full h-full fixed inset-0'>
+          <AgGridReact
+            onGridReady={handleGridReady}
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            className='w-full h-full'
+            getRowHeight={() => 13}
+            onCellClicked={handleCellClicked}
+            gridOptions={{
+              theme: myTheme
+            }}
+          />
+        </div>
       )}
 
       <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup} />
-    </div>
+    </>
   );
 };
 
