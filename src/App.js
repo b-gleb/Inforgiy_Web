@@ -10,7 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 // Custom components
 import MyDutiesCard from './MyDuties';
 import WeeklyView from './WeeklyView'
-import Stats from './Stats';
+import Stats from './statistics/Stats';
 import catchResponseError from './responseError';
 
 // CSS
@@ -759,6 +759,7 @@ function App() {
 
       {showStats && <Stats
         branch={branch}
+        user_id={initDataUnsafe.user.id}
         setShowStats={setShowStats}  
       />}
 
