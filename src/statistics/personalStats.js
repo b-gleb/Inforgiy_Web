@@ -1,37 +1,73 @@
 import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import axios from 'axios';
 import catchResponseError from '../responseError';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
-export default function PersonalStats({ user_id }) {
+export default function PersonalStats({ branch, user_id }) {
   const [personalStatsData, setPersonalStatsData] = useState(null);
 
   useEffect(() => {
+    const now = new Date();
+
+    const getWeekRange = (date) => {
+      const startOfWeek = new Date(date);
+      startOfWeek.setDate(date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1)); // Monday as first day
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      return [startOfWeek, endOfWeek];
+    };
+
+    const getMonthRange = (date) => {
+      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      return [startOfMonth, endOfMonth];
+    };
+
+    const getYearRange = (date) => {
+      const startOfYear = new Date(date.getFullYear(), 0, 1);
+      const endOfYear = new Date(date.getFullYear(), 11, 31);
+      return [startOfYear, endOfYear];
+    };
+
+    const currentWeekRange = getWeekRange(now);
+    const previousWeekRange = getWeekRange(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
+    const currentMonthRange = getMonthRange(now);
+    const previousMonthRange = getMonthRange(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
+    const currentYearRange = getYearRange(now);
+
     const fetchPersonalStats = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/stats/user`, {
-          params: {
-            user_id: user_id
-          }
+        const response = await axios.post(`${apiUrl}/api/stats/user`, {
+          branch: branch,
+          user_ids: [user_id],
+          dateRanges: [
+            [format(currentWeekRange[0], 'yyyy-MM-dd'), format(currentWeekRange[1], 'yyyy-MM-dd')],
+            [format(previousWeekRange[0], 'yyyy-MM-dd'), format(previousWeekRange[1], 'yyyy-MM-dd')],
+            [format(currentMonthRange[0], 'yyyy-MM-dd'), format(currentMonthRange[1], 'yyyy-MM-dd')],
+            [format(previousMonthRange[0], 'yyyy-MM-dd'), format(previousMonthRange[1], 'yyyy-MM-dd')],
+            [format(currentYearRange[0], 'yyyy-MM-dd'), format(currentYearRange[1], 'yyyy-MM-dd')]
+          ]
         });
 
-        setPersonalStatsData(response.data);
+        console.log(response.data)
+        const stats  = Object.values(response.data)[0];
+        setPersonalStatsData({
+          currentWeek: stats[0].count,
+          previousWeek: stats[1].count,
+          currentMonth: stats[2].count,
+          previousMonth: stats[3].count,
+          currentYear: stats[4].count
+        });
 
       } catch (error) {
         catchResponseError(error);
       }
     };
 
-    // fetchPersonalStats();
-    setPersonalStatsData({
-      currentWeek: 10,
-      previousWeek: 5,
-      currentMonth: 50,
-      previousMonth: 70,
-      currentYear: 200
-    })
-  }, [user_id])
+    fetchPersonalStats();
+  }, [branch, user_id])
 
 
   return (
