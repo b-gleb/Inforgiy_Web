@@ -403,7 +403,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
 function App() {
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('light');
   const [rotaData, setRotaData] = useState({});
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(today);
