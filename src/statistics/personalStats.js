@@ -10,7 +10,7 @@ export default function PersonalStats({ user_id }) {
   useEffect(() => {
     const fetchPersonalStats = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/userStats`, {
+        const response = await axios.get(`${apiUrl}/api/stats/user`, {
           params: {
             user_id: user_id
           }
@@ -35,7 +35,7 @@ export default function PersonalStats({ user_id }) {
 
 
   return (
-    <div className="flex flex-wrap justify-around py-2 bg-gray-100">
+    <div className="flex flex-wrap justify-evenly py-2 bg-gray-100">
       <StatCard 
         label="Неделя"
         sublabel="от прошлой"
