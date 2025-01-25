@@ -2,63 +2,54 @@ import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import axios from 'axios';
 import catchResponseError from '../responseError';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
+export default function BranchStats({ branch, initDataUnsafe }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [columnDefs, setColumnDefs] = useState([]);
+  const [rowData, setRowData] = useState(null);
+  const fetchAllUsers = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/users`, {
+        params: {
+          branch: branch,
+          initDataUnsafe: initDataUnsafe
+        }
+      });
 
-export default function BranchStats({ branch }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [branchStatsData, setBranchStatsData] = useState(null);
+      return response.data.map((userObj) => userObj.id);
+    } catch (error) {
+      catchResponseError(error);
+    }
+  };
 
-  // Prefil start and end date
-  useEffect(() => {
-    const today = new Date();
-    const diff = (today.getDay() === 0 ? 6 : today.getDay() - 1);
+  const fetchBranchData = async (user_ids) => {
+    try {
+      const response = await axios.post(`${apiUrl}/api/stats/user`, {
+        branch: branch,
+        user_ids: user_ids,
+        dateRanges: [["2025-01-01", "2025-01-31"], ["2025-02-01", "2025-02-28"]]
+      });
 
-    const firstDayOfWeek = new Date(today);
-    firstDayOfWeek.setDate(today.getDate() - diff);
-
-    const lastDayOfWeek = new Date(firstDayOfWeek);
-    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
-
-    setStartDate(format(firstDayOfWeek, 'yyyy-MM-dd'));
-    setEndDate(format(lastDayOfWeek, 'yyyy-MM-dd'));
-  }, []);
-
+      return response.data;
+    } catch (error) {
+      catchResponseError(error);
+    }
+  };
 
   useEffect(() => {
     const fetchBranchStats = async () => {
-      setIsLoading(true);
-      const startTime = Date.now();
+      const allUserIds = await fetchAllUsers();
+      const branchData = await fetchBranchData(allUserIds);
 
-      try {
-        const response = await axios.get(`${apiUrl}/api/stats`, {
-          params: {
-            branch: branch,
-            startDate: startDate,
-            endDate: endDate
-          }
-        });
-        setBranchStatsData(response.data);
-      } catch (error) {
-        catchResponseError(error);
-      }
+      console.log(branchData);
 
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, 300 - elapsedTime);
 
-      setTimeout(() => {
-        setIsLoading(false);
-      }, remainingTime);
-    };
-    if (startDate !== null){
-      fetchBranchStats();
-    }
-  }, [branch, startDate, endDate]);
+    fetchBranchStats();
+    setIsLoading(false);
+  }, [])
 
 
   return (
@@ -66,25 +57,7 @@ export default function BranchStats({ branch }) {
       {isLoading ? (
         <div className="flex items-center justify-center animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
       ) : (
-        <div className='w-full h-full overflow-x-auto'>
-          <div className='flex my-3 justify-center items-center space-x-5'>
-            <input
-                type="date"
-                name="startDate"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-            />
-            <input
-                type="date"
-                name="endDate"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-          <DataTable value={branchStatsData} sortMode="multiple">
-            <Column field="nick" header="Позывной" sortable></Column>
-            <Column field="count" header="Смен" sortable></Column>
-          </DataTable>
+        <div className='h-full w-full'>
         </div>
       )}
     </>
