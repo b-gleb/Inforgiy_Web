@@ -39,7 +39,7 @@ export default function PersonalStats({ branch, user_id }) {
 
     const fetchPersonalStats = async () => {
       try {
-        const response = await axios.post(`${apiUrl}/api/stats/user`, {
+        const response = await axios.post(`${apiUrl}/api/stats`, {
           branch: branch,
           user_ids: [user_id],
           dateRanges: [
@@ -51,7 +51,6 @@ export default function PersonalStats({ branch, user_id }) {
           ]
         });
 
-        console.log(response.data)
         const stats  = Object.values(response.data)[0];
         setPersonalStatsData({
           currentWeek: stats[0].count,
