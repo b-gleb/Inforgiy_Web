@@ -27,7 +27,7 @@ export default function BranchStats({ branch, initDataUnsafe }) {
 
   const fetchBranchData = async (user_ids) => {
     try {
-      const response = await axios.post(`${apiUrl}/api/stats/user`, {
+      const response = await axios.post(`${apiUrl}/api/stats`, {
         branch: branch,
         user_ids: user_ids,
         dateRanges: [["2025-01-01", "2025-01-31"], ["2025-02-01", "2025-02-28"]]
