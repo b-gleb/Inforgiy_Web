@@ -8,6 +8,7 @@ import { AgGridReact } from 'ag-grid-react';
 import {
   ModuleRegistry,
   AllCommunityModule,
+  themeQuartz
 } from 'ag-grid-community';
 
 ModuleRegistry.registerModules([
@@ -15,6 +16,34 @@ ModuleRegistry.registerModules([
 ]);
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
+
+const myTheme = themeQuartz
+	.withParams({
+    browserColorScheme: "dark",
+    backgroundColor: "#1f2836",
+    columnBorder: true,
+    fontFamily: "inherit",
+    fontSize: 10,
+    foregroundColor: "#D6D6D6",
+    headerFontSize: 10,
+    headerFontWeight: 700,
+    iconSize: 12,
+    oddRowBackgroundColor: "#1F2836",
+    spacing: 5,
+    wrapperBorderRadius: 0
+   }, 'dark')
+  .withParams({
+    browserColorScheme: "light",
+    columnBorder: true,
+    fontFamily: "inherit",
+    fontSize: 10,
+    headerFontSize: 10,
+    headerFontWeight: 700,
+    iconSize: 12,
+    oddRowBackgroundColor: "#F9F9F9",
+    spacing: 5,
+    wrapperBorderRadius: 0
+   }, 'light');
 
 
 async function fetchAllUsers (branch, initDataUnsafe) {
@@ -154,6 +183,10 @@ export default function BranchStats({ branch, initDataUnsafe }) {
     suppressMovable: true,
   });
 
+   useEffect(() => {
+    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
+  }, []);
+  }, []);
 
 
   const onColumnGroupOpened = useCallback( async (params) => {
@@ -202,20 +235,16 @@ export default function BranchStats({ branch, initDataUnsafe }) {
 
 
   return (
-    <>
-      {isLoading ? (
-        <div className="flex items-center justify-center animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
-      ) : (
-        <div className='h-full w-full'>
-          <AgGridReact
-            rowData={rowData}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            onColumnGroupOpened={onColumnGroupOpened}
-            className='w-full h-full'
-          />
-        </div>
-      )}
-    </>
+      <AgGridReact
+        rowData={rowData}
+        columnDefs={columnDefs}
+        defaultColDef={defaultColDef}
+        onColumnGroupOpened={onColumnGroupOpened}
+        className='w-full h-full'
+        autoSizeStrategy={autoSizeStrategy}
+        gridOptions={{
+          theme: myTheme,
+        }}
+      />
   );
 };
