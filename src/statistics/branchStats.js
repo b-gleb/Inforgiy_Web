@@ -170,7 +170,6 @@ function transformData(data) {
 
 
 export default function BranchStats({ branch, initDataUnsafe }) {
-  const [isLoading, setIsLoading] = useState(true);
   const [allUsers, setAllUsers] = useState(null);
   const [columnDefs, setColumnDefs] = useState(null);
   const [rowData, setRowData] = useState(null);
@@ -241,7 +240,6 @@ export default function BranchStats({ branch, initDataUnsafe }) {
     };
 
     generateTable();
-    setIsLoading(false)
   }, [branch, initDataUnsafe])
 
 
