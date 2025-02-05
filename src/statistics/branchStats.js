@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 import axios from 'axios';
@@ -191,6 +191,11 @@ export default function BranchStats({ branch, initDataUnsafe }) {
    useEffect(() => {
     document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
   }, []);
+
+  const autoSizeStrategy = useMemo(() => {
+    return {
+      type: 'fitCellContents'
+    };
   }, []);
 
 
@@ -214,6 +219,7 @@ export default function BranchStats({ branch, initDataUnsafe }) {
         });
       });
     };
+    params.api.autoSizeAllColumns()
   }, [branch, allUsers]);
 
 
