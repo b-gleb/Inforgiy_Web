@@ -178,9 +178,14 @@ export default function BranchStats({ branch, initDataUnsafe }) {
     sortable: true,
     filter: "agNumberColumnFilter",
     filterParams: {
-      filterOptions: ['inRange']
+      filterOptions: ['inRange'],
+      inRangeInclusive: true,
+      buttons: ['apply', 'reset'],
+      closeOnApply: true,
+      maxNumConditions: 1
     },
     suppressMovable: true,
+    wrapText: true,
   });
 
    useEffect(() => {
