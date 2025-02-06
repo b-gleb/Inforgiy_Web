@@ -763,7 +763,7 @@ function App() {
 
       {showStats && <Stats
         branch={branch}
-        user_id={initDataUnsafe.user.id}
+        initDataUnsafe={initDataUnsafe}
         setShowStats={setShowStats}  
       />}
 
