@@ -2,7 +2,7 @@ import React, { useEffect, useState} from 'react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import axios from 'axios';
-import catchResponseError from './responseError';
+import catchResponseError from './utils/responseError';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 

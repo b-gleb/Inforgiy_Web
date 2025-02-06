@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 import axios from 'axios';
-import catchResponseError from '../responseError';
+import catchResponseError from '../utils/responseError';
 
 import { AgGridReact } from 'ag-grid-react';
 import {

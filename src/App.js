@@ -11,15 +11,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import MyDutiesCard from './MyDuties';
 import WeeklyView from './WeeklyView';
 import Stats from './statistics/Stats';
-import catchResponseError from './responseError';
+import catchResponseError from './utils/responseError';
 
 // CSS
-import './App.css';
+import './styles/App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
-import shrugAnimationData from "./animations/shrug.json";
-import deniedAnimationData from "./animations/denied.json";
+import shrugAnimationData from "./assets/shrug.json";
+import deniedAnimationData from "./assets/denied.json";
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;

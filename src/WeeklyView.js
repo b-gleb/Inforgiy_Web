@@ -3,8 +3,8 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import catchResponseError from './responseError';
-import './WeeklyView.css';
+import catchResponseError from './utils/responseError';
+import './styles/WeeklyView.css';
 
 import { AgGridReact } from 'ag-grid-react';
 import {
