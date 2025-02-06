@@ -275,7 +275,6 @@ export default function BranchStats({ branch, initDataUnsafe }) {
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         onColumnGroupOpened={onColumnGroupOpened}
-        className='w-full h-full'
         autoSizeStrategy={autoSizeStrategy}
         suppressColumnVirtualisation={true} // to autosize columns not in viewport
         localeText={localeText}
