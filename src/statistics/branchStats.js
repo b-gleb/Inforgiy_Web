@@ -99,6 +99,7 @@ function generateColumnDefs(year) {
 
   const yearColumnDefs = {
     field: `${year}`,
+    openByDefault: true,
     children: [],
   };
 
@@ -187,9 +188,12 @@ export default function BranchStats({ branch, initDataUnsafe }) {
     wrapText: true,
   });
 
+
+   // Set Table Theme
    useEffect(() => {
     document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
   }, []);
+
 
   const autoSizeStrategy = useMemo(() => {
     return {
