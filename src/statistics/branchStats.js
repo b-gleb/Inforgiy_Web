@@ -17,6 +17,15 @@ ModuleRegistry.registerModules([
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
+const localeText = {
+  loadingOoo: "Загрузка...",
+  inRange: 'Значение между',
+  inRangeStart: 'Больше',
+  inRangeEnd: 'Меньше',
+  applyFilter: 'Применить',
+  resetFilter: 'Сброс',
+};
+
 const myTheme = themeQuartz
 	.withParams({
     browserColorScheme: "dark",
@@ -261,6 +270,7 @@ export default function BranchStats({ branch, initDataUnsafe }) {
         className='w-full h-full'
         autoSizeStrategy={autoSizeStrategy}
         suppressColumnVirtualisation={true} // to autosize columns not in viewport
+        localeText={localeText}
         gridOptions={{
           theme: myTheme,
         }}
