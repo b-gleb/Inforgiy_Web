@@ -7,12 +7,20 @@ import catchResponseError from '../responseError';
 import { AgGridReact } from 'ag-grid-react';
 import {
   ModuleRegistry,
-  AllCommunityModule,
+  ValidationModule,
+  NumberFilterModule,
+  ClientSideRowModelModule,
+  ColumnAutoSizeModule,
+  LocaleModule,
   themeQuartz
 } from 'ag-grid-community';
 
 ModuleRegistry.registerModules([
-  AllCommunityModule,
+  ValidationModule,
+  NumberFilterModule,
+  ClientSideRowModelModule,
+  ColumnAutoSizeModule,
+  LocaleModule
 ]);
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
