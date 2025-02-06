@@ -222,7 +222,12 @@ export default function BranchStats({ branch, initDataUnsafe }) {
         });
       });
     };
-    params.api.autoSizeAllColumns()
+
+    // Adjust the width of opened columns
+    if (params.columnGroup.isExpanded() === true){
+      const colArray = params.columnGroup.children.map(col => col.getId());
+      params.api.autoSizeColumns(colArray)
+    }
   }, [branch, allUsers]);
 
 
@@ -255,6 +260,7 @@ export default function BranchStats({ branch, initDataUnsafe }) {
         onColumnGroupOpened={onColumnGroupOpened}
         className='w-full h-full'
         autoSizeStrategy={autoSizeStrategy}
+        suppressColumnVirtualisation={true} // to autosize columns not in viewport
         gridOptions={{
           theme: myTheme,
         }}
