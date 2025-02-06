@@ -6,6 +6,7 @@ import catchResponseError from '../utils/responseError';
 
 import { AgGridReact } from 'ag-grid-react';
 import gridTheme from '../styles/gridTheme';
+import localeText from '../utils/gridLocale';
 import {
   ModuleRegistry,
   ValidationModule,
@@ -24,15 +25,6 @@ ModuleRegistry.registerModules([
 ]);
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
-
-const localeText = {
-  loadingOoo: "Загрузка...",
-  inRange: 'Значение между',
-  inRangeStart: 'Больше',
-  inRangeEnd: 'Меньше',
-  applyFilter: 'Применить',
-  resetFilter: 'Сброс',
-};
 
 
 async function fetchAllUsers (branch, initDataUnsafe) {
