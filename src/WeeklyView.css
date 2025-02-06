@@ -1,29 +1,13 @@
-.cell { @apply 
-    w-[20vw]
-    min-w-[5vw]
-    max-w-[50vw]
-    p-1
-    border
-    border-gray-300 dark:border-[#4f4f4f]
+.empty { @apply
+    bg-red-100 dark:bg-[#421212]
 }
 
-.cell.header { @apply
-    text-xs
-    text-center
-    text-[#393939] dark:text-gray-400
-    bg-gray-200 dark:bg-[#1b1b1b]
+.empty.gp { @apply
+    bg-[#fbe4a2] dark:bg-[#62501d]
 }
 
-.cell.full { @apply
-    bg-white dark:bg-[#404040]
-}
-
-.cell.empty { @apply
-    bg-red-100 dark:bg-[#404040]
-}
-
-.cell.empty.gp { @apply
-    bg-[#fbe4a2] dark:bg-[#404040]
+.my-duty { @apply
+    bg-[#babec4] dark:bg-[#737387]
 }
 
 .pop-up { @apply

@@ -9,7 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
 import MyDutiesCard from './MyDuties';
-import WeeklyView from './WeeklyView'
+import WeeklyView from './WeeklyView';
 import Stats from './statistics/Stats';
 import catchResponseError from './responseError';
 
@@ -19,7 +19,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
 import shrugAnimationData from "./animations/shrug.json";
-import deniedAnimationData from "./animations/denied.json"
+import deniedAnimationData from "./animations/denied.json";
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
@@ -174,20 +174,20 @@ function UserSearchPopUp({
             initDataUnsafe: initDataUnsafe
           },
         });
-        setAllUsers(Object.entries(response.data));
-        setFilteredUsers(Object.entries(response.data));
+        setAllUsers(response.data);
+        setFilteredUsers(response.data);
       } catch (error) {
         catchResponseError(error);
       }
     };
 
     fetchUsers();
-  }, [branch, initDataUnsafe]); 
+  }, [branch, initDataUnsafe]);
 
 
   // Fuzzy search
   useEffect(() => {
-    const results = allUsers.filter(([user_id, userObj]) =>
+    const results = allUsers.filter((userObj) =>
       userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredUsers(results);
@@ -227,19 +227,18 @@ function UserSearchPopUp({
           )}
 
           <div className="search_results_container">
-              {filteredUsers.map(([user_id, userObj]) => (
+              {filteredUsers.map((userObj) => (
                 <motion.button
                   initial={{ opacity: 0.5, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1, transition: { ease: 'easeOut', duration: 0.2}}}
-
-                  key={user_id}
+                  key={userObj.id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe);
+                      handleUpdateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
-                      setEditingUser({id: user_id, username: userObj.username, nick: userObj.nick, color: userObj.color});
+                      setEditingUser(userObj);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }
                   }}
@@ -306,10 +305,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
     const data = {
       branch: branch,
-      modifyUserId: editingUser.id,
-      modifyUsername: editingUser.username,
-      nick: editingUser.nick,
-      color: editingUser.color,
+      userObj: editingUser,
       initDataUnsafe: initDataUnsafe
     };
 
@@ -407,6 +403,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
 function App() {
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
+  const [theme, setTheme] = useState('light');
   const [rotaData, setRotaData] = useState({});
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(today);
@@ -448,15 +445,16 @@ function App() {
       console.warn('Telegram WebApp is not avaliable')
       return
     } else if (Object.keys(window.Telegram.WebApp.initDataUnsafe).length === 0) {
-      console.log('Using mock Telegram data')
-      console.log(process.env.REACT_APP_INIT_DATA_UNSAFE)
-        setInitDataUnsafe(JSON.parse(process.env.REACT_APP_INIT_DATA_UNSAFE))
+      console.log('Using mock Telegram data');
+      console.log(process.env.REACT_APP_INIT_DATA_UNSAFE);
+      setTheme('light');
+      setInitDataUnsafe(JSON.parse(process.env.REACT_APP_INIT_DATA_UNSAFE));
     } else {
       console.log('Using real Telegram data');
+      setTheme(window.Telegram.WebApp.colorScheme);
       setInitDataUnsafe(window.Telegram.WebApp.initDataUnsafe);
       window.Telegram.WebApp.disableVerticalSwipes();
       window.Telegram.WebApp.expand();
-
       storeLastLogin();
     }
   }, []);
@@ -613,7 +611,7 @@ function App() {
 
 
   return (
-    <div className="app">
+    <div className={`app ${theme}`}>
       <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
 
       {isLoading && (
