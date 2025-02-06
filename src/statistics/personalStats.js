@@ -70,7 +70,7 @@ export default function PersonalStats({ branch, user_id }) {
 
 
   return (
-    <div className="flex flex-wrap justify-evenly py-2 bg-gray-100">
+    <div className="flex flex-wrap justify-evenly py-2 bg-gray-100 dark:bg-neutral-900">
       <StatCard 
         label="Неделя"
         sublabel="от прошлой"
@@ -100,22 +100,22 @@ const StatCard = ({ label, sublabel, current, previous }) => {
   const change = showComparison ? current - previous : 0;
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-2 w-1/4">
-      <h3 className="text-base font-semibold text-gray-500 mb-2">{label}</h3>
+    <div className="rounded-2xl shadow-md p-2 w-1/4 bg-white dark:bg-neutral-800">
+      <h3 className="text-base font-semibold mb-2 text-gray-500 dark:text-gray-400">{label}</h3>
       {current === null ? (
         <div className="animate-pulse">
-          <div className="h-10 bg-gray-200 rounded w-3/4 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-10 rounded w-3/4 mb-2 bg-gray-200 dark:bg-neutral-700"></div>
+          <div className="h-4 rounded w-1/2 bg-gray-200 dark:bg-neutral-700"></div>
         </div>
       ) : (
         <>
-          <div className="text-2xl font-semibold text-gray-800 mb-2">{current}</div>
+          <div className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{current}</div>
           {showComparison && (
             <div className="flex items-center">
-              <span className={`text-[0.6rem] ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              <span className={`text-[0.6rem] ${isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
                 {isPositive ? '↑' : '↓'} {Math.abs(change)}
               </span>
-              <span className="text-[0.6rem] text-gray-500 ml-1">{sublabel}</span>
+              <span className="text-[0.6rem] ml-1 text-gray-500 dark:text-gray-400">{sublabel}</span>
             </div>
           )}
         </>
