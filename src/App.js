@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import axios from 'axios';
-import Lottie from "react-lottie";
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-react';
@@ -10,17 +9,22 @@ import { ToastContainer, toast } from 'react-toastify';
 // Custom components
 import { handleUpdateRota } from './rota/handleUpdateRota';
 import MyDutiesCard from './MyDuties';
-import WeeklyView from './WeeklyView'
-import Stats from './Stats';
-import catchResponseError from './responseError';
+import WeeklyView from './WeeklyView';
+import Stats from './statistics/Stats';
+import Loading from './components/loading';
+import Animation from './components/animation';
+import catchResponseError from './utils/responseError';
+
+// APIs
+import fetchAllUsers from './services/fetchAllUsers';
 
 // CSS
-import './App.css';
+import './styles/App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
-import shrugAnimationData from "./animations/shrug.json";
-import deniedAnimationData from "./animations/denied.json"
+import shrugAnimationData from "./assets/shrug.json";
+import deniedAnimationData from "./assets/denied.json";
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
@@ -120,22 +124,6 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
 }
 
 
-function Animation({ animationData }) {
-    const options = {
-      loop: true,
-      autoplay: true,
-      animationData: animationData,
-      rendererSettings: {
-        preserveAspectRatio: "xMidYMid slice",
-      },
-    };
-  
-    return (
-      <Lottie options={options} />
-    );
-  };
-
-
 function UserSearchPopUp({ 
   mode,
   branch,
@@ -168,27 +156,18 @@ function UserSearchPopUp({
   // Fetch all users
   useEffect(() => {
     const fetchUsers = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/users`, {
-          params: { 
-            branch: branch,
-            initDataUnsafe: initDataUnsafe
-          },
-        });
-        setAllUsers(Object.entries(response.data));
-        setFilteredUsers(Object.entries(response.data));
-      } catch (error) {
-        catchResponseError(error);
-      }
+      const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+      setAllUsers(allUsers);
+      setFilteredUsers(allUsers);
     };
 
     fetchUsers();
-  }, [branch, initDataUnsafe]); 
+  }, [branch, initDataUnsafe]);
 
 
   // Fuzzy search
   useEffect(() => {
-    const results = allUsers.filter(([user_id, userObj]) =>
+    const results = allUsers.filter((userObj) =>
       userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredUsers(results);
@@ -228,19 +207,18 @@ function UserSearchPopUp({
           )}
 
           <div className="search_results_container">
-              {filteredUsers.map(([user_id, userObj]) => (
+              {filteredUsers.map((userObj) => (
                 <motion.button
                   initial={{ opacity: 0.5, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1, transition: { ease: 'easeOut', duration: 0.2}}}
-
-                  key={user_id}
+                  key={userObj.id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, user_id, initDataUnsafe, setRotaData);
+                      handleUpdateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
-                      setEditingUser({id: user_id, username: userObj.username, nick: userObj.nick, color: userObj.color});
+                      setEditingUser(userObj);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }
                   }}
@@ -307,10 +285,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
     const data = {
       branch: branch,
-      modifyUserId: editingUser.id,
-      modifyUsername: editingUser.username,
-      nick: editingUser.nick,
-      color: editingUser.color,
+      userObj: editingUser,
       initDataUnsafe: initDataUnsafe
     };
 
@@ -408,6 +383,7 @@ function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
 
 function App() {
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
+  const [theme, setTheme] = useState('light');
   const [rotaData, setRotaData] = useState({});
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(today);
@@ -449,15 +425,16 @@ function App() {
       console.warn('Telegram WebApp is not avaliable')
       return
     } else if (Object.keys(window.Telegram.WebApp.initDataUnsafe).length === 0) {
-      console.log('Using mock Telegram data')
-      console.log(process.env.REACT_APP_INIT_DATA_UNSAFE)
-        setInitDataUnsafe(JSON.parse(process.env.REACT_APP_INIT_DATA_UNSAFE))
+      console.log('Using mock Telegram data');
+      console.log(process.env.REACT_APP_INIT_DATA_UNSAFE);
+      setTheme('light');
+      setInitDataUnsafe(JSON.parse(process.env.REACT_APP_INIT_DATA_UNSAFE));
     } else {
       console.log('Using real Telegram data');
+      setTheme(window.Telegram.WebApp.colorScheme);
       setInitDataUnsafe(window.Telegram.WebApp.initDataUnsafe);
       window.Telegram.WebApp.disableVerticalSwipes();
       window.Telegram.WebApp.expand();
-
       storeLastLogin();
     }
   }, []);
@@ -572,7 +549,7 @@ function App() {
       }, 400);
       isFirstMount.current = false;
     },
-    delta: 100,
+    delta: 75,
   });
 
 
@@ -597,14 +574,10 @@ function App() {
 
 
   return (
-    <div className="app">
+    <div className={`app ${theme}`}>
       <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
 
-      {isLoading && (
-        <div className='flex items-center justify-center w-full h-full fixed inset-0 z-20 bg-gray-100 dark:bg-neutral-900'>
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
-        </div>
-      )}
+      {isLoading && <Loading />}
 
       {!isLoading && userBranches && (
         <>
@@ -747,6 +720,7 @@ function App() {
 
       {showStats && <Stats
         branch={branch}
+        initDataUnsafe={initDataUnsafe}
         setShowStats={setShowStats}  
       />}
 

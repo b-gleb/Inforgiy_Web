@@ -1,7 +1,8 @@
 import React, { useEffect, useState} from 'react';
 import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import axios from 'axios';
-import catchResponseError from './responseError';
+import catchResponseError from './utils/responseError';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 
@@ -76,7 +77,7 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
               ? 
               nextDuties.map((duty, index) => (
                 <p key={index} className="text-sm text-white">
-                  <span className="font-semibold">{format(duty.date, 'dd.MM.yyyy')}:</span> {convertToDutyString(duty.hours)}
+                  <span className="font-semibold">{format(duty.date, 'dd.MM (EEEE)', { locale: ru })}:</span> {convertToDutyString(duty.hours)}
                 </p>
               ))
               : <p className='text-sm text-white'>Смен нет :(</p>
