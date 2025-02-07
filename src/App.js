@@ -14,6 +14,9 @@ import Loading from './components/loading';
 import Animation from './components/animation';
 import catchResponseError from './utils/responseError';
 
+// APIs
+import fetchAllUsers from './services/fetchAllUsers';
+
 // CSS
 import './styles/App.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -152,18 +155,9 @@ function UserSearchPopUp({
   // Fetch all users
   useEffect(() => {
     const fetchUsers = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/api/users`, {
-          params: { 
-            branch: branch,
-            initDataUnsafe: initDataUnsafe
-          },
-        });
-        setAllUsers(response.data);
-        setFilteredUsers(response.data);
-      } catch (error) {
-        catchResponseError(error);
-      }
+      const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+      setAllUsers(allUsers);
+      setFilteredUsers(allUsers);
     };
 
     fetchUsers();

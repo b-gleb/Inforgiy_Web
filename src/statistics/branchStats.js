@@ -2,8 +2,10 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 import axios from 'axios';
+import fetchAllUsers from '../services/fetchAllUsers';
 import catchResponseError from '../utils/responseError';
 
+// AG Grid
 import { AgGridReact } from 'ag-grid-react';
 import gridTheme from '../styles/gridTheme';
 import localeText from '../utils/gridLocale';
@@ -25,22 +27,6 @@ ModuleRegistry.registerModules([
 ]);
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
-
-
-async function fetchAllUsers (branch, initDataUnsafe) {
-  try {
-    const response = await axios.get(`${apiUrl}/api/users`, {
-      params: {
-        branch: branch,
-        initDataUnsafe: initDataUnsafe
-      }
-    });
-
-    return response.data.map((userObj) => userObj.id);
-  } catch (error) {
-    catchResponseError(error);
-  }
-};
 
 
 async function fetchBranchStats (branch, user_ids, dateRanges) {
@@ -215,7 +201,8 @@ export default function BranchStats({ branch, initDataUnsafe }) {
   useEffect(() => {
     const generateTable = async () => {
       const year = new Date().getFullYear();
-      const allUserIds = await fetchAllUsers(branch, initDataUnsafe);
+      const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+      const allUserIds = allUsers.map(userObj => userObj.id);
       const yearlyColumnDefs = generateColumnDefs(year);
       const intervalsToFetch = calculateIntervals(year);
       const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
