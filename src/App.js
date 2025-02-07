@@ -154,10 +154,10 @@ function UserSearchPopUp({
 
   // Fetch all users
   useEffect(() => {
-    const fetchUsers = async () => {
-      const allUsers = await fetchAllUsers(branch, initDataUnsafe);
-      setAllUsers(allUsers);
-      setFilteredUsers(allUsers);
+    const fetchUsers = () => {
+      fetchAllUsers(branch, initDataUnsafe)
+        .then((result) => {setAllUsers(result); setFilteredUsers(result)})
+        .catch(() => {});
     };
 
     fetchUsers();

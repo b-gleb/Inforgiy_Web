@@ -200,20 +200,24 @@ export default function BranchStats({ branch, initDataUnsafe }) {
 
   useEffect(() => {
     const generateTable = async () => {
-      const year = new Date().getFullYear();
-      const allUsers = await fetchAllUsers(branch, initDataUnsafe);
-      const allUserIds = allUsers.map(userObj => userObj.id);
-      const yearlyColumnDefs = generateColumnDefs(year);
-      const intervalsToFetch = calculateIntervals(year);
-      const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
-      const { rows } = transformData(branchStats);
+      try {
+        const year = new Date().getFullYear();
+        const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+        const allUserIds = allUsers.map(userObj => userObj.id);
+        const yearlyColumnDefs = generateColumnDefs(year);
+        const intervalsToFetch = calculateIntervals(year);
+        const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
+        const { rows } = transformData(branchStats);
 
-      setAllUsers(allUserIds);
-      setRowData(rows);
-      setColumnDefs([
-        {field: "user", headerName: "Позывной", filter: null, pinned: 'left'},
-        ...yearlyColumnDefs
-      ]);
+        setAllUsers(allUserIds);
+        setRowData(rows);
+        setColumnDefs([
+          {field: "user", headerName: "Позывной", filter: null, pinned: 'left'},
+          ...yearlyColumnDefs
+        ]);
+      } catch (error) {
+        
+      };
     };
 
     generateTable();
