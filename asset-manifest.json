@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.css": "/Inforgiy_Web/static/css/main.84fa9b74.css",
-    "main.js": "/Inforgiy_Web/static/js/main.5601f290.js",
+    "main.css": "/Inforgiy_Web/static/css/main.b6feaeb9.css",
+    "main.js": "/Inforgiy_Web/static/js/main.f956c2ff.js",
     "static/js/685.1e1ce3fc.chunk.js": "/Inforgiy_Web/static/js/685.1e1ce3fc.chunk.js",
     "index.html": "/Inforgiy_Web/index.html"
   },
   "entrypoints": [
-    "static/css/main.84fa9b74.css",
-    "static/js/main.5601f290.js"
+    "static/css/main.b6feaeb9.css",
+    "static/js/main.f956c2ff.js"
   ]
 }
