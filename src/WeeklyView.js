@@ -5,7 +5,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
-import Loading from './utils/loading';
+import Loading from './components/loading';
 import catchResponseError from './utils/responseError';
 
 // CSS

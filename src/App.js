@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import axios from 'axios';
-import Lottie from "react-lottie";
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-react';
@@ -11,7 +10,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import MyDutiesCard from './MyDuties';
 import WeeklyView from './WeeklyView';
 import Stats from './statistics/Stats';
-import Loading from './utils/loading';
+import Loading from './components/loading';
+import Animation from './components/animation';
 import catchResponseError from './utils/responseError';
 
 // CSS
@@ -118,22 +118,6 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
     </div>
   );
 }
-
-
-function Animation({ animationData }) {
-    const options = {
-      loop: true, // Set to false if you don't want the animation to loop
-      autoplay: true, // Autoplay the animation
-      animationData: animationData, // The JSON data of the sticker
-      rendererSettings: {
-        preserveAspectRatio: "xMidYMid slice", // You can adjust this based on your layout
-      },
-    };
-  
-    return (
-      <Lottie options={options} />
-    );
-  };
 
 
 function UserSearchPopUp({ 
