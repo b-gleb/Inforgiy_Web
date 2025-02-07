@@ -3,9 +3,15 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Custom components
+import Loading from './utils/loading';
 import catchResponseError from './utils/responseError';
+
+// CSS
 import './styles/WeeklyView.css';
 
+// AG Grid
 import { AgGridReact } from 'ag-grid-react';
 import gridTheme from './styles/gridTheme';
 import {
@@ -222,11 +228,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
 
   return (
     <>
-      {isLoading && (
-        <div className='flex items-center justify-center fixed inset-0 bg-gray-100 dark:bg-neutral-900 z-40'>
-          <div className="fixed animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300 z-50"/>
-        </div>
-      )}
+      {isLoading && <Loading />}
 
       {rowData && (
         <div className='w-full h-full fixed inset-0'>

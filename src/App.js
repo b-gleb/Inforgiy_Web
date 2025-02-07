@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import MyDutiesCard from './MyDuties';
 import WeeklyView from './WeeklyView';
 import Stats from './statistics/Stats';
+import Loading from './utils/loading';
 import catchResponseError from './utils/responseError';
 
 // CSS
@@ -614,11 +615,7 @@ function App() {
     <div className={`app ${theme}`}>
       <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
 
-      {isLoading && (
-        <div className='flex items-center justify-center w-full h-full fixed inset-0 z-20 bg-gray-100 dark:bg-neutral-900'>
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 dark:border-blue-300"/>
-        </div>
-      )}
+      {isLoading && <Loading />}
 
       {!isLoading && userBranches && (
         <>
