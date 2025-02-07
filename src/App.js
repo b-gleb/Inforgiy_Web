@@ -7,7 +7,6 @@ import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-
 import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
-import { handleUpdateRota } from './rota/handleUpdateRota';
 import MyDutiesCard from './MyDuties';
 import WeeklyView from './WeeklyView';
 import Stats from './statistics/Stats';
@@ -16,6 +15,7 @@ import Animation from './components/animation';
 import catchResponseError from './utils/responseError';
 
 // APIs
+import handleUpdateRota from './services/handleUpdateRota';
 import fetchAllUsers from './services/fetchAllUsers';
 
 // CSS
@@ -68,7 +68,9 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
                 <button
                   className="ml-2"
                     onClick={() => {
-                      handleUpdateRota('remove', branch, date, timeRange, userObj.id, initDataUnsafe, setRotaData);
+                      handleUpdateRota('remove', branch, date, timeRange, userObj.id, initDataUnsafe)
+                        .then((result) => {setRotaData(result)})
+                        .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }}
                 >
@@ -98,7 +100,9 @@ function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, i
           <button
             className='p-1'
             onClick={() => {
-              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe, setRotaData);
+              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe)
+                .then((result) => {setRotaData(result)})
+                .catch(() => {});
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
             }}
           >
@@ -214,7 +218,9 @@ function UserSearchPopUp({
                   key={userObj.id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe);
+                      handleUpdateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe)
+                        .then((result) => {setRotaData(result)})
+                        .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
