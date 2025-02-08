@@ -7,7 +7,7 @@ import { User, Plus, Settings, CalendarDays, Trash2, ChartSpline } from 'lucide-
 import { ToastContainer, toast } from 'react-toastify';
 
 // Custom components
-import MyDutiesCard from './MyDuties';
+import MyDutiesCard from './rota/myDuties';
 import WeeklyView from './WeeklyView';
 import Stats from './statistics/Stats';
 import Loading from './components/loading';

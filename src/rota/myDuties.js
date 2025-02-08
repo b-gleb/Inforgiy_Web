@@ -1,11 +1,8 @@
 import React, { useEffect, useState} from 'react';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import axios from 'axios';
-import catchResponseError from './utils/responseError';
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
-
+import userDuties from '../services/userDuties';
 
 function convertToDutyString(hours) {
   if (!hours || hours.length === 0) return "";
@@ -36,28 +33,19 @@ function convertToDutyString(hours) {
 
 export default function MyDutiesCard({ branch, initDataUnsafe }) {
   const [nextDuties, setNextDuties] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNextDuty = async () => {
       const today = new Date();
-      const endDate = new Date(today);
-      endDate.setDate(endDate.getDate() + 13);
 
-      try {
-        const response = await axios.get(`${apiUrl}/api/userDuties`, {
-          params: {
-            branch: branch,
-            user_id: initDataUnsafe.user.id,
-            startDate: format(today, 'yyyy-MM-dd'),
-            endDate: format(endDate, 'yyyy-MM-dd')
-          }
-        });
-        setNextDuties(response.data)
-        setLoading(false)
-      } catch (error) {
-        catchResponseError(error)
-      }
+      userDuties(
+        branch,
+        initDataUnsafe.user.id,
+        today,
+        addDays(today, 14)
+      )
+        .then((result) => {setNextDuties(result)})
+        .catch(() => {});
     };
     // Prevent passing empty branch before auth is complete
     if (branch){
@@ -65,11 +53,12 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
     }
   }, [branch, initDataUnsafe]);
 
+
   return (
     <div className="w-full mb-3 rounded-xl shadow-lg overflow-hidden bg-gradient-to-br from-purple-400 to-purple-600 dark:from-[#7941b2] dark:to-[#3d0273]">
       <div className="px-2 py-3">
         <h2 className="text-lg font-bold text-white mb-2">Мои смены</h2>
-        {loading 
+        {!nextDuties 
           ? <SkeletonLoader />
           :
             <div className="space-y-1">
