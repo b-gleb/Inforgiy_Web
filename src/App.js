@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import axios from 'axios';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -160,10 +160,10 @@ function UserSearchPopUp({
 
   // Fetch all users
   useEffect(() => {
-    const fetchUsers = async () => {
-      const allUsers = await fetchAllUsers(branch, initDataUnsafe);
-      setAllUsers(allUsers);
-      setFilteredUsers(allUsers);
+    const fetchUsers = () => {
+      fetchAllUsers(branch, initDataUnsafe)
+        .then((result) => {setAllUsers(result); setFilteredUsers(result)})
+        .catch(() => {});
     };
 
     fetchUsers();
@@ -393,17 +393,9 @@ function App() {
     fetchRotaData();
   }, [branch, date]);
 
-
-  const addDate = (dateString, delta) => {
-    let date = new Date(dateString);
-    date.setDate(date.getDate() + delta);
-    return format(date, 'yyyy-MM-dd');
-  }
-
-
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      setDate(addDate(date, 1));
+      setDate(format(addDays(new Date(date), 1), 'yyyy-MM-dd'));
       setSwipeDirection('left');
       setShowRota(false);
       setTimeout(() => {
@@ -413,7 +405,7 @@ function App() {
     },
 
     onSwipedRight: () => {
-      setDate(addDate(date, -1));
+      setDate(format(addDays(new Date(date), -1), 'yyyy-MM-dd'));
       setSwipeDirection('right');
       setShowRota(false);
       setTimeout(() => {
@@ -441,7 +433,6 @@ function App() {
       transition: { duration: 0.4, ease: 'easeOut' },
     }),
   };
-  
 
 
 

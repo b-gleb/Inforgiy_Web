@@ -14,7 +14,9 @@ export default async function fetchAllUsers(branch, initDataUnsafe) {
     });
 
     return response.data;
+    
   } catch (error) {
     catchResponseError(error);
+    throw error
   }
 };
