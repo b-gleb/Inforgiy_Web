@@ -3,10 +3,11 @@ import { format, addDays } from 'date-fns';
 import axios from 'axios';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Plus, Settings, CalendarDays, ChartSpline } from 'lucide-react';
+import { Settings, CalendarDays, ChartSpline } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
 
 // Custom components
+import RotaHour from './rota/rota';
 import UserSearchPopUp from './rota/userSearchPopUp';
 import MyDutiesCard from './rota/myDuties';
 import WeeklyView from './WeeklyView';
@@ -14,9 +15,6 @@ import Stats from './statistics/Stats';
 import Loading from './components/loading';
 import Animation from './components/animation';
 import catchResponseError from './utils/responseError';
-
-// APIs
-import handleUpdateRota from './services/handleUpdateRota';
 
 // CSS
 import './styles/App.css';
@@ -28,104 +26,6 @@ import deniedAnimationData from "./assets/denied.json";
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
-let today = format(new Date(), 'yyyy-MM-dd');
-
-function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
-  const [showSearch, setShowSearch] = useState(false);
-
-  useEffect(() => {
-    if (showSearch) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-  }, [showSearch]);
-
-  let hourContainerClass = "hour-container";
-  if (usersArray.length === 0) {
-    hourContainerClass = `hour-container empty ${branch}`
-  };
-
-
-  return (
-    <div className={hourContainerClass}>
-      <span className="hour-label">{timeRange}</span>
-      <div className="usernames-container">
-        {usersArray.map((userObj, index) => {
-          return (
-            <AnimatePresence key={index}>
-              <motion.div
-                key={index}
-                className={`username-box color-${userObj.color}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-              >
-              <span>{userObj.nick}</span>
-
-              {rotaAdmin && (
-                <button
-                  className="ml-2"
-                    onClick={() => {
-                      handleUpdateRota('remove', branch, date, timeRange, userObj.id, initDataUnsafe)
-                        .then((result) => {setRotaData(result)})
-                        .catch(() => {});
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                    }}
-                >
-                  ✕
-                </button>
-              )}
-              </motion.div>
-            </AnimatePresence>
-          );
-        })}
-      </div>
-
-      <div className='buttons-container'>
-        {rotaAdmin && (
-          <button
-            className="p-1"
-            onClick={() => {
-              setShowSearch(true);
-              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-            }}
-          >
-            <User size={15} className="icon-text" />
-          </button>
-        )}
-
-        {date >= today && !(usersArray.some(user => user.id === initDataUnsafe.user.id)) && usersArray.length < maxDuties && (
-          <button
-            className='p-1'
-            onClick={() => {
-              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe)
-                .then((result) => {setRotaData(result)})
-                .catch(() => {});
-              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-            }}
-          >
-              <Plus size={15} className="icon-text"/>
-          </button>
-        )}
-      </div>
-
-    {showSearch && (
-      <UserSearchPopUp
-        mode='rota'
-        branch={branch}
-        date={date}
-        timeRange={timeRange}
-        initDataUnsafe={initDataUnsafe}
-        setRotaData={setRotaData}
-        onClose={() => setShowSearch(false)}
-      />
-    )}
-
-    </div>
-  );
-}
 
 
 function App() {
@@ -133,7 +33,7 @@ function App() {
   const [theme, setTheme] = useState('light');
   const [rotaData, setRotaData] = useState({});
   const [rotaAdmin, setRotaAdmin] = useState([]);
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [userBranches, setUserBranches] = useState(null);
   const [branch, setBranch] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
