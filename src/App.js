@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import { format, addDays } from 'date-fns';
 import axios from 'axios';
 import { useSwipeable } from 'react-swipeable';
@@ -8,12 +8,8 @@ import { ToastContainer } from 'react-toastify';
 
 // Custom components
 import RotaHour from './rota/rota';
-import UserSearchPopUp from './rota/userSearchPopUp';
 import MyDutiesCard from './rota/myDuties';
-import WeeklyView from './WeeklyView';
-import Stats from './statistics/Stats';
 import Loading from './components/loading';
-import Animation from './components/animation';
 import catchResponseError from './utils/responseError';
 
 // CSS
@@ -23,6 +19,12 @@ import 'react-toastify/dist/ReactToastify.css';
 // Animations
 import shrugAnimationData from "./assets/shrug.json";
 import deniedAnimationData from "./assets/denied.json";
+
+// Lazy Loading
+const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'));
+const WeeklyView = lazy(() => import('./WeeklyView'));
+const Stats = lazy(() => import('./statistics/Stats'));
+const Animation = lazy(() => import('./components/animation'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
 const apiUrl = process.env.REACT_APP_PROXY_URL;
@@ -325,42 +327,56 @@ function App() {
           )}
         </AnimatePresence>
       : (
-        <div className='size-7/12  mx-auto'>
-          <Animation animationData={shrugAnimationData} />
-          <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
-        </div>
+        <Suspense fallback={null}>
+          <div className='size-7/12  mx-auto'>
+            <Animation animationData={shrugAnimationData} />
+            <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
+          </div>
+        </Suspense>
       )
       }
 
       {showForbidden && (
-        <div className='popup flex justify-center items-center'>
-          <div className='w-[50%]'>
-            <Animation animationData={deniedAnimationData} />
-            <p className='text-center dark:text-white'>Недостаточно прав!</p>
+        <Suspense fallback={null}>
+          <div className='popup flex justify-center items-center'>
+            <div className='w-[50%]'>
+              <Animation animationData={deniedAnimationData} />
+              <p className='text-center dark:text-white'>Недостаточно прав!</p>
+            </div>
           </div>
-        </div>
+        </Suspense>
       )}
 
       {showUserManagement && (
-        <UserSearchPopUp
-          mode='user_management'
-          branch={branch}
-          initDataUnsafe={initDataUnsafe}
-          onClose={() => setShowUserManagement(false)}
-        />
+        <Suspense fallback={null}>
+          <UserSearchPopUp
+            mode='user_management'
+            branch={branch}
+            initDataUnsafe={initDataUnsafe}
+            onClose={() => setShowUserManagement(false)}
+          />
+        </Suspense>
       )}
 
-      {showWeekly && <WeeklyView
-        branch={branch}
-        initDataUnsafe={initDataUnsafe}
-        setShowWeekly={setShowWeekly}
-      />}
+      {showWeekly && (
+        <Suspense fallback={null}>
+          <WeeklyView
+            branch={branch}
+            initDataUnsafe={initDataUnsafe}
+            setShowWeekly={setShowWeekly}
+          />
+        </Suspense>
+      )}
 
-      {showStats && <Stats
-        branch={branch}
-        initDataUnsafe={initDataUnsafe}
-        setShowStats={setShowStats}  
-      />}
+      {showStats && (
+        <Suspense fallback={null}>
+          <Stats
+            branch={branch}
+            initDataUnsafe={initDataUnsafe}
+            setShowStats={setShowStats}  
+          />
+        </Suspense>
+      )}
 
       <ToastContainer
         position='bottom-center'

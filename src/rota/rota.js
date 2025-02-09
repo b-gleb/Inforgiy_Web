@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
 
-import UserSearchPopUp from './userSearchPopUp';
+// API
 import handleUpdateRota from '../services/handleUpdateRota';
+
+// Lazy Loading
+const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
 
 export default function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
   const today = format(new Date(), 'yyyy-MM-dd')
@@ -89,15 +92,17 @@ export default function RotaHour({ branch, date, timeRange, usersArray, rotaAdmi
       </div>
 
     {showSearch && (
-      <UserSearchPopUp
-        mode='rota'
-        branch={branch}
-        date={date}
-        timeRange={timeRange}
-        initDataUnsafe={initDataUnsafe}
-        setRotaData={setRotaData}
-        onClose={() => setShowSearch(false)}
-      />
+      <Suspense fallback={null}>
+        <UserSearchPopUp
+          mode='rota'
+          branch={branch}
+          date={date}
+          timeRange={timeRange}
+          initDataUnsafe={initDataUnsafe}
+          setRotaData={setRotaData}
+          onClose={() => setShowSearch(false)}
+        />
+      </Suspense>
     )}
 
     </div>
