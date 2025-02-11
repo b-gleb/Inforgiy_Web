@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkclient=self.webpackChunkclient||[]).push([[136],{5136:(e,t,a)=>{a.r(t),a.d(t,{default:()=>s});a(9950);var n=a(9879),i=a(4414);function s(e){let{animationData:t}=e;const a={loop:!0,autoplay:!0,animationData:t,rendererSettings:{preserveAspectRatio:"xMidYMid slice"}};return(0,i.jsx)(n.A,{options:a})}}}]);

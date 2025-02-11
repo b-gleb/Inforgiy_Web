@@ -1,12 +1,19 @@
 {
   "files": {
-    "main.css": "/Inforgiy_Web/static/css/main.b6feaeb9.css",
-    "main.js": "/Inforgiy_Web/static/js/main.f956c2ff.js",
+    "main.css": "/Inforgiy_Web/static/css/main.d8240a7f.css",
+    "main.js": "/Inforgiy_Web/static/js/main.5e0381fc.js",
+    "static/js/100.9b46a503.chunk.js": "/Inforgiy_Web/static/js/100.9b46a503.chunk.js",
+    "static/css/317.80cb387a.chunk.css": "/Inforgiy_Web/static/css/317.80cb387a.chunk.css",
+    "static/js/317.d3688dfd.chunk.js": "/Inforgiy_Web/static/js/317.d3688dfd.chunk.js",
+    "static/js/143.ffc3ff4f.chunk.js": "/Inforgiy_Web/static/js/143.ffc3ff4f.chunk.js",
+    "static/js/136.8344d664.chunk.js": "/Inforgiy_Web/static/js/136.8344d664.chunk.js",
     "static/js/685.1e1ce3fc.chunk.js": "/Inforgiy_Web/static/js/685.1e1ce3fc.chunk.js",
+    "static/js/691.69956bbf.chunk.js": "/Inforgiy_Web/static/js/691.69956bbf.chunk.js",
+    "static/js/879.e7c4aaf5.chunk.js": "/Inforgiy_Web/static/js/879.e7c4aaf5.chunk.js",
     "index.html": "/Inforgiy_Web/index.html"
   },
   "entrypoints": [
-    "static/css/main.b6feaeb9.css",
-    "static/js/main.f956c2ff.js"
+    "static/css/main.d8240a7f.css",
+    "static/js/main.5e0381fc.js"
   ]
 }
