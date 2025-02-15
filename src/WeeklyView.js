@@ -259,9 +259,9 @@ function CellPopUp({ selectedCellData, closePopup }) {
       <AnimatePresence>
         {selectedCellData && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50"
+            className="fixed inset-0 bg-black"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
             onClick={closePopup}
           />

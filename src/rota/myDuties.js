@@ -55,7 +55,7 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
 
 
   return (
-    <div className="w-full mb-3 rounded-xl shadow-lg overflow-hidden bg-gradient-to-br from-purple-400 to-purple-600 dark:from-[#7941b2] dark:to-[#3d0273]">
+    <div className="w-full mb-3 rounded-xl shadow-lg overflow-hidden bg-linear-to-br from-purple-400 to-purple-600 dark:from-[#7941b2] dark:to-[#3d0273]">
       <div className="px-2 py-3">
         <h2 className="text-lg font-bold text-white mb-2">Мои смены</h2>
         {!nextDuties 
@@ -82,9 +82,9 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
 function SkeletonLoader() {
   return (
     <div className="animate-pulse space-y-2">
-      <div className="h-4 rounded bg-gray-200 dark:bg-gray-400"></div>
-      <div className="h-4 rounded w-5/6 bg-gray-200 dark:bg-gray-400"></div>
-      <div className="h-4 rounded w-4/6 bg-gray-200 dark:bg-gray-400"></div>
+      <div className="h-4 rounded-sm bg-gray-200 dark:bg-gray-400"></div>
+      <div className="h-4 rounded-sm w-5/6 bg-gray-200 dark:bg-gray-400"></div>
+      <div className="h-4 rounded-sm w-4/6 bg-gray-200 dark:bg-gray-400"></div>
     </div>
   );
 }

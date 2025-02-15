@@ -13,7 +13,7 @@ import Loading from './components/loading';
 import catchResponseError from './utils/responseError';
 
 // CSS
-import './styles/App.css';
+import './styles/output.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
@@ -242,7 +242,7 @@ function App() {
           )}
 
           <div className='flex justify-between items-center space-x-2 mb-3'>
-            <div className="button-icon !p-2 flex-1">
+            <div className="button-icon p-2! flex-1">
               <input
                 type="date"
                 value={date}
