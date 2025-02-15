@@ -104,8 +104,8 @@ const StatCard = ({ label, sublabel, current, previous }) => {
       <h3 className="text-base font-semibold mb-2 text-gray-500 dark:text-gray-400">{label}</h3>
       {current === null ? (
         <div className="animate-pulse">
-          <div className="h-10 rounded w-3/4 mb-2 bg-gray-200 dark:bg-neutral-700"></div>
-          <div className="h-4 rounded w-1/2 bg-gray-200 dark:bg-neutral-700"></div>
+          <div className="h-10 rounded-sm w-3/4 mb-2 bg-gray-200 dark:bg-neutral-700"></div>
+          <div className="h-4 rounded-sm w-1/2 bg-gray-200 dark:bg-neutral-700"></div>
         </div>
       ) : (
         <>
