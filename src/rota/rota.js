@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
 
 // API
-import handleUpdateRota from '../services/handleUpdateRota';
+import updateRota from '../services/updateRota';
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
@@ -48,7 +48,7 @@ export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties,
                 <button
                   className="ml-2"
                     onClick={() => {
-                      handleUpdateRota('remove', branch, date, dutyHour.label, userObj.id, initDataUnsafe)
+                      updateRota('remove', branch, date, dutyHour.label, userObj.id, initDataUnsafe)
                         .then((result) => {setRotaData(result)})
                         .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -80,7 +80,7 @@ export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties,
           <button
             className='p-1'
             onClick={() => {
-              handleUpdateRota('add', branch, date, dutyHour.label, initDataUnsafe.user.id, initDataUnsafe)
+              updateRota('add', branch, date, dutyHour.label, initDataUnsafe.user.id, initDataUnsafe)
                 .then((result) => {setRotaData(result)})
                 .catch(() => {});
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');

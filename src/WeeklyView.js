@@ -8,6 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Loading from './components/loading';
 import catchResponseError from './utils/responseError';
 
+// API
+import updateRota from './services/updateRota';
+
 // CSS
 import './styles/WeeklyView.css';
 

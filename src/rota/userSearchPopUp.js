@@ -6,7 +6,7 @@ import UserEditForm from './userEditForm';
 
 // APIs
 import fetchAllUsers from '../services/fetchAllUsers';
-import handleUpdateRota from '../services/handleUpdateRota';
+import updateRota from '../services/updateRota';
 
 export default function UserSearchPopUp({ 
   mode,
@@ -98,7 +98,7 @@ export default function UserSearchPopUp({
                   key={userObj.id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe)
+                      updateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe)
                         .then((result) => {setRotaData(result)})
                         .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
