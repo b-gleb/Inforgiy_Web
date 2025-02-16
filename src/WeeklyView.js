@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { format } from 'date-fns';
+import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { User } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -13,6 +14,7 @@ import updateRota from './services/updateRota';
 
 // CSS
 import './styles/WeeklyView.css';
+import './styles/App.css';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
@@ -35,7 +37,7 @@ ModuleRegistry.registerModules([
 ]);
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
-
+const today = startOfToday();
 
 function rowIndexToTime(rowIndex) {
   const start = rowIndex.toString().padStart(2, '0');
@@ -44,7 +46,7 @@ function rowIndexToTime(rowIndex) {
 }
 
 
-export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
+export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsafe, setShowWeekly }) {
   const cellRenderer = ( params ) => {
     const value = params.value;
     if (!Array.isArray(value) || value.length === 0){return value};
@@ -250,13 +252,19 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
         </div>
       )}
 
-      <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup} />
+      <CellPopUp
+        selectedCellData={selectedCellData}
+        rotaAdmin={rotaAdmin}
+        maxDuties={maxDuties}
+        initDataUnsafe={initDataUnsafe}
+        closePopup={closePopup}
+      />
     </>
   );
 };
 
 
-function CellPopUp({ selectedCellData, closePopup }) {
+function CellPopUp({ selectedCellData, rotaAdmin, maxDuties, initDataUnsafe, closePopup }) {
   return (
     <>
       <AnimatePresence>
@@ -283,7 +291,7 @@ function CellPopUp({ selectedCellData, closePopup }) {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
               <button
-                className="text-red-500 text-lg font-bold"
+                className="pr-2 text-red-500 text-lg font-bold"
                 onClick={closePopup}
               >
                 ✕
@@ -297,11 +305,23 @@ function CellPopUp({ selectedCellData, closePopup }) {
                 Object.values(selectedCellData.users).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.nick}</span>
+                    <button>✕</button>
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-500">В это время нет дежурных</p>
+                <p className="pb-4 text-center text-gray-500">В это время нет дежурных</p>
               )}
+
+              {selectedCellData.date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
+                <div className='flex justify-between gap-6'>
+                  <button className='button-primary'>Взять смену</button>
+
+                  {rotaAdmin && (
+                    <button className='button-secondary'><User /></button>
+                  )}
+                </div>
+              )}
+              
             </div>
           </motion.div>
         )}
