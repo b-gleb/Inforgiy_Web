@@ -9,7 +9,7 @@ import handleUpdateRota from '../services/handleUpdateRota';
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
 
-export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
+export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
   const today = format(new Date(), 'yyyy-MM-dd')
   const [showSearch, setShowSearch] = useState(false);
 
@@ -29,7 +29,23 @@ export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties,
 
   return (
     <div className={hourContainerClass}>
-      <span className="hour-label">{dutyHour.label}</span>
+      <div className='flex flex-col'>
+        <span className="hour-label">{dutyHour.label}</span>
+
+        {secondaryDutyHour !== undefined && secondaryDutyHour.users.length > 0 && (
+          <div className='flex gap-1'>
+            {secondaryDutyHour.users.map((userObj, index) => {
+              return (
+                <div
+                  key={index}
+                  className={`user-box color-${userObj.color}`}
+                />
+              )
+            })}
+          </div>
+        )}
+      </div>
+
       <div className="usernames-container">
         {dutyHour.users.map((userObj, index) => {
           return (
