@@ -1,9 +1,44 @@
 import React, { useEffect, useState } from 'react';
+import Chart from "react-apexcharts";
 import { format } from 'date-fns';
 import axios from 'axios';
 import catchResponseError from '../utils/responseError';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
+
+const LineChart = () => {
+  const chartOptions = {
+    chart: {
+      id: "line-chart",
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false
+      },
+    },
+    xaxis: {
+      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+    },
+    stroke: {
+      curve: "smooth",
+    },
+    colors: ["#008FFB"],
+  };
+
+  const chartSeries = [
+    {
+      name: "Sales",
+      data: [30, 40, 45, 50, 49, 60, 70],
+    },
+  ];
+
+  return (
+    <div className="w-full max-w-md mx-auto">
+      <Chart options={chartOptions} series={chartSeries} type="line" />
+    </div>
+  );
+};
 
 export default function PersonalStats({ branch, user_id }) {
   const [personalStatsData, setPersonalStatsData] = useState(null);
@@ -70,6 +105,7 @@ export default function PersonalStats({ branch, user_id }) {
 
 
   return (
+    <>
     <div className="flex flex-wrap justify-evenly py-2 bg-gray-100 dark:bg-neutral-900">
       <StatCard 
         label="Неделя"
@@ -90,6 +126,9 @@ export default function PersonalStats({ branch, user_id }) {
         previous={personalStatsData?.previousYear ?? null}
       />
     </div>
+
+    <LineChart/>
+    </>
   );
 };
 
