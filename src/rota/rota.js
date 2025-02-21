@@ -48,7 +48,14 @@ export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties,
                 <button
                   className="ml-2"
                     onClick={() => {
-                      updateRota('remove', branch, date, dutyHour.label, userObj.id, initDataUnsafe)
+                      updateRota({
+                          type: 'remove',
+                          branch: branch,
+                          date: date,
+                          timeRange: dutyHour.label,
+                          modifyUserId: userObj.id,
+                          initDataUnsafe: initDataUnsafe
+                      })
                         .then((result) => {setRotaData(result)})
                         .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -80,7 +87,14 @@ export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties,
           <button
             className='p-1'
             onClick={() => {
-              updateRota('add', branch, date, dutyHour.label, initDataUnsafe.user.id, initDataUnsafe)
+              updateRota({
+                  type: 'add',
+                  branch: branch,
+                  date: date,
+                  timeRange: dutyHour.label,
+                  modifyUserId: initDataUnsafe.user.id,
+                  initDataUnsafe: initDataUnsafe
+                })
                 .then((result) => {setRotaData(result)})
                 .catch(() => {});
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');

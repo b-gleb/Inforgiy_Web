@@ -98,7 +98,14 @@ export default function UserSearchPopUp({
                   key={userObj.id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      updateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe)
+                      updateRota({
+                          type: 'add',
+                          branch: branch,
+                          date: date,
+                          timeRange: timeRange,
+                          modifyUserId: userObj.id,
+                          initDataUnsafe: initDataUnsafe
+                        })
                         .then((result) => {setRotaData(result)})
                         .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
