@@ -104,8 +104,8 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
     else {
       setSelectedCellData({
         users: params?.value ?? [],
-        date: new Date(params.colDef.field),
-        rowIndex: params.rowIndex
+        column: params.column,
+        rowNode: params.node
       })
     }
   };
@@ -264,7 +264,13 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 };
 
 
-function CellPopUp({ selectedCellData, rotaAdmin, maxDuties, initDataUnsafe, closePopup }) {
+  let date;
+  let rowIndex;
+
+  if (selectedCellData) {
+    date = new Date(selectedCellData.column.colDef.field);
+    rowIndex = selectedCellData.rowNode.rowIndex;
+  };
   return (
     <>
       <AnimatePresence>
@@ -298,7 +304,7 @@ function CellPopUp({ selectedCellData, rotaAdmin, maxDuties, initDataUnsafe, clo
               </button>
             </div>
 
-            <h3 className="text-sm font-medium mb-2 text-gray-500">{format(selectedCellData.date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(selectedCellData.rowIndex)}</h3>
+            <h3 className="text-sm font-medium mb-2 text-gray-500">{format(date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(rowIndex)}</h3>
 
             <div>
               {Object.values(selectedCellData.users).length > 0 ? (
@@ -312,7 +318,7 @@ function CellPopUp({ selectedCellData, rotaAdmin, maxDuties, initDataUnsafe, clo
                 <p className="pb-4 text-center text-gray-500">В это время нет дежурных</p>
               )}
 
-              {selectedCellData.date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
+              {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
                 <div className='flex justify-between gap-6'>
                   <button className='button-primary'>Взять смену</button>
 
