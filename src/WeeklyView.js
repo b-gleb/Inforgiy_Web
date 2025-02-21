@@ -254,8 +254,10 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
       <CellPopUp
         selectedCellData={selectedCellData}
+        branch={branch}
         rotaAdmin={rotaAdmin}
         maxDuties={maxDuties}
+        setSelectedCellData={setSelectedCellData}
         initDataUnsafe={initDataUnsafe}
         closePopup={closePopup}
       />
@@ -264,6 +266,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 };
 
 
+function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
   let date;
   let rowIndex;
 
@@ -271,6 +274,25 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
     date = new Date(selectedCellData.column.colDef.field);
     rowIndex = selectedCellData.rowNode.rowIndex;
   };
+
+  const handleUpdateCell = async (updateParams) => {
+    updateParams.date = selectedCellData.column.colDef.field;
+    updateParams.timeRange = rowIndexToTime(rowIndex);
+
+    updateRota(updateParams)
+      .then((result) => {
+        selectedCellData.rowNode.setDataValue(
+          selectedCellData.column,
+          result[rowIndex].users
+        );
+        setSelectedCellData(prevState => ({
+          ...prevState,
+          users: result[rowIndex].users
+        }));
+      })
+      .catch(() => {});
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -307,11 +329,24 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
             <h3 className="text-sm font-medium mb-2 text-gray-500">{format(date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(rowIndex)}</h3>
 
             <div>
+              {/* TODO: Add animation? */}
               {Object.values(selectedCellData.users).length > 0 ? (
                 Object.values(selectedCellData.users).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.nick}</span>
-                    <button>✕</button>
+                    <button
+                      onClick={() => {
+                        // TODO: Add haptics
+                        handleUpdateCell({
+                          type: 'remove',
+                          branch: branch,
+                          modifyUserId: user.id,
+                          initDataUnsafe: initDataUnsafe
+                        })
+                      }}
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))
               ) : (
@@ -320,7 +355,20 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
               {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
                 <div className='flex justify-between gap-6'>
-                  <button className='button-primary'>Взять смену</button>
+                  <button
+                    className='button-primary'
+                    onClick={() => {
+                      // TODO: Add haptics
+                      handleUpdateCell({
+                        type: 'add',
+                        branch: branch,
+                        modifyUserId: initDataUnsafe.user.id,
+                        initDataUnsafe: initDataUnsafe
+                      })
+                    }}
+                  >
+                    Взять смену
+                  </button>
 
                   {rotaAdmin && (
                     <button className='button-secondary'><UserPlus /></button>
