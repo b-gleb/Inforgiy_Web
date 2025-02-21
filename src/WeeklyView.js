@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { User } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -317,7 +317,7 @@ function CellPopUp({ selectedCellData, rotaAdmin, maxDuties, initDataUnsafe, clo
                   <button className='button-primary'>Взять смену</button>
 
                   {rotaAdmin && (
-                    <button className='button-secondary'><User /></button>
+                    <button className='button-secondary'><UserPlus /></button>
                   )}
                 </div>
               )}
