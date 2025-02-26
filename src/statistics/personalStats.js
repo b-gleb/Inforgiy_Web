@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import Chart from "react-apexcharts";
-import { format } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import axios from 'axios';
 import catchResponseError from '../utils/responseError';
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
+
+function getWeekRange (date) {
+  const weekStart = startOfWeek(date, {weekStartsOn: 1});
+  const weekEnd = endOfWeek(date, {weelStartsOn: 1});
+  return [format(weekStart, 'yyyy-MM-dd'), format(weekEnd, 'yyyy-MM-dd')];
+};
 
 const LineChart = () => {
   const chartOptions = {
@@ -46,31 +53,17 @@ export default function PersonalStats({ branch, user_id }) {
   useEffect(() => {
     const now = new Date();
 
-    const getWeekRange = (date) => {
-      const startOfWeek = new Date(date);
-      startOfWeek.setDate(date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1)); // Monday as first day
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-      return [startOfWeek, endOfWeek];
-    };
-
     const getMonthRange = (date) => {
-      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-      return [startOfMonth, endOfMonth];
+      const monthStart = startOfMonth(date);
+      const monthEnd = endOfMonth(date);
+      return [format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')];
     };
 
     const getYearRange = (date) => {
-      const startOfYear = new Date(date.getFullYear(), 0, 1);
-      const endOfYear = new Date(date.getFullYear(), 11, 31);
-      return [startOfYear, endOfYear];
+      const yearStart = startOfYear(date);
+      const yearEnd = endOfYear(date);
+      return [format(yearStart, 'yyyy-MM-dd'), format(yearEnd, 'yyyy-MM-dd')];
     };
-
-    const currentWeekRange = getWeekRange(now);
-    const previousWeekRange = getWeekRange(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
-    const currentMonthRange = getMonthRange(now);
-    const previousMonthRange = getMonthRange(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
-    const currentYearRange = getYearRange(now);
 
     const fetchPersonalStats = async () => {
       try {
@@ -78,11 +71,11 @@ export default function PersonalStats({ branch, user_id }) {
           branch: branch,
           user_ids: [user_id],
           dateRanges: [
-            [format(currentWeekRange[0], 'yyyy-MM-dd'), format(currentWeekRange[1], 'yyyy-MM-dd')],
-            [format(previousWeekRange[0], 'yyyy-MM-dd'), format(previousWeekRange[1], 'yyyy-MM-dd')],
-            [format(currentMonthRange[0], 'yyyy-MM-dd'), format(currentMonthRange[1], 'yyyy-MM-dd')],
-            [format(previousMonthRange[0], 'yyyy-MM-dd'), format(previousMonthRange[1], 'yyyy-MM-dd')],
-            [format(currentYearRange[0], 'yyyy-MM-dd'), format(currentYearRange[1], 'yyyy-MM-dd')]
+            getWeekRange(now),
+            getWeekRange(subWeeks(now, 1)),
+            getMonthRange(now),
+            getMonthRange(subMonths(now, 1)),
+            getYearRange(now)
           ]
         });
 
