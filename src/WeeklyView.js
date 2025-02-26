@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
@@ -35,6 +35,9 @@ ModuleRegistry.registerModules([
   RowAutoHeightModule,
   CellStyleModule,
 ]);
+
+// Lazy Loading
+const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'))
 
 const apiUrl = process.env.REACT_APP_PROXY_URL;
 const today = startOfToday();
@@ -267,6 +270,8 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
 
 function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
+  const [showSearch, setShowSearch] = useState(false);
+
   let date;
   let rowIndex;
 
@@ -376,7 +381,15 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                   </button>
 
                   {rotaAdmin && (
-                    <button className='button-secondary'><UserPlus /></button>
+                    <button
+                      className='button-secondary'
+                      onClick={() => {
+                        setShowSearch(true);
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                      }}
+                    >
+                      <UserPlus />
+                    </button>
                   )}
                 </div>
               )}
@@ -385,6 +398,19 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showSearch && (
+        <Suspense fallback={null}>
+          <UserSearchPopUp 
+            mode='rota_weekly'
+            branch={branch}
+            initDataUnsafe={initDataUnsafe}
+            handleUpdateCell={handleUpdateCell}
+            onClose={() => {setShowSearch(false)}}
+          />
+        </Suspense>
+      )}
+
     </>
   );
 };

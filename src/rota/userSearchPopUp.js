@@ -16,12 +16,14 @@ export default function UserSearchPopUp({
   timeRange,
   onClose,
   setRotaData,
+  handleUpdateCell
 }) {
   // States for fetching users and managing fuzzy search
   const [allUsers, setAllUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  // States for user management
+
+  // User management
   const [editingUser, setEditingUser] = useState(null);
 
   // Telegram UI Back Button
@@ -113,6 +115,18 @@ export default function UserSearchPopUp({
                     } else if (mode === 'user_management'){
                       setEditingUser(userObj);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    } else if (mode === 'rota_weekly'){
+                      handleUpdateCell({
+                        type: 'add',
+                        branch: branch,
+                        modifyUserId: userObj.id,
+                        initDataUnsafe: initDataUnsafe
+                      })
+                      .then(() => {
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                        onClose();
+                      })
+                      .catch(() => {});
                     }
                   }}
                   className="search_results_button"
