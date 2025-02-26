@@ -56,9 +56,11 @@ export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties,
                           modifyUserId: userObj.id,
                           initDataUnsafe: initDataUnsafe
                       })
-                        .then((result) => {setRotaData(result)})
+                        .then((result) => {
+                          setRotaData(result);
+                          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                        })
                         .catch(() => {});
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }}
                 >
                   ✕
@@ -105,19 +107,19 @@ export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties,
         )}
       </div>
 
-    {showSearch && (
-      <Suspense fallback={null}>
-        <UserSearchPopUp
-          mode='rota'
-          branch={branch}
-          date={date}
-          timeRange={dutyHour.label}
-          initDataUnsafe={initDataUnsafe}
-          setRotaData={setRotaData}
-          onClose={() => setShowSearch(false)}
-        />
-      </Suspense>
-    )}
+      {showSearch && (
+        <Suspense fallback={null}>
+          <UserSearchPopUp
+            mode='rota'
+            branch={branch}
+            date={date}
+            timeRange={dutyHour.label}
+            initDataUnsafe={initDataUnsafe}
+            setRotaData={setRotaData}
+            onClose={() => setShowSearch(false)}
+          />
+        </Suspense>
+      )}
 
     </div>
   );
