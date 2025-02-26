@@ -334,19 +334,23 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                 Object.values(selectedCellData.users).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.nick}</span>
-                    <button
-                      onClick={() => {
-                        // TODO: Add haptics
-                        handleUpdateCell({
-                          type: 'remove',
-                          branch: branch,
-                          modifyUserId: user.id,
-                          initDataUnsafe: initDataUnsafe
-                        })
-                      }}
-                    >
-                      ✕
-                    </button>
+
+                    {rotaAdmin && (
+                      <button
+                        onClick={() => {
+                          handleUpdateCell({
+                            type: 'remove',
+                            branch: branch,
+                            modifyUserId: user.id,
+                            initDataUnsafe: initDataUnsafe
+                          })
+                          .then(window.Telegram.WebApp.HapticFeedback.impactOccurred('light'))
+                          .catch(() => {});
+                        }}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 ))
               ) : (
@@ -358,13 +362,14 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                   <button
                     className='button-primary'
                     onClick={() => {
-                      // TODO: Add haptics
                       handleUpdateCell({
                         type: 'add',
                         branch: branch,
                         modifyUserId: initDataUnsafe.user.id,
                         initDataUnsafe: initDataUnsafe
                       })
+                      .then(window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'))
+                      .catch(() => {})
                     }}
                   >
                     Взять смену
@@ -382,4 +387,4 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
       </AnimatePresence>
     </>
   );
-}
+};
