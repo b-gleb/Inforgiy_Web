@@ -13,6 +13,19 @@ function getWeekRange (date) {
   return [format(weekStart, 'yyyy-MM-dd'), format(weekEnd, 'yyyy-MM-dd')];
 };
 
+function getMonthRange (date) {
+  const monthStart = startOfMonth(date);
+  const monthEnd = endOfMonth(date);
+  return [format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')];
+};
+
+function getYearRange (date) {
+  const yearStart = startOfYear(date);
+  const yearEnd = endOfYear(date);
+  return [format(yearStart, 'yyyy-MM-dd'), format(yearEnd, 'yyyy-MM-dd')];
+};
+
+
 const LineChart = () => {
   const chartOptions = {
     chart: {
@@ -53,18 +66,6 @@ export default function PersonalStats({ branch, user_id }) {
 
   useEffect(() => {
     const now = new Date();
-
-    const getMonthRange = (date) => {
-      const monthStart = startOfMonth(date);
-      const monthEnd = endOfMonth(date);
-      return [format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')];
-    };
-
-    const getYearRange = (date) => {
-      const yearStart = startOfYear(date);
-      const yearEnd = endOfYear(date);
-      return [format(yearStart, 'yyyy-MM-dd'), format(yearEnd, 'yyyy-MM-dd')];
-    };
 
     const fetchPersonalStats = async () => {
       try {
