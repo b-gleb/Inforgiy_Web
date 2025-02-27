@@ -48,6 +48,7 @@ const LineChart = () => {
 };
 
 export default function PersonalStats({ branch, user_id }) {
+  // CARDS
   const [personalStatsData, setPersonalStatsData] = useState(null);
 
   useEffect(() => {
@@ -97,6 +98,74 @@ export default function PersonalStats({ branch, user_id }) {
   }, [branch, user_id])
 
 
+  // Weekly Bars
+  const [weeklyChartSeries, setWeeklyChartSeries] = useState(null);
+  const [weeklyChartOptions, setWeeklyChartOptions] = useState({
+    chart: {
+      id: "weekly-chart",
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false
+      },
+    },
+    grid: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    yaxis: {
+      show: false
+    },
+    colors: ["#008FFB"],
+  });
+
+
+  useEffect(() => {
+    const XWeekRanges = (weeks) => {
+      const date = subWeeks(new Date(), weeks);
+      const ranges = [];
+
+      for (let i = 0; i <= weeks; i++) {
+        ranges.push(getWeekRange(addWeeks(date, i)))
+      };
+      return ranges;
+    };
+
+    const fetchWeeklyStats = async () => {
+      try {
+        const weekRanges = XWeekRanges(11);
+        
+        const response = await axios.post(`${apiUrl}/api/stats`, {
+          branch: branch,
+          user_ids: [user_id],
+          dateRanges: weekRanges
+        });
+        const user_nick = Object.keys(response.data)[0];
+
+        setWeeklyChartSeries([{
+          name: user_nick,
+          data: response.data[user_nick].map(item => item.count)
+        }]);
+
+        setWeeklyChartOptions(prevOptions => ({
+          ...prevOptions,
+          xaxis: {
+            categories: weekRanges.map(range => format(parseISO(range[0]), 'dd LLL', { locale: ru })),
+          }
+        }));
+      
+      } catch (error) {
+        catchResponseError(error);
+      };
+    };
+
+    fetchWeeklyStats();  
+  }, [branch, user_id])
+
+
   return (
     <>
     <div className="flex flex-wrap justify-evenly py-2 bg-gray-100 dark:bg-neutral-900">
@@ -121,6 +190,12 @@ export default function PersonalStats({ branch, user_id }) {
     </div>
 
     <LineChart/>
+
+    {weeklyChartSeries && (
+      <div className="w-full max-w-md mx-auto px-2">
+        <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
+      </div>
+    )}
     </>
   );
 };
