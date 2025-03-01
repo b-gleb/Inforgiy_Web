@@ -26,40 +26,6 @@ function getYearRange (date) {
 };
 
 
-const LineChart = () => {
-  const chartOptions = {
-    chart: {
-      id: "line-chart",
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false
-      },
-    },
-    xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
-    },
-    stroke: {
-      curve: "smooth",
-    },
-    colors: ["#008FFB"],
-  };
-
-  const chartSeries = [
-    {
-      name: "Sales",
-      data: [30, 40, 45, 50, 49, 60, 70],
-    },
-  ];
-
-  return (
-    <div className="w-full max-w-md mx-auto">
-      <Chart options={chartOptions} series={chartSeries} type="line" />
-    </div>
-  );
-};
-
 export default function PersonalStats({ branch, user_id }) {
   // CARDS
   const [personalStatsData, setPersonalStatsData] = useState(null);
@@ -167,6 +133,79 @@ export default function PersonalStats({ branch, user_id }) {
   }, [branch, user_id])
 
 
+  // Day by day Stats
+  const [dayByDaySeries, setDayByDaySeries] = useState(null);
+  const [dayByDayOptions] = useState({
+    chart: {
+      id: "day-by-day-chart",
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false
+      },
+    },
+    grid: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    xaxis: {
+      categories: Array.from({ length: 31 }, (_, i) => i + 1),
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      },
+      labels: {
+        show: false
+      },
+    },
+    yaxis: {
+      show: false
+    },
+    legend: {
+      show: false
+    },
+    colors: ["#008FFB", "#ff0000"],
+  });
+
+  useEffect(() => {
+    const fetchDayByDayStats = async () => {
+      try {
+        const today = new Date();
+        const response = await axios.post(`${apiUrl}/api/stats/cumulative`, {
+          branch: branch,
+          user_id: user_id,
+          dateRanges: [
+            getMonthRange(today),
+            getMonthRange(subMonths(today, 1))
+          ]
+        });
+
+        setDayByDaySeries([
+          {
+            name: "This month",
+            data: response.data[0].data.map(item => item.cumulativeCount)
+          },
+          {
+            name: "Previous month",
+            data: response.data[1].data.map(item => item.cumulativeCount)
+          }
+        ]);
+
+
+      } catch (error) {
+        catchResponseError(error);
+      };
+    };
+
+    fetchDayByDayStats();
+  }, [branch, user_id])
+
+
   return (
     <>
     <div className="flex flex-wrap justify-evenly py-2 bg-gray-100 dark:bg-neutral-900">
@@ -190,11 +229,15 @@ export default function PersonalStats({ branch, user_id }) {
       />
     </div>
 
-    <LineChart/>
-
     {weeklyChartSeries && (
       <div className="w-full max-w-md mx-auto px-2">
         <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
+      </div>
+    )}
+
+    {dayByDaySeries && (
+      <div className="w-full max-w-md mx-auto px-2">
+        <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
       </div>
     )}
     </>
