@@ -32,7 +32,7 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
       <div className='flex flex-col'>
         <span className="hour-label">{dutyHour.label}</span>
 
-        {secondaryDutyHour !== undefined && secondaryDutyHour.users.length > 0 && (
+        {secondaryDutyHour !== undefined && secondaryDutyHour.users.length > 0 && date === today && (
           <div className='flex gap-1'>
             {secondaryDutyHour.users.map((userObj, index) => {
               return (
