@@ -83,10 +83,13 @@ export default function PersonalStats({ branch, user_id }) {
     tooltip: {
       enabled: false
     },
+    dataLabels: {
+      formatter: (val) => (val === 0 ? "" : val),
+    },
     yaxis: {
       show: false
     },
-    colors: ["#008FFB"],
+    colors: ["#F69200"],
   });
 
 
@@ -163,13 +166,25 @@ export default function PersonalStats({ branch, user_id }) {
         show: false
       },
     },
-    yaxis: {
-      show: false
-    },
     legend: {
       show: false
     },
-    colors: ["#008FFB", "#ff0000"],
+    stroke: {
+      width: [4, 2],
+    },
+    markers: {
+      discrete: [
+        {
+          seriesIndex: 0,
+          dataPointIndex: new Date().getDate() - 1,
+          fillColor: "#F69200",
+          strokeColor: "#FFFFFF",
+          size: 5,
+          shape: "circle",
+        },
+      ],
+    },
+    colors: ["#F69200", "#e6d3b8"],
   });
 
   useEffect(() => {
@@ -180,7 +195,10 @@ export default function PersonalStats({ branch, user_id }) {
           branch: branch,
           user_id: user_id,
           dateRanges: [
-            getMonthRange(today),
+            [
+              format(startOfMonth(today), 'yyyy-MM-dd'),
+              format(today, 'yyyy-MM-dd'),
+            ], 
             getMonthRange(subMonths(today, 1))
           ]
         });
