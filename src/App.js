@@ -3,7 +3,7 @@ import { format, addDays } from 'date-fns';
 import axios from 'axios';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, CalendarDays, ChartSpline } from 'lucide-react';
+import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
 
 // Custom components
@@ -274,7 +274,7 @@ function App() {
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                   }}
                 >
-                  <ChartSpline size={25} className='icon-text'/>
+                  <ChartNoAxesCombined size={25} className='icon-text'/>
                 </button>
 
                 <button
