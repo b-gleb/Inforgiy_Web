@@ -9,9 +9,14 @@ import handleUpdateRota from '../services/handleUpdateRota';
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
 
-export default function RotaHour({ branch, date, timeRange, usersArray, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
+export default function RotaHour({ branch, date, dutyHour, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
   const today = format(new Date(), 'yyyy-MM-dd')
   const [showSearch, setShowSearch] = useState(false);
+
+  let hourContainerClass = "hour-container";
+  if (dutyHour.users.length === 0) {
+    hourContainerClass = `hour-container empty ${branch}`
+  };
 
   useEffect(() => {
     if (showSearch) {
@@ -21,17 +26,12 @@ export default function RotaHour({ branch, date, timeRange, usersArray, rotaAdmi
     }
   }, [showSearch]);
 
-  let hourContainerClass = "hour-container";
-  if (usersArray.length === 0) {
-    hourContainerClass = `hour-container empty ${branch}`
-  };
-
 
   return (
     <div className={hourContainerClass}>
-      <span className="hour-label">{timeRange}</span>
+      <span className="hour-label">{dutyHour.label}</span>
       <div className="usernames-container">
-        {usersArray.map((userObj, index) => {
+        {dutyHour.users.map((userObj, index) => {
           return (
             <AnimatePresence key={index}>
               <motion.div
@@ -48,7 +48,7 @@ export default function RotaHour({ branch, date, timeRange, usersArray, rotaAdmi
                 <button
                   className="ml-2"
                     onClick={() => {
-                      handleUpdateRota('remove', branch, date, timeRange, userObj.id, initDataUnsafe)
+                      handleUpdateRota('remove', branch, date, dutyHour.label, userObj.id, initDataUnsafe)
                         .then((result) => {setRotaData(result)})
                         .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -76,11 +76,11 @@ export default function RotaHour({ branch, date, timeRange, usersArray, rotaAdmi
           </button>
         )}
 
-        {date >= today && !(usersArray.some(user => user.id === initDataUnsafe.user.id)) && usersArray.length < maxDuties && (
+        {date >= today && !(dutyHour.users.some(user => user.id === initDataUnsafe.user.id)) && dutyHour.users.length < maxDuties && (
           <button
             className='p-1'
             onClick={() => {
-              handleUpdateRota('add', branch, date, timeRange, initDataUnsafe.user.id, initDataUnsafe)
+              handleUpdateRota('add', branch, date, dutyHour.label, initDataUnsafe.user.id, initDataUnsafe)
                 .then((result) => {setRotaData(result)})
                 .catch(() => {});
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -97,7 +97,7 @@ export default function RotaHour({ branch, date, timeRange, usersArray, rotaAdmi
           mode='rota'
           branch={branch}
           date={date}
-          timeRange={timeRange}
+          timeRange={dutyHour.label}
           initDataUnsafe={initDataUnsafe}
           setRotaData={setRotaData}
           onClose={() => setShowSearch(false)}

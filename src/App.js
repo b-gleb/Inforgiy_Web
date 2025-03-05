@@ -33,7 +33,7 @@ const apiUrl = process.env.REACT_APP_PROXY_URL;
 function App() {
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [theme, setTheme] = useState('light');
-  const [rotaData, setRotaData] = useState({});
+  const [rotaData, setRotaData] = useState([]);
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [userBranches, setUserBranches] = useState(null);
@@ -155,7 +155,7 @@ function App() {
             date: date,
           },
         });
-        setRotaData({ ...response.data });
+        setRotaData(response.data);
       } catch (error) {
 
         if (error.response.status === 404){
@@ -310,13 +310,12 @@ function App() {
               animate="animate"
               exit="exit"
             >
-              {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
+              {rotaData.map((dutyHour, index) => (
                 <RotaHour
                   key={index}
                   branch={branch}
                   date={date}
-                  timeRange={timeRange}
-                  usersArray={usersArray}
+                  dutyHour={dutyHour}
                   rotaAdmin={rotaAdmin.includes(branch)}
                   maxDuties={userBranches[branch].maxDuties}
                   initDataUnsafe={initDataUnsafe}

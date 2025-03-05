@@ -210,7 +210,7 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
       const updatedRotaData = []
 
       for (const day of fetchedRotaData) {
-        updatedRotaData.push(Object.values(day))
+        updatedRotaData.push(day.map(entry => entry.users));
       };
 
       const rowData = transformColumnSchemaToRowSchema(formattedDates, updatedRotaData);
