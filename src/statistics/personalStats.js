@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Chart from "react-apexcharts";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
+
+// Skeletons
+import BarChartSkeleton from '../components/skeletons/barChartSkeleton';
+import LineChartSkeleton from '../components/skeletons/lineChartSkeleton';
+
+// API
 import axios from 'axios';
 import catchResponseError from '../utils/responseError';
 
@@ -247,17 +253,22 @@ export default function PersonalStats({ branch, user_id }) {
       />
     </div>
 
-    {weeklyChartSeries && (
-      <div className="w-full max-w-md mx-auto px-2">
+    <div className="w-full max-w-md mx-auto px-2">
+      {weeklyChartSeries ?
         <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
-      </div>
-    )}
+        :
+        <BarChartSkeleton/>
+      }
+    </div>
 
-    {dayByDaySeries && (
-      <div className="w-full max-w-md mx-auto px-2">
+    <div className="w-full max-w-md mx-auto px-2">
+      {dayByDaySeries ?
         <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
-      </div>
-    )}
+        :
+        <LineChartSkeleton/>
+      }
+    </div>
+
     </>
   );
 };
