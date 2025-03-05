@@ -34,6 +34,7 @@ function App() {
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [theme, setTheme] = useState('light');
   const [rotaData, setRotaData] = useState([]);
+  const [secondaryRotaData, setSecondaryRotaData] = useState([]);
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [userBranches, setUserBranches] = useState(null);
@@ -156,6 +157,19 @@ function App() {
           },
         });
         setRotaData(response.data);
+
+        if (branch === 'di') {
+          const responseSecondary = await axios.get(`${apiUrl}/api/rota`, {
+            params: {
+              branch: 'gp',
+              date: date,
+            },
+          });
+          setSecondaryRotaData(responseSecondary.data);
+        } else {
+          setSecondaryRotaData([])
+        };
+
       } catch (error) {
 
         if (error.response.status === 404){
@@ -316,6 +330,7 @@ function App() {
                   branch={branch}
                   date={date}
                   dutyHour={dutyHour}
+                  secondaryDutyHour={secondaryRotaData[index]}
                   rotaAdmin={rotaAdmin.includes(branch)}
                   maxDuties={userBranches[branch].maxDuties}
                   initDataUnsafe={initDataUnsafe}
