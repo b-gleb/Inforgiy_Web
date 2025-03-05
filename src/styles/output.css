@@ -1155,6 +1155,7 @@
   margin-inline: auto;
   margin-block: calc(var(--spacing) * 0);
   max-width: 600px;
+  overflow-x: auto;
   background-color: var(--color-white);
   padding-inline: calc(var(--spacing) * 3);
   padding-block: calc(var(--spacing) * 5);
