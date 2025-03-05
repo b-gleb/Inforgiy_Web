@@ -269,7 +269,7 @@ const StatCard = ({ label, sublabel, current, previous }) => {
   const change = showComparison ? current - previous : 0;
 
   return (
-    <div className="rounded-2xl shadow-md p-2 w-1/4 bg-white dark:bg-neutral-800">
+    <div className="rounded-2xl shadow-sm p-2 w-1/4 bg-white dark:bg-neutral-800">
       <h3 className="text-base font-semibold mb-2 text-gray-500 dark:text-gray-400">{label}</h3>
       {current === null ? (
         <div className="animate-pulse">
