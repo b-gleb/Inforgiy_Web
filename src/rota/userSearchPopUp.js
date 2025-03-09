@@ -6,7 +6,7 @@ import fetchAllUsers from '../services/fetchAllUsers';
 import handleUpdateRota from '../services/handleUpdateRota';
 
 // Lazy Loading
-const UserEditForm = lazy(() => import('./userEditForm'));
+const UserProfile = lazy(() => import('../userProfile'));
 
 export default function UserSearchPopUp({ 
   mode,
@@ -118,7 +118,7 @@ export default function UserSearchPopUp({
       
         :
         <Suspense fallback={null}>
-          <UserEditForm
+          <UserProfile
             branch={branch}
             editingUser={editingUser}
             setEditingUser={setEditingUser}
