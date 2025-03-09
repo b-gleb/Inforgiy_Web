@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 // Lazy loading
 const UserEditForm = lazy(() => import('./rota/userEditForm'));
 const PersonalStats = lazy(() => import('./statistics/personalStats'));
+const MyDutiesCard = lazy(() => import('./rota/myDuties'));
 
 
 const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
@@ -60,6 +61,22 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
             editingUser={editingUser}
             setEditingUser={setEditingUser}
             initDataUnsafe={initDataUnsafe}
+          />
+        </Suspense>
+      </CollapsibleSection>
+
+
+      <CollapsibleSection
+        title={'Смены'}
+        isOpen={openSection === "duties"}
+        onClick={() => handleToggle("duties")}
+      >
+        <Suspense fallback={null}>
+          <MyDutiesCard
+            branch={branch}
+            user_id={editingUser.id}
+            prevDays={14}
+            nextDays={30}
           />
         </Suspense>
       </CollapsibleSection>
