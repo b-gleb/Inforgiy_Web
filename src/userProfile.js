@@ -1,5 +1,5 @@
 import { useState, Suspense, lazy } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 // Lazy loading
@@ -27,14 +27,19 @@ const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
       </button>
 
       {/* Content */}
-      <motion.div
-        initial={false}
-        animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="overflow-hidden mt-2"
-      >
-        {children}
-      </motion.div>
+      <AnimatePresence key={title}>
+        {isOpen && (
+          <motion.div
+            initial={false}
+            animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden mt-2"
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
