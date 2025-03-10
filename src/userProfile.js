@@ -90,7 +90,7 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
         <Suspense fallback={null}>
           <PersonalStats
             branch={branch}
-            user_id={initDataUnsafe.user.id}
+            user_id={editingUser.id}
           />
         </Suspense>
       </CollapsibleSection>
