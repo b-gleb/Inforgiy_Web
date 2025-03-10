@@ -376,6 +376,8 @@ function App() {
         <Suspense fallback={null}>
           <WeeklyView
             branch={branch}
+            rotaAdmin={rotaAdmin.includes(branch)}
+            maxDuties={userBranches[branch].maxDuties}
             initDataUnsafe={initDataUnsafe}
             setShowWeekly={setShowWeekly}
           />

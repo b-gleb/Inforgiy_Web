@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
 
 // API
-import handleUpdateRota from '../services/handleUpdateRota';
+import updateRota from '../services/updateRota';
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
@@ -64,10 +64,19 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
                 <button
                   className="ml-2"
                     onClick={() => {
-                      handleUpdateRota('remove', branch, date, dutyHour.label, userObj.id, initDataUnsafe)
-                        .then((result) => {setRotaData(result)})
+                      updateRota({
+                          type: 'remove',
+                          branch: branch,
+                          date: date,
+                          timeRange: dutyHour.label,
+                          modifyUserId: userObj.id,
+                          initDataUnsafe: initDataUnsafe
+                      })
+                        .then((result) => {
+                          setRotaData(result);
+                          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                        })
                         .catch(() => {});
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     }}
                 >
                   ✕
@@ -96,7 +105,14 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
           <button
             className='p-1'
             onClick={() => {
-              handleUpdateRota('add', branch, date, dutyHour.label, initDataUnsafe.user.id, initDataUnsafe)
+              updateRota({
+                  type: 'add',
+                  branch: branch,
+                  date: date,
+                  timeRange: dutyHour.label,
+                  modifyUserId: initDataUnsafe.user.id,
+                  initDataUnsafe: initDataUnsafe
+                })
                 .then((result) => {setRotaData(result)})
                 .catch(() => {});
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -107,19 +123,19 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
         )}
       </div>
 
-    {showSearch && (
-      <Suspense fallback={null}>
-        <UserSearchPopUp
-          mode='rota'
-          branch={branch}
-          date={date}
-          timeRange={dutyHour.label}
-          initDataUnsafe={initDataUnsafe}
-          setRotaData={setRotaData}
-          onClose={() => setShowSearch(false)}
-        />
-      </Suspense>
-    )}
+      {showSearch && (
+        <Suspense fallback={null}>
+          <UserSearchPopUp
+            mode='rota'
+            branch={branch}
+            date={date}
+            timeRange={dutyHour.label}
+            initDataUnsafe={initDataUnsafe}
+            setRotaData={setRotaData}
+            onClose={() => setShowSearch(false)}
+          />
+        </Suspense>
+      )}
 
     </div>
   );
