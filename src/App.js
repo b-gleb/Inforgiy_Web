@@ -308,7 +308,7 @@ function App() {
 
       <MyDutiesCard 
         branch={branch}
-        initDataUnsafe={initDataUnsafe}
+        user_id={initDataUnsafe?.user?.id ?? null}
       />
 
       {rotaData !== null

@@ -6,6 +6,7 @@ import fetchAllUsers from '../services/fetchAllUsers';
 import updateRota from '../services/updateRota';
 
 // Lazy Loading
+const UserProfile = lazy(() => import('../userProfile'));
 const UserEditForm = lazy(() => import('./userEditForm'));
 
 export default function UserSearchPopUp({ 
@@ -62,8 +63,8 @@ export default function UserSearchPopUp({
 
   return (
     <div className="popup">
-      {! editingUser
-        ? <>
+      {! editingUser ? (
+        <>
           <div className="flex items-center mb-4">
             <input
               type="text"
@@ -136,17 +137,32 @@ export default function UserSearchPopUp({
               ))}
           </div>
         </>
-      
-        :
-        <Suspense fallback={null}>
-          <UserEditForm
-            branch={branch}
-            editingUser={editingUser}
-            setEditingUser={setEditingUser}
-            initDataUnsafe={initDataUnsafe}
-          />
-        </Suspense>
-      }
+      )
+      : (
+
+        editingUser?.id !== null ? (
+          // Show full user profile
+          <Suspense fallback={null}>
+            <UserProfile
+              branch={branch}
+              editingUser={editingUser}
+              setEditingUser={setEditingUser}
+              initDataUnsafe={initDataUnsafe}
+            />
+          </Suspense>
+        )
+        : (
+          // Adding a new user
+          <Suspense fallback={null}>
+            <UserEditForm
+              branch={branch}
+              editingUser={editingUser}
+              setEditingUser={setEditingUser}
+              initDataUnsafe={initDataUnsafe}
+            />
+          </Suspense>
+        )
+      )}
     </div>
   )
 };
