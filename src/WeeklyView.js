@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { format } from 'date-fns';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
+import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { UserPlus } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,8 +9,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Loading from './components/loading';
 import catchResponseError from './utils/responseError';
 
+// API
+import updateRota from './services/updateRota';
+
 // CSS
 import './styles/WeeklyView.css';
+import './styles/App.css';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
@@ -31,8 +36,11 @@ ModuleRegistry.registerModules([
   CellStyleModule,
 ]);
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+// Lazy Loading
+const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'))
 
+const apiUrl = process.env.REACT_APP_PROXY_URL;
+const today = startOfToday();
 
 function rowIndexToTime(rowIndex) {
   const start = rowIndex.toString().padStart(2, '0');
@@ -41,7 +49,7 @@ function rowIndexToTime(rowIndex) {
 }
 
 
-export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
+export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsafe, setShowWeekly }) {
   const cellRenderer = ( params ) => {
     const value = params.value;
     if (!Array.isArray(value) || value.length === 0){return value};
@@ -99,8 +107,8 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
     else {
       setSelectedCellData({
         users: params?.value ?? [],
-        date: new Date(params.colDef.field),
-        rowIndex: params.rowIndex
+        column: params.column,
+        rowNode: params.node
       })
     }
   };
@@ -247,13 +255,49 @@ export default function WeeklyView({ branch, initDataUnsafe, setShowWeekly }) {
         </div>
       )}
 
-      <CellPopUp selectedCellData={selectedCellData} closePopup={closePopup} />
+      <CellPopUp
+        selectedCellData={selectedCellData}
+        branch={branch}
+        rotaAdmin={rotaAdmin}
+        maxDuties={maxDuties}
+        setSelectedCellData={setSelectedCellData}
+        initDataUnsafe={initDataUnsafe}
+        closePopup={closePopup}
+      />
     </>
   );
 };
 
 
-function CellPopUp({ selectedCellData, closePopup }) {
+function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
+  const [showSearch, setShowSearch] = useState(false);
+
+  let date;
+  let rowIndex;
+
+  if (selectedCellData) {
+    date = new Date(selectedCellData.column.colDef.field);
+    rowIndex = selectedCellData.rowNode.rowIndex;
+  };
+
+  const handleUpdateCell = async (updateParams) => {
+    updateParams.date = selectedCellData.column.colDef.field;
+    updateParams.timeRange = rowIndexToTime(rowIndex);
+
+    updateRota(updateParams)
+      .then((result) => {
+        selectedCellData.rowNode.setDataValue(
+          selectedCellData.column,
+          result[rowIndex].users
+        );
+        setSelectedCellData(prevState => ({
+          ...prevState,
+          users: result[rowIndex].users
+        }));
+      })
+      .catch(() => {});
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -280,29 +324,93 @@ function CellPopUp({ selectedCellData, closePopup }) {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
               <button
-                className="text-red-500 text-lg font-bold"
+                className="pr-2 text-red-500 text-lg font-bold"
                 onClick={closePopup}
               >
                 ✕
               </button>
             </div>
 
-            <h3 className="text-sm font-medium mb-2 text-gray-500">{format(selectedCellData.date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(selectedCellData.rowIndex)}</h3>
+            <h3 className="text-sm font-medium mb-2 text-gray-500">{format(date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(rowIndex)}</h3>
 
             <div>
+              {/* TODO: Add animation? */}
               {Object.values(selectedCellData.users).length > 0 ? (
                 Object.values(selectedCellData.users).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.nick}</span>
+
+                    {rotaAdmin && (
+                      <button
+                        onClick={() => {
+                          handleUpdateCell({
+                            type: 'remove',
+                            branch: branch,
+                            modifyUserId: user.id,
+                            initDataUnsafe: initDataUnsafe
+                          })
+                          .then(window.Telegram.WebApp.HapticFeedback.impactOccurred('light'))
+                          .catch(() => {});
+                        }}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-500">В это время нет дежурных</p>
+                <p className="pb-4 text-center text-gray-500">В это время нет дежурных</p>
               )}
+
+              {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
+                <div className='flex justify-between gap-6'>
+                  <button
+                    className='button-primary'
+                    onClick={() => {
+                      handleUpdateCell({
+                        type: 'add',
+                        branch: branch,
+                        modifyUserId: initDataUnsafe.user.id,
+                        initDataUnsafe: initDataUnsafe
+                      })
+                      .then(window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'))
+                      .catch(() => {})
+                    }}
+                  >
+                    Взять смену
+                  </button>
+
+                  {rotaAdmin && (
+                    <button
+                      className='button-secondary'
+                      onClick={() => {
+                        setShowSearch(true);
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                      }}
+                    >
+                      <UserPlus />
+                    </button>
+                  )}
+                </div>
+              )}
+              
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showSearch && (
+        <Suspense fallback={null}>
+          <UserSearchPopUp 
+            mode='rota_weekly'
+            branch={branch}
+            initDataUnsafe={initDataUnsafe}
+            handleUpdateCell={handleUpdateCell}
+            onClose={() => {setShowSearch(false)}}
+          />
+        </Suspense>
+      )}
+
     </>
   );
-}
+};
