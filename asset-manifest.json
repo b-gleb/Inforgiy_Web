@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.css": "/Inforgiy_Web/static/css/main.a2c32db6.css",
-    "main.js": "/Inforgiy_Web/static/js/main.a04afbe1.js",
-    "static/js/217.cf88887d.chunk.js": "/Inforgiy_Web/static/js/217.cf88887d.chunk.js",
-    "static/css/317.89d8d484.chunk.css": "/Inforgiy_Web/static/css/317.89d8d484.chunk.css",
-    "static/js/317.90344e0c.chunk.js": "/Inforgiy_Web/static/js/317.90344e0c.chunk.js",
-    "static/js/143.bad566bd.chunk.js": "/Inforgiy_Web/static/js/143.bad566bd.chunk.js",
+    "main.css": "/Inforgiy_Web/static/css/main.9a6f49a1.css",
+    "main.js": "/Inforgiy_Web/static/js/main.6c677a38.js",
+    "static/js/217.8a22f6ae.chunk.js": "/Inforgiy_Web/static/js/217.8a22f6ae.chunk.js",
+    "static/css/523.27c836a1.chunk.css": "/Inforgiy_Web/static/css/523.27c836a1.chunk.css",
+    "static/js/523.991687f8.chunk.js": "/Inforgiy_Web/static/js/523.991687f8.chunk.js",
+    "static/js/143.bbf835c2.chunk.js": "/Inforgiy_Web/static/js/143.bbf835c2.chunk.js",
     "static/js/136.8344d664.chunk.js": "/Inforgiy_Web/static/js/136.8344d664.chunk.js",
     "static/js/685.1e1ce3fc.chunk.js": "/Inforgiy_Web/static/js/685.1e1ce3fc.chunk.js",
     "static/js/497.83a350e0.chunk.js": "/Inforgiy_Web/static/js/497.83a350e0.chunk.js",
@@ -14,7 +14,7 @@
     "index.html": "/Inforgiy_Web/index.html"
   },
   "entrypoints": [
-    "static/css/main.a2c32db6.css",
-    "static/js/main.a04afbe1.js"
+    "static/css/main.9a6f49a1.css",
+    "static/js/main.6c677a38.js"
   ]
 }
