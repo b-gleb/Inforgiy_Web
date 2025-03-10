@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-
-// Custom components
-import UserEditForm from './userEditForm';
 
 // APIs
 import fetchAllUsers from '../services/fetchAllUsers';
 import updateRota from '../services/updateRota';
+
+// Lazy Loading
+const UserEditForm = lazy(() => import('./userEditForm'));
 
 export default function UserSearchPopUp({ 
   mode,
@@ -138,15 +138,14 @@ export default function UserSearchPopUp({
         </>
       
         :
-        <>
+        <Suspense fallback={null}>
           <UserEditForm
             branch={branch}
             editingUser={editingUser}
             setEditingUser={setEditingUser}
             initDataUnsafe={initDataUnsafe}
           />
-        </>
-        
+        </Suspense>
       }
     </div>
   )
