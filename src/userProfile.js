@@ -2,15 +2,15 @@ import { useState, Suspense, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-// Lazy loading
-const UserEditForm = lazy(() => import('./rota/userEditForm'));
+// Sections
+import UserEditForm from "./rota/userEditForm";
 const PersonalStats = lazy(() => import('./statistics/personalStats'));
 const MyDutiesCard = lazy(() => import('./rota/myDuties'));
 
 
 const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
   return (
-    <div className="">
+    <>
       {/* Header */}
       <button
         onClick={onClick}
@@ -40,7 +40,7 @@ const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
 
@@ -60,14 +60,12 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
         isOpen={openSection === "settings"}
         onClick={() => handleToggle("settings")}
       >
-        <Suspense fallback={null}>
-          <UserEditForm
-            branch={branch}
-            editingUser={editingUser}
-            setEditingUser={setEditingUser}
-            initDataUnsafe={initDataUnsafe}
-          />
-        </Suspense>
+        <UserEditForm
+          branch={branch}
+          editingUser={editingUser}
+          setEditingUser={setEditingUser}
+          initDataUnsafe={initDataUnsafe}
+        />
       </CollapsibleSection>
 
 
