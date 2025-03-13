@@ -20,30 +20,12 @@ export default function LineChartSkeleton ({ width = 400, height = 200, pointCou
       <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#ddd" strokeWidth="2" />
 
       {/* Fading Line */}
-      <path d={pathD} className="line" strokeWidth="3" fill="none" />
+      <path d={pathD} className="stroke-gray-300 [stroke-dasharray:6] animate-pulse" strokeWidth="3" fill="none" />
 
       {/* Circles for data points */}
       {points.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="5" className="point" />
+        <circle key={i} cx={p.x} cy={p.y} r="5" className="fill-gray-300 animate-pulse" />
       ))}
-
-      <style>
-        {`
-          .line {
-            stroke: #e0e0e0;
-            stroke-dasharray: 6;
-            animation: shimmer 1.5s infinite alternate;
-          }
-          .point {
-            fill: #e0e0e0;
-            animation: shimmer 1.5s infinite alternate;
-          }
-          @keyframes shimmer {
-            0% { opacity: 0.6; }
-            100% { opacity: 1; }
-          }
-        `}
-      </style>
     </svg>
   );
 };
