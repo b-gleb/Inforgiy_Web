@@ -142,11 +142,11 @@ export default function PersonalStats({ branch, user_id }) {
   }, [branch, user_id])
 
 
-  // Day by day Stats
+  // Cumulative month stats
   const [dayByDaySeries, setDayByDaySeries] = useState(null);
   const [dayByDayOptions] = useState({
     chart: {
-      id: "day-by-day-chart",
+      id: "cumulative",
       toolbar: {
         show: false,
       },
@@ -176,12 +176,12 @@ export default function PersonalStats({ branch, user_id }) {
       show: false
     },
     stroke: {
-      width: [4, 2],
+      width: [2, 4],
     },
     markers: {
       discrete: [
         {
-          seriesIndex: 0,
+          seriesIndex: 1,
           dataPointIndex: new Date().getDate() - 1,
           fillColor: "#F69200",
           strokeColor: "#FFFFFF",
@@ -190,7 +190,7 @@ export default function PersonalStats({ branch, user_id }) {
         },
       ],
     },
-    colors: ["#F69200", "#e6d3b8"],
+    colors: ["#E6D3B8", "#F69200"],
   });
 
   useEffect(() => {
@@ -211,13 +211,13 @@ export default function PersonalStats({ branch, user_id }) {
 
         setDayByDaySeries([
           {
+            name: "Previous month",
+            data: response.data[1].data.map(item => item.cumulativeCount)
+          },
+          {
             name: "This month",
             data: response.data[0].data.map(item => item.cumulativeCount)
           },
-          {
-            name: "Previous month",
-            data: response.data[1].data.map(item => item.cumulativeCount)
-          }
         ]);
 
 
