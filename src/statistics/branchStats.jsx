@@ -26,7 +26,7 @@ ModuleRegistry.registerModules([
   LocaleModule
 ]);
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
 async function fetchBranchStats (branch, user_ids, dateRanges) {

@@ -39,7 +39,7 @@ ModuleRegistry.registerModules([
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'))
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 const today = startOfToday();
 
 function rowIndexToTime(rowIndex) {

@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
 
 // API
-import updateRota from '../services/updateRota';
+import updateRota from '../services/updateRota.jsx';
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
