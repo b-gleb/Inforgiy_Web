@@ -4,9 +4,6 @@
   "private": true,
   "homepage": "https://b-gleb.github.io/Inforgiy_Web",
   "dependencies": {
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.1.0",
-    "@testing-library/user-event": "^14.5.2",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "ag-grid-community": "^33.1.1",
     "ag-grid-react": "^33.1.1",
@@ -21,8 +18,7 @@
     "react-toastify": "^11.0.5",
     "vite": "^6.2.2",
     "vite-plugin-svgr": "^4.3.0",
-    "vite-tsconfig-paths": "^5.1.4",
-    "web-vitals": "^4.2.4"
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "scripts": {
     "predeploy": "npm run build",
@@ -30,24 +26,6 @@
     "start": "concurrently \"npx @tailwindcss/cli -i ./src/styles/input.css -o ./src/styles/output.css --watch\" \"vite\"",
     "build": "tsc && vite build",
     "serve": "vite preview"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
