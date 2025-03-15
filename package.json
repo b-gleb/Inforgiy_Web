@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://b-gleb.github.io/Inforgiy_Web",
   "dependencies": {
+    "@tailwindcss/vite": "^4.0.14",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "ag-grid-community": "^33.1.1",
     "ag-grid-react": "^33.1.1",
@@ -23,7 +24,7 @@
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build --repo https://github.com/b-gleb/Inforgiy_Web.git",
-    "start": "concurrently \"npx @tailwindcss/cli -i ./src/styles/input.css -o ./src/styles/output.css --watch\" \"vite\"",
+    "start": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview"
   },

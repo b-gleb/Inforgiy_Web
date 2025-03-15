@@ -14,7 +14,6 @@ import updateRota from './services/updateRota';
 
 // CSS
 import './styles/WeeklyView.css';
-import './styles/App.css';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';

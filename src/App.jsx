@@ -13,7 +13,7 @@ import Loading from './components/loading';
 import catchResponseError from './utils/responseError.jsx';
 
 // CSS
-import './styles/output.css';
+import './styles/App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
