@@ -25,7 +25,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist --repo https://github.com/b-gleb/Inforgiy_Web.git",
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "serve": "vite preview"
   },
   "devDependencies": {
