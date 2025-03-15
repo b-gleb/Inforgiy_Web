@@ -1,6 +1,0 @@
-.app,.branch-button,.branch-button.selected,.branches-container,.branches-flexbox,.button-icon,.button-primary,.button-secondary,.buttons-container,.empty,.empty.gp,.form-label,.gp-green,.hour-container,.hour-container.empty,.hour-container.empty.gp,.hour-label,.hours-grid,.icon-text,.input-field,.my-duty,.pop-up,.popup,.search_results_button,.search_results_container,.user-box,.user-box.color-1,.user-box.color-3,.username-box,.username-box.color-0,.username-box.color-1,.username-box.color-2,.username-box.color-3,.username-box.color-4,.username-box.color-5,.username-box.color-6,.usernames-container{@apply overflow-hidden
-  text-sm
-
-  text-[#393939] dark:text-gray-400
-  dark:bg-neutral-700
-  border rounded-lg border-gray-300 dark:border-neutral-700}
