@@ -1,10 +1,10 @@
 import axios from 'axios';
 import catchResponseError from '../utils/responseError';
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
-export default async function handleUpdateRota(type, branch, date, timeRange, modifyUserId, initDataUnsafe) {
+export default async function updateRota({type, branch, date, timeRange, modifyUserId, initDataUnsafe}) {
   try {
     const response = await axios.post(`${apiUrl}/api/updateRota`, {
       type: type,

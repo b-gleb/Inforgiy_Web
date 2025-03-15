@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-
-// Custom components
-import UserEditForm from './userEditForm';
 
 // APIs
 import fetchAllUsers from '../services/fetchAllUsers';
-import handleUpdateRota from '../services/handleUpdateRota';
+import updateRota from '../services/updateRota';
+
+// Lazy Loading
+const UserProfile = lazy(() => import('../userProfile'));
+const UserEditForm = lazy(() => import('./userEditForm'));
 
 export default function UserSearchPopUp({ 
   mode,
@@ -16,12 +17,14 @@ export default function UserSearchPopUp({
   timeRange,
   onClose,
   setRotaData,
+  handleUpdateCell
 }) {
   // States for fetching users and managing fuzzy search
   const [allUsers, setAllUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  // States for user management
+
+  // User management
   const [editingUser, setEditingUser] = useState(null);
 
   // Telegram UI Back Button
@@ -60,8 +63,8 @@ export default function UserSearchPopUp({
 
   return (
     <div className="popup">
-      {! editingUser
-        ? <>
+      {! editingUser ? (
+        <>
           <div className="flex items-center mb-4">
             <input
               type="text"
@@ -98,7 +101,14 @@ export default function UserSearchPopUp({
                   key={userObj.id}
                   onClick={() => {
                     if (mode === 'rota'){
-                      handleUpdateRota('add', branch, date, timeRange, userObj.id, initDataUnsafe)
+                      updateRota({
+                          type: 'add',
+                          branch: branch,
+                          date: date,
+                          timeRange: timeRange,
+                          modifyUserId: userObj.id,
+                          initDataUnsafe: initDataUnsafe
+                        })
                         .then((result) => {setRotaData(result)})
                         .catch(() => {});
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -106,6 +116,18 @@ export default function UserSearchPopUp({
                     } else if (mode === 'user_management'){
                       setEditingUser(userObj);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    } else if (mode === 'rota_weekly'){
+                      handleUpdateCell({
+                        type: 'add',
+                        branch: branch,
+                        modifyUserId: userObj.id,
+                        initDataUnsafe: initDataUnsafe
+                      })
+                      .then(() => {
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                        onClose();
+                      })
+                      .catch(() => {});
                     }
                   }}
                   className="search_results_button"
@@ -115,18 +137,32 @@ export default function UserSearchPopUp({
               ))}
           </div>
         </>
-      
-        :
-        <>
-          <UserEditForm
-            branch={branch}
-            editingUser={editingUser}
-            setEditingUser={setEditingUser}
-            initDataUnsafe={initDataUnsafe}
-          />
-        </>
-        
-      }
+      )
+      : (
+
+        editingUser?.id !== null ? (
+          // Show full user profile
+          <Suspense fallback={null}>
+            <UserProfile
+              branch={branch}
+              editingUser={editingUser}
+              setEditingUser={setEditingUser}
+              initDataUnsafe={initDataUnsafe}
+            />
+          </Suspense>
+        )
+        : (
+          // Adding a new user
+          <Suspense fallback={null}>
+            <UserEditForm
+              branch={branch}
+              editingUser={editingUser}
+              setEditingUser={setEditingUser}
+              initDataUnsafe={initDataUnsafe}
+            />
+          </Suspense>
+        )
+      )}
     </div>
   )
 };

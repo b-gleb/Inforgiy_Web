@@ -10,10 +10,10 @@ import { ToastContainer } from 'react-toastify';
 import RotaHour from './rota/rota';
 import MyDutiesCard from './rota/myDuties';
 import Loading from './components/loading';
-import catchResponseError from './utils/responseError';
+import catchResponseError from './utils/responseError.jsx';
 
 // CSS
-import './styles/output.css';
+import './styles/App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
@@ -27,13 +27,14 @@ const Stats = lazy(() => import('./statistics/Stats'));
 const Animation = lazy(() => import('./components/animation'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
 function App() {
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [theme, setTheme] = useState('light');
-  const [rotaData, setRotaData] = useState({});
+  const [rotaData, setRotaData] = useState([]);
+  const [secondaryRotaData, setSecondaryRotaData] = useState([]);
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [userBranches, setUserBranches] = useState(null);
@@ -75,9 +76,9 @@ function App() {
       return
     } else if (Object.keys(window.Telegram.WebApp.initDataUnsafe).length === 0) {
       console.log('Using mock Telegram data');
-      console.log(process.env.REACT_APP_INIT_DATA_UNSAFE);
+      console.log(import.meta.env.VITE_INIT_DATA_UNSAFE);
       setTheme('light');
-      setInitDataUnsafe(JSON.parse(process.env.REACT_APP_INIT_DATA_UNSAFE));
+      setInitDataUnsafe(JSON.parse(import.meta.env.VITE_INIT_DATA_UNSAFE));
     } else {
       console.log('Using real Telegram data');
       setTheme(window.Telegram.WebApp.colorScheme);
@@ -155,7 +156,20 @@ function App() {
             date: date,
           },
         });
-        setRotaData({ ...response.data });
+        setRotaData(response.data);
+
+        if (branch === 'di') {
+          const responseSecondary = await axios.get(`${apiUrl}/api/rota`, {
+            params: {
+              branch: 'gp',
+              date: date,
+            },
+          });
+          setSecondaryRotaData(responseSecondary.data);
+        } else {
+          setSecondaryRotaData([])
+        };
+
       } catch (error) {
 
         if (error.response.status === 404){
@@ -294,7 +308,7 @@ function App() {
 
       <MyDutiesCard 
         branch={branch}
-        initDataUnsafe={initDataUnsafe}
+        user_id={initDataUnsafe?.user?.id ?? null}
       />
 
       {rotaData !== null
@@ -310,13 +324,13 @@ function App() {
               animate="animate"
               exit="exit"
             >
-              {Object.entries(rotaData).map(([timeRange, usersArray], index) => (
+              {rotaData.map((dutyHour, index) => (
                 <RotaHour
                   key={index}
                   branch={branch}
                   date={date}
-                  timeRange={timeRange}
-                  usersArray={usersArray}
+                  dutyHour={dutyHour}
+                  secondaryDutyHour={secondaryRotaData[index]}
                   rotaAdmin={rotaAdmin.includes(branch)}
                   maxDuties={userBranches[branch].maxDuties}
                   initDataUnsafe={initDataUnsafe}
@@ -362,6 +376,8 @@ function App() {
         <Suspense fallback={null}>
           <WeeklyView
             branch={branch}
+            rotaAdmin={rotaAdmin.includes(branch)}
+            maxDuties={userBranches[branch].maxDuties}
             initDataUnsafe={initDataUnsafe}
             setShowWeekly={setShowWeekly}
           />

@@ -1,8 +1,8 @@
 import React, { useEffect, useState} from 'react';
-import { format, addDays } from 'date-fns';
+import { format, addDays, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
-import userDuties from '../services/userDuties';
+import userDuties from '../services/userDuties.jsx';
 
 function convertToDutyString(hours) {
   if (!hours || hours.length === 0) return "";
@@ -31,7 +31,7 @@ function convertToDutyString(hours) {
 }
 
 
-export default function MyDutiesCard({ branch, initDataUnsafe }) {
+export default function MyDutiesCard({ branch, user_id, prevDays = 0, nextDays = 14 }) {
   const [nextDuties, setNextDuties] = useState(null);
 
   useEffect(() => {
@@ -40,9 +40,9 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
 
       userDuties(
         branch,
-        initDataUnsafe.user.id,
-        today,
-        addDays(today, 14)
+        user_id,
+        subDays(today, prevDays),
+        addDays(today, nextDays)
       )
         .then((result) => {setNextDuties(result)})
         .catch(() => {});
@@ -51,7 +51,7 @@ export default function MyDutiesCard({ branch, initDataUnsafe }) {
     if (branch){
       fetchNextDuty();
     }
-  }, [branch, initDataUnsafe]);
+  }, [branch, user_id, prevDays, nextDays]);
 
 
   return (

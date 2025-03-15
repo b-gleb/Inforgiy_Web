@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import catchResponseError from '../utils/responseError';
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 export default function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
     const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный", 3: "Чёрный", 4: "Фиолетовый", 5: "Оранжевый", 6: "Жёлтый"};

@@ -11,7 +11,7 @@ import LineChartSkeleton from '../components/skeletons/lineChartSkeleton';
 import axios from 'axios';
 import catchResponseError from '../utils/responseError';
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 function getWeekRange (date) {
   const weekStart = startOfWeek(date, {weekStartsOn: 1});

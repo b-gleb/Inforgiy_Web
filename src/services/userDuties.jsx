@@ -2,7 +2,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import catchResponseError from '../utils/responseError';
 
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
 export default async function userDuties (branch, user_id, startDate, endDate) {
