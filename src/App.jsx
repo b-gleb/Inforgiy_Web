@@ -10,10 +10,10 @@ import { ToastContainer } from 'react-toastify';
 import RotaHour from './rota/rota';
 import MyDutiesCard from './rota/myDuties';
 import Loading from './components/loading';
-import catchResponseError from './utils/responseError';
+import catchResponseError from './utils/responseError.jsx';
 
 // CSS
-import './styles/output.css';
+import './styles/App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
@@ -27,7 +27,7 @@ const Stats = lazy(() => import('./statistics/Stats'));
 const Animation = lazy(() => import('./components/animation'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
-const apiUrl = process.env.REACT_APP_PROXY_URL;
+const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
 function App() {
@@ -76,9 +76,9 @@ function App() {
       return
     } else if (Object.keys(window.Telegram.WebApp.initDataUnsafe).length === 0) {
       console.log('Using mock Telegram data');
-      console.log(process.env.REACT_APP_INIT_DATA_UNSAFE);
+      console.log(import.meta.env.VITE_INIT_DATA_UNSAFE);
       setTheme('light');
-      setInitDataUnsafe(JSON.parse(process.env.REACT_APP_INIT_DATA_UNSAFE));
+      setInitDataUnsafe(JSON.parse(import.meta.env.VITE_INIT_DATA_UNSAFE));
     } else {
       console.log('Using real Telegram data');
       setTheme(window.Telegram.WebApp.colorScheme);
