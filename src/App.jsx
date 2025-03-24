@@ -26,7 +26,7 @@ const WeeklyView = lazy(() => import('./WeeklyView'));
 const Stats = lazy(() => import('./statistics/Stats'));
 const Animation = lazy(() => import('./components/animation'));
 
-const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ'};
+const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
