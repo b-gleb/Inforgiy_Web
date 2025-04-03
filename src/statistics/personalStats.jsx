@@ -130,6 +130,12 @@ export default function PersonalStats({ branch, user_id }) {
           ...prevOptions,
           xaxis: {
             categories: weekRanges.map(range => format(parseISO(range[0]), 'dd LLL', { locale: ru })),
+            labels: {
+              style: {
+                colors: '#808080',
+                fontSize: '12px',
+              }
+            }
           }
         }));
       
@@ -171,6 +177,14 @@ export default function PersonalStats({ branch, user_id }) {
       labels: {
         show: false
       },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#808080',
+          fontSize: '12px',
+        }
+      }
     },
     legend: {
       show: false
