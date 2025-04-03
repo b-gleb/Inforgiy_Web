@@ -1,0 +1,1 @@
+import{a as e,b as t}from"./index-DKfdfCwq.js";const o="https://inforgiy-server.fly.dev";async function c(s,a){try{return(await e.get(`${o}/api/users`,{params:{branch:s,initDataUnsafe:a}})).data}catch(r){throw t(r),r}}export{c as f};
