@@ -16,12 +16,7 @@ export default function Stats({ branch, initDataUnsafe, setShowStats }){
   }, [setShowStats]);
 
   return (
-    <div className='w-full h-full flex flex-col fixed inset-0 bg-gray-100 dark:bg-neutral-900'>
-      <PersonalStats
-        branch={branch}
-        user_id={initDataUnsafe.user.id}
-      />
-
+    <div className='overflow-y-auto fixed inset-0 bg-white dark:bg-neutral-900'>
       <div className='flex-1 overflow-hidden'>
         <BranchStats 
           branch={branch}

@@ -1,41 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { format } from 'date-fns';
+import Chart from "react-apexcharts";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
+
+// Skeletons
+import BarChartSkeleton from '../components/skeletons/barChartSkeleton';
+import LineChartSkeleton from '../components/skeletons/lineChartSkeleton';
+
+// API
 import axios from 'axios';
 import catchResponseError from '../utils/responseError';
 
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
+function getWeekRange (date) {
+  const weekStart = startOfWeek(date, {weekStartsOn: 1});
+  const weekEnd = endOfWeek(date, {weelStartsOn: 1});
+  return [format(weekStart, 'yyyy-MM-dd'), format(weekEnd, 'yyyy-MM-dd')];
+};
+
+function getMonthRange (date) {
+  const monthStart = startOfMonth(date);
+  const monthEnd = endOfMonth(date);
+  return [format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')];
+};
+
+function getYearRange (date) {
+  const yearStart = startOfYear(date);
+  const yearEnd = endOfYear(date);
+  return [format(yearStart, 'yyyy-MM-dd'), format(yearEnd, 'yyyy-MM-dd')];
+};
+
+
 export default function PersonalStats({ branch, user_id }) {
+  // CARDS
   const [personalStatsData, setPersonalStatsData] = useState(null);
 
   useEffect(() => {
     const now = new Date();
-
-    const getWeekRange = (date) => {
-      const startOfWeek = new Date(date);
-      startOfWeek.setDate(date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1)); // Monday as first day
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-      return [startOfWeek, endOfWeek];
-    };
-
-    const getMonthRange = (date) => {
-      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-      return [startOfMonth, endOfMonth];
-    };
-
-    const getYearRange = (date) => {
-      const startOfYear = new Date(date.getFullYear(), 0, 1);
-      const endOfYear = new Date(date.getFullYear(), 11, 31);
-      return [startOfYear, endOfYear];
-    };
-
-    const currentWeekRange = getWeekRange(now);
-    const previousWeekRange = getWeekRange(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
-    const currentMonthRange = getMonthRange(now);
-    const previousMonthRange = getMonthRange(new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()));
-    const currentYearRange = getYearRange(now);
 
     const fetchPersonalStats = async () => {
       try {
@@ -43,11 +45,11 @@ export default function PersonalStats({ branch, user_id }) {
           branch: branch,
           user_ids: [user_id],
           dateRanges: [
-            [format(currentWeekRange[0], 'yyyy-MM-dd'), format(currentWeekRange[1], 'yyyy-MM-dd')],
-            [format(previousWeekRange[0], 'yyyy-MM-dd'), format(previousWeekRange[1], 'yyyy-MM-dd')],
-            [format(currentMonthRange[0], 'yyyy-MM-dd'), format(currentMonthRange[1], 'yyyy-MM-dd')],
-            [format(previousMonthRange[0], 'yyyy-MM-dd'), format(previousMonthRange[1], 'yyyy-MM-dd')],
-            [format(currentYearRange[0], 'yyyy-MM-dd'), format(currentYearRange[1], 'yyyy-MM-dd')]
+            getWeekRange(now),
+            getWeekRange(subWeeks(now, 1)),
+            getMonthRange(now),
+            getMonthRange(subMonths(now, 1)),
+            getYearRange(now)
           ]
         });
 
@@ -69,8 +71,182 @@ export default function PersonalStats({ branch, user_id }) {
   }, [branch, user_id])
 
 
+  // Weekly Bars
+  const [weeklyChartSeries, setWeeklyChartSeries] = useState(null);
+  const [weeklyChartOptions, setWeeklyChartOptions] = useState({
+    chart: {
+      id: "weekly-chart",
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false
+      },
+    },
+    grid: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    dataLabels: {
+      formatter: (val) => (val === 0 ? "" : val),
+    },
+    yaxis: {
+      show: false
+    },
+    colors: ["#F69200"],
+  });
+
+
+  useEffect(() => {
+    const XWeekRanges = (weeks) => {
+      const date = subWeeks(new Date(), weeks);
+      const ranges = [];
+
+      for (let i = 0; i <= weeks; i++) {
+        ranges.push(getWeekRange(addWeeks(date, i)))
+      };
+      return ranges;
+    };
+
+    const fetchWeeklyStats = async () => {
+      try {
+        const weekRanges = XWeekRanges(11);
+        
+        const response = await axios.post(`${apiUrl}/api/stats`, {
+          branch: branch,
+          user_ids: [user_id],
+          dateRanges: weekRanges
+        });
+        const user_nick = Object.keys(response.data)[0];
+
+        setWeeklyChartSeries([{
+          name: user_nick,
+          data: response.data[user_nick].map(item => item.count)
+        }]);
+
+        setWeeklyChartOptions(prevOptions => ({
+          ...prevOptions,
+          xaxis: {
+            categories: weekRanges.map(range => format(parseISO(range[0]), 'dd LLL', { locale: ru })),
+            labels: {
+              style: {
+                colors: '#808080',
+                fontSize: '12px',
+              }
+            }
+          }
+        }));
+      
+      } catch (error) {
+        catchResponseError(error);
+      };
+    };
+
+    fetchWeeklyStats();  
+  }, [branch, user_id])
+
+
+  // Cumulative month stats
+  const [dayByDaySeries, setDayByDaySeries] = useState(null);
+  const [dayByDayOptions] = useState({
+    chart: {
+      id: "cumulative",
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false
+      },
+    },
+    grid: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    xaxis: {
+      categories: Array.from({ length: 31 }, (_, i) => i + 1),
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      },
+      labels: {
+        show: false
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#808080',
+          fontSize: '12px',
+        }
+      }
+    },
+    legend: {
+      show: false
+    },
+    stroke: {
+      width: [2, 4],
+    },
+    markers: {
+      discrete: [
+        {
+          seriesIndex: 1,
+          dataPointIndex: new Date().getDate() - 1,
+          fillColor: "#F69200",
+          strokeColor: "#FFFFFF",
+          size: 5,
+          shape: "circle",
+        },
+      ],
+    },
+    colors: ["#E6D3B8", "#F69200"],
+  });
+
+  useEffect(() => {
+    const fetchDayByDayStats = async () => {
+      try {
+        const today = new Date();
+        const response = await axios.post(`${apiUrl}/api/stats/cumulative`, {
+          branch: branch,
+          user_id: user_id,
+          dateRanges: [
+            [
+              format(startOfMonth(today), 'yyyy-MM-dd'),
+              format(today, 'yyyy-MM-dd'),
+            ], 
+            getMonthRange(subMonths(today, 1))
+          ]
+        });
+
+        setDayByDaySeries([
+          {
+            name: "Previous month",
+            data: response.data[1].data.map(item => item.cumulativeCount)
+          },
+          {
+            name: "This month",
+            data: response.data[0].data.map(item => item.cumulativeCount)
+          },
+        ]);
+
+
+      } catch (error) {
+        catchResponseError(error);
+      };
+    };
+
+    fetchDayByDayStats();
+  }, [branch, user_id])
+
+
   return (
-    <div className="flex flex-wrap justify-evenly py-2 bg-gray-100 dark:bg-neutral-900">
+    <>
+    <div className="max-w-md mx-auto flex justify-between gap-x-8 bg-white dark:bg-neutral-900">
       <StatCard 
         label="Неделя"
         sublabel="от прошлой"
@@ -90,6 +266,24 @@ export default function PersonalStats({ branch, user_id }) {
         previous={personalStatsData?.previousYear ?? null}
       />
     </div>
+
+    <div className="w-full max-w-md mx-auto px-2">
+      {weeklyChartSeries ?
+        <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
+        :
+        <BarChartSkeleton/>
+      }
+    </div>
+
+    <div className="w-full max-w-md mx-auto px-2">
+      {dayByDaySeries ?
+        <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
+        :
+        <LineChartSkeleton/>
+      }
+    </div>
+
+    </>
   );
 };
 
@@ -100,7 +294,7 @@ const StatCard = ({ label, sublabel, current, previous }) => {
   const change = showComparison ? current - previous : 0;
 
   return (
-    <div className="rounded-2xl shadow-md p-2 w-1/4 bg-white dark:bg-neutral-800">
+    <div className="flex-1 p-2 rounded-2xl shadow-md bg-white dark:bg-neutral-800">
       <h3 className="text-base font-semibold mb-2 text-gray-500 dark:text-gray-400">{label}</h3>
       {current === null ? (
         <div className="animate-pulse">
