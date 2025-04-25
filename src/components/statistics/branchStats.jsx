@@ -2,13 +2,13 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 import axios from 'axios';
-import fetchAllUsers from '../services/fetchAllUsers';
-import catchResponseError from '../utils/responseError';
+import fetchAllUsers from '../../services/fetchAllUsers';
+import catchResponseError from '../../utils/responseError';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '../styles/gridTheme';
-import localeText from '../utils/gridLocale';
+import gridTheme from '../../styles/gridTheme';
+import localeText from '../../utils/gridLocale';
 import {
   ModuleRegistry,
   ValidationModule,

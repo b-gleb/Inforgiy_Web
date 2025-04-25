@@ -6,18 +6,18 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
-import Loading from './components/loading';
-import catchResponseError from './utils/responseError';
+import Loading from './loading';
+import catchResponseError from '../utils/responseError';
 
 // API
-import updateRota from './services/updateRota';
+import updateRota from '../services/updateRota';
 
 // CSS
-import './styles/WeeklyView.css';
+import '../styles/WeeklyView.css';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
-import gridTheme from './styles/gridTheme';
+import gridTheme from '../styles/gridTheme';
 import {
   ModuleRegistry,
   ValidationModule,

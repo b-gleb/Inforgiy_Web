@@ -2,7 +2,7 @@ import { Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-import catchResponseError from '../utils/responseError';
+import catchResponseError from '../../utils/responseError';
 
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 

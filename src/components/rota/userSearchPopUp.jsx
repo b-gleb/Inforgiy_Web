@@ -2,8 +2,8 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 
 // APIs
-import fetchAllUsers from '../services/fetchAllUsers';
-import updateRota from '../services/updateRota';
+import fetchAllUsers from '../../services/fetchAllUsers';
+import updateRota from '../../services/updateRota';
 
 // Lazy Loading
 const UserProfile = lazy(() => import('../userProfile'));

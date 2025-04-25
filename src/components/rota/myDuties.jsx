@@ -2,7 +2,7 @@ import React, { useEffect, useState} from 'react';
 import { format, addDays, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
-import userDuties from '../services/userDuties.jsx';
+import userDuties from '../../services/userDuties.jsx';
 
 function convertToDutyString(hours) {
   if (!hours || hours.length === 0) return "";

@@ -7,8 +7,8 @@ import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
 
 // Custom components
-import RotaHour from './rota/rota';
-import MyDutiesCard from './rota/myDuties';
+import RotaHour from './components/rota/rota';
+import MyDutiesCard from './components/rota/myDuties';
 import Loading from './components/loading';
 import catchResponseError from './utils/responseError.jsx';
 
@@ -21,9 +21,9 @@ import shrugAnimationData from "./assets/shrug.json";
 import deniedAnimationData from "./assets/denied.json";
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'));
-const WeeklyView = lazy(() => import('./WeeklyView'));
-const Stats = lazy(() => import('./statistics/Stats'));
+const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp'));
+const WeeklyView = lazy(() => import('./components/WeeklyView'));
+const Stats = lazy(() => import('./components/statistics/Stats'));
 const Animation = lazy(() => import('./components/animation'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};

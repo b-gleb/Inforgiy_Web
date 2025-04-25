@@ -4,12 +4,12 @@ import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, 
 import { ru } from 'date-fns/locale';
 
 // Skeletons
-import BarChartSkeleton from '../components/skeletons/barChartSkeleton';
-import LineChartSkeleton from '../components/skeletons/lineChartSkeleton';
+import BarChartSkeleton from '../skeletons/barChartSkeleton';
+import LineChartSkeleton from '../skeletons/lineChartSkeleton';
 
 // API
 import axios from 'axios';
-import catchResponseError from '../utils/responseError';
+import catchResponseError from '../../utils/responseError';
 
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
