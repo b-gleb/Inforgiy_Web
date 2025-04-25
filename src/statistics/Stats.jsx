@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import PersonalStats from './personalStats';
+// import PersonalStats from './personalStats';
 import BranchStats from './branchStats';
 
 export default function Stats({ branch, initDataUnsafe, setShowStats }){
@@ -16,8 +16,8 @@ export default function Stats({ branch, initDataUnsafe, setShowStats }){
   }, [setShowStats]);
 
   return (
-    <div className='overflow-y-auto fixed inset-0 bg-white dark:bg-neutral-900'>
-      <div className='flex-1 overflow-hidden'>
+    <div className='w-full h-full flex flex-col fixed inset-0 bg-gray-white dark:bg-neutral-900'>
+      <div className='w-full h-full flex-1 overflow-hidden'>
         <BranchStats 
           branch={branch}
           initDataUnsafe={initDataUnsafe}
