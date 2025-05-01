@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -51,6 +51,15 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
   const handleToggle = (section) => {
     setOpenSection((prev) => (prev === section ? null : section));
   };
+
+  // Telegram UI Back Button
+  useEffect(() => {
+    window.Telegram.WebApp.BackButton.onClick(() => setShowUserManagement(false));
+
+    return () => {
+      window.Telegram.WebApp.BackButton.offClick(() => setShowUserManagement(false));
+    }
+  }, [editingUser])
 
   return (
     <>
