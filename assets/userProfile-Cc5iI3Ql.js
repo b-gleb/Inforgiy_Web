@@ -1,0 +1,12 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/personalStats-BveRe_Yl.js","assets/index-BdusljqS.js","assets/index-iMyJczqh.css","assets/index-Chjiymov.js","assets/endOfWeek-BRRdGTOb.js"])))=>i.map(i=>d[i]);
+import{c as d,r as n,j as e,A as p,m as h,_ as u}from"./index-BdusljqS.js";import _ from"./userEditForm-K3u8x7Fv.js";/**
+ * @license lucide-react v0.503.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const f=[["path",{d:"m6 9 6 6 6-6",key:"qrunsl"}]],j=d("chevron-down",f);/**
+ * @license lucide-react v0.503.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const g=[["path",{d:"m18 15-6-6-6 6",key:"153udz"}]],k=d("chevron-up",g),y=n.lazy(()=>u(()=>import("./personalStats-BveRe_Yl.js"),__vite__mapDeps([0,1,2,3,4]))),w=n.lazy(()=>u(()=>import("./index-BdusljqS.js").then(s=>s.x),__vite__mapDeps([1,2]))),l=({title:s,isOpen:t,onClick:o,children:a})=>e.jsxs(e.Fragment,{children:[e.jsxs("button",{onClick:o,className:"w-full flex justify-between items-center px-1 py-3 border-b dark:border-gray-400",children:[e.jsx("span",{className:"text-lg font-semibold dark:text-gray-400",children:s}),t?e.jsx(k,{className:"icon-text"}):e.jsx(j,{className:"icon-text"})]}),e.jsx(p,{children:t&&e.jsx(h.div,{initial:!1,animate:{height:t?"auto":0,opacity:t?1:0},exit:{height:0,opacity:0},transition:{duration:.3,ease:"easeInOut"},className:"overflow-hidden mt-2",children:a})},s)]});function C({branch:s,editingUser:t,setEditingUser:o,initDataUnsafe:a}){const[i,x]=n.useState("settings"),r=c=>{x(m=>m===c?null:c)};return n.useEffect(()=>(window.Telegram.WebApp.BackButton.onClick(()=>setShowUserManagement(!1)),()=>{window.Telegram.WebApp.BackButton.offClick(()=>setShowUserManagement(!1))}),[t]),e.jsxs(e.Fragment,{children:[e.jsx(l,{title:"Профиль",isOpen:i==="settings",onClick:()=>r("settings"),children:e.jsx(_,{branch:s,editingUser:t,setEditingUser:o,initDataUnsafe:a})}),e.jsx(l,{title:"Смены",isOpen:i==="duties",onClick:()=>r("duties"),children:e.jsx(n.Suspense,{fallback:null,children:e.jsx(w,{branch:s,user_id:t.id,prevDays:14,nextDays:30})})}),e.jsx(l,{title:"Статистика",isOpen:i==="personal_stats",onClick:()=>r("personal_stats"),children:e.jsx(n.Suspense,{fallback:null,children:e.jsx(y,{branch:s,user_id:t.id})})})]})}export{C as default};
