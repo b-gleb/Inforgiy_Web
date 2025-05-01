@@ -1,0 +1,12 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/personalStats-DumcqgsL.js","assets/index-CVODSqiP.js","assets/index-iMyJczqh.css","assets/index-Chjiymov.js","assets/endOfWeek-DFJMli2h.js"])))=>i.map(i=>d[i]);
+import{c as d,r as n,j as e,A as m,m as h,_ as u}from"./index-CVODSqiP.js";import _ from"./userEditForm-Bxkd6eVP.js";/**
+ * @license lucide-react v0.503.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const j=[["path",{d:"m6 9 6 6 6-6",key:"qrunsl"}]],f=d("chevron-down",j);/**
+ * @license lucide-react v0.503.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const k=[["path",{d:"m18 15-6-6-6 6",key:"153udz"}]],y=d("chevron-up",k),v=n.lazy(()=>u(()=>import("./personalStats-DumcqgsL.js"),__vite__mapDeps([0,1,2,3,4]))),b=n.lazy(()=>u(()=>import("./index-CVODSqiP.js").then(s=>s.x),__vite__mapDeps([1,2]))),r=({title:s,isOpen:t,onClick:o,children:a})=>e.jsxs(e.Fragment,{children:[e.jsxs("button",{onClick:o,className:"w-full flex justify-between items-center px-1 py-3 border-b dark:border-gray-400",children:[e.jsx("span",{className:"text-lg font-semibold dark:text-gray-400",children:s}),t?e.jsx(y,{className:"icon-text"}):e.jsx(f,{className:"icon-text"})]}),e.jsx(m,{children:t&&e.jsx(h.div,{initial:!1,animate:{height:t?"auto":0,opacity:t?1:0},exit:{height:0,opacity:0},transition:{duration:.3,ease:"easeInOut"},className:"overflow-hidden mt-2",children:a})},s)]});function C({branch:s,editingUser:t,setEditingUser:o,initDataUnsafe:a}){const[l,x]=n.useState("settings"),i=c=>{x(p=>p===c?null:c)};return n.useEffect(()=>(window.Telegram.WebApp.BackButton.onClick(()=>o(null)),()=>{window.Telegram.WebApp.BackButton.offClick(()=>o(null))}),[t]),e.jsxs(e.Fragment,{children:[e.jsx(r,{title:"Профиль",isOpen:l==="settings",onClick:()=>i("settings"),children:e.jsx(_,{branch:s,editingUser:t,setEditingUser:o,initDataUnsafe:a})}),e.jsx(r,{title:"Смены",isOpen:l==="duties",onClick:()=>i("duties"),children:e.jsx(n.Suspense,{fallback:null,children:e.jsx(b,{branch:s,user_id:t.id,prevDays:14,nextDays:30})})}),e.jsx(r,{title:"Статистика",isOpen:l==="personal_stats",onClick:()=>i("personal_stats"),children:e.jsx(n.Suspense,{fallback:null,children:e.jsx(v,{branch:s,user_id:t.id})})})]})}export{C as default};
