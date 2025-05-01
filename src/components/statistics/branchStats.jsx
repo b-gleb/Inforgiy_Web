@@ -15,6 +15,7 @@ import {
   NumberFilterModule,
   ClientSideRowModelModule,
   ColumnAutoSizeModule,
+  CellStyleModule,
   LocaleModule,
 } from 'ag-grid-community';
 
@@ -23,6 +24,7 @@ ModuleRegistry.registerModules([
   NumberFilterModule,
   ClientSideRowModelModule,
   ColumnAutoSizeModule,
+  CellStyleModule,
   LocaleModule
 ]);
 
@@ -137,6 +139,17 @@ function transformData(data) {
 };
 
 
+const cellClass = ( params ) => {
+  if (
+    params.value <= 0 && 
+    params.column?.originalParent?.expanded === true &&
+    params.column?.originalParent?.expandable === true
+  ){
+    return 'text-[#ff0000]'
+  }
+}
+
+
 export default function BranchStats({ branch, initDataUnsafe }) {
   const [allUsers, setAllUsers] = useState(null);
   const [columnDefs, setColumnDefs] = useState(null);
@@ -153,6 +166,7 @@ export default function BranchStats({ branch, initDataUnsafe }) {
     },
     suppressMovable: true,
     wrapText: true,
+    cellClass: cellClass
   });
 
 
@@ -212,7 +226,13 @@ export default function BranchStats({ branch, initDataUnsafe }) {
         setAllUsers(allUserIds);
         setRowData(rows);
         setColumnDefs([
-          {field: "user", headerName: "Позывной", filter: null, pinned: 'left'},
+          {
+            field: "user",
+            headerName: "Позывной",
+            pinned: 'left',
+            filter: null,
+            cellClass: null
+          },
           ...yearlyColumnDefs
         ]);
       } catch (error) {
