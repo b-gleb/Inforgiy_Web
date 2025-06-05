@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
-import axios from 'axios';
+import api from '../../services/api.js';
 import fetchAllUsers from '../../services/fetchAllUsers';
 import catchResponseError from '../../utils/responseError';
 
@@ -28,12 +28,11 @@ ModuleRegistry.registerModules([
   LocaleModule
 ]);
 
-const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
 async function fetchBranchStats (branch, user_ids, dateRanges) {
   try {
-    const response = await axios.post(`${apiUrl}/api/stats`, {
+    const response = await api.post('/api/stats', {
       branch: branch,
       user_ids: user_ids,
       dateRanges: dateRanges

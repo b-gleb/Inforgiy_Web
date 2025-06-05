@@ -2,7 +2,7 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
@@ -38,7 +38,6 @@ ModuleRegistry.registerModules([
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'))
 
-const apiUrl = import.meta.env.VITE_PROXY_URL;
 const today = startOfToday();
 
 function rowIndexToTime(rowIndex) {
@@ -182,7 +181,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
       for (const day of days) {
         try {
-          const response = await axios.get(`${apiUrl}/api/rota`, {
+          const response = await api.get('/api/rota', {
             params: {
               branch: branch,
               date: format(day, 'yyyy-MM-dd')

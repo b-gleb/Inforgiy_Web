@@ -8,10 +8,9 @@ import BarChartSkeleton from '../skeletons/barChartSkeleton';
 import LineChartSkeleton from '../skeletons/lineChartSkeleton';
 
 // API
-import axios from 'axios';
+import api from '../../services/api.js';
 import catchResponseError from '../../utils/responseError';
 
-const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 function getWeekRange (date) {
   const weekStart = startOfWeek(date, {weekStartsOn: 1});
@@ -41,7 +40,7 @@ export default function PersonalStats({ branch, user_id }) {
 
     const fetchPersonalStats = async () => {
       try {
-        const response = await axios.post(`${apiUrl}/api/stats`, {
+        const response = await api.post('/api/stats', {
           branch: branch,
           user_ids: [user_id],
           dateRanges: [
@@ -114,7 +113,7 @@ export default function PersonalStats({ branch, user_id }) {
       try {
         const weekRanges = XWeekRanges(11);
         
-        const response = await axios.post(`${apiUrl}/api/stats`, {
+        const response = await api.post('/api/stats', {
           branch: branch,
           user_ids: [user_id],
           dateRanges: weekRanges
@@ -211,7 +210,7 @@ export default function PersonalStats({ branch, user_id }) {
     const fetchDayByDayStats = async () => {
       try {
         const today = new Date();
-        const response = await axios.post(`${apiUrl}/api/stats/cumulative`, {
+        const response = await api.post('/api/stats/cumulative', {
           branch: branch,
           user_id: user_id,
           dateRanges: [

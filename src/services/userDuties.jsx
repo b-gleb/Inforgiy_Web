@@ -1,13 +1,11 @@
-import axios from 'axios';
+import api from './api.js';
 import { format } from 'date-fns';
 import catchResponseError from '../utils/responseError';
-
-const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
 export default async function userDuties (branch, user_id, startDate, endDate) {
   try {
-    const response = await axios.get(`${apiUrl}/api/userDuties`, {
+    const response = await api.get('/api/userDuties', {
       params: {
         branch: branch,
         user_id: user_id,

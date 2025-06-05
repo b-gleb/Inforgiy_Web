@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import { format, addDays } from 'date-fns';
-import axios from 'axios';
+import api from './services/api.js';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
@@ -27,7 +27,6 @@ const Stats = lazy(() => import('./components/statistics/Stats'));
 const Animation = lazy(() => import('./components/animation'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
-const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 
 function App() {
@@ -116,7 +115,7 @@ function App() {
   useEffect(() => {
     const fetchAuthData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/auth`, {
+        const response = await api.get('/api/auth', {
           params: {
             initDataUnsafe: initDataUnsafe,
           }
@@ -150,7 +149,7 @@ function App() {
       }
 
       try {
-        const response = await axios.get(`${apiUrl}/api/rota`, {
+        const response = await api.get('/api/rota', {
           params: {
             branch: branch,
             date: date,
@@ -159,7 +158,7 @@ function App() {
         setRotaData(response.data);
 
         if (branch === 'di') {
-          const responseSecondary = await axios.get(`${apiUrl}/api/rota`, {
+          const responseSecondary = await api.get('/api/rota', {
             params: {
               branch: 'gp',
               date: date,

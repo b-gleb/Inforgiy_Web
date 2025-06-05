@@ -1,10 +1,9 @@
 import { Trash2 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api.js';
 import { toast } from 'react-toastify';
 
 import catchResponseError from '../../utils/responseError';
 
-const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 export default function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
     const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный", 3: "Чёрный", 4: "Фиолетовый", 5: "Оранжевый", 6: "Жёлтый"};
@@ -24,7 +23,7 @@ export default function UserEditForm({ branch, editingUser, setEditingUser, init
   
     const handleRemoveUser = async (branch, user_id, initDataUnsafe) => {
       try {
-        const response = await axios.post(`${apiUrl}/api/removeUser`, {
+        const response = await api.post('/api/removeUser', {
           branch: branch,
           modifyUserId: user_id,
           initDataUnsafe: initDataUnsafe
@@ -50,7 +49,7 @@ export default function UserEditForm({ branch, editingUser, setEditingUser, init
       };
   
       try {
-        const response = await axios.post(`${apiUrl}/api/updateUser`, data);
+        const response = await api.post('/api/updateUser', data);
   
         if (response.status === 200){
           setEditingUser(null);
