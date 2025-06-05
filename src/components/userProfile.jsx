@@ -54,10 +54,10 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
 
   // Telegram UI Back Button
   useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => setShowUserManagement(false));
+    window.Telegram.WebApp.BackButton.onClick(() => setEditingUser(null));
 
     return () => {
-      window.Telegram.WebApp.BackButton.offClick(() => setShowUserManagement(false));
+      window.Telegram.WebApp.BackButton.offClick(() => setEditingUser(null));
     }
   }, [editingUser])
 

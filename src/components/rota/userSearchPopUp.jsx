@@ -113,6 +113,7 @@ export default function UserSearchPopUp({
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       onClose();
                     } else if (mode === 'user_management'){
+                      window.Telegram.WebApp.BackButton.offClick(onClose);
                       setEditingUser(userObj);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                     } else if (mode === 'rota_weekly'){
