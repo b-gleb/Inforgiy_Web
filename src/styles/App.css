@@ -260,7 +260,7 @@
   gap-y-1
   gap-x-2
   grid-cols-2
-  auto-rows-[6vh]
+  auto-rows-[38px]
 
   dark:text-gray-400
 }
@@ -268,6 +268,7 @@
 .search_results_button{ @apply
   overflow-hidden
   text-sm
+  h-[38px]
 
   text-[#393939] dark:text-gray-400
   dark:bg-neutral-700
