@@ -1,6 +1,6 @@
 import { useState, useEffect, Suspense, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, NotepadText, ChartColumn, User } from "lucide-react";
 
 // Sections
 import UserEditForm from "./rota/userEditForm";
@@ -8,7 +8,7 @@ const PersonalStats = lazy(() => import('./statistics/personalStats'));
 const MyDutiesCard = lazy(() => import('./rota/myDuties'));
 
 
-const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
+const CollapsibleSection = ({ title, icon: Icon, isOpen, onClick, children }) => {
   return (
     <>
       {/* Header */}
@@ -16,9 +16,12 @@ const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
         onClick={onClick}
         className="w-full flex justify-between items-center px-1 py-3 border-b dark:border-gray-400"
       >
-        <span className="text-lg font-semibold dark:text-gray-400">
-          {title}
-        </span>
+        <div className="flex items-center gap-2">
+          {Icon && <Icon className="icon-text" />}
+          <span className="text-lg font-semibold dark:text-gray-400">
+            {title}
+          </span>
+        </div>
         {isOpen ? (
           <ChevronUp className="icon-text"/>
         ) : (
@@ -66,6 +69,7 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
 
       <CollapsibleSection
         title={'Профиль'}
+        icon={User}
         isOpen={openSection === "settings"}
         onClick={() => handleToggle("settings")}
       >
@@ -80,6 +84,7 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
 
       <CollapsibleSection
         title={'Смены'}
+        icon={NotepadText}
         isOpen={openSection === "duties"}
         onClick={() => handleToggle("duties")}
       >
@@ -96,6 +101,7 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
 
       <CollapsibleSection
         title={'Статистика'}
+        icon={ChartColumn}
         isOpen={openSection === "personal_stats"}
         onClick={() => handleToggle("personal_stats")}
       >
