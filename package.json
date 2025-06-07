@@ -17,6 +17,7 @@
     "react-apexcharts": "^1.7.0",
     "react-dom": "^19.1.0",
     "react-lottie": "^1.2.10",
+    "react-router-dom": "^7.6.2",
     "react-swipeable": "^7.0.2",
     "react-toastify": "^11.0.5",
     "vite": "^6.3.5",
