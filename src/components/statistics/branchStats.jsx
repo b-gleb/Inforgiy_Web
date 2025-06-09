@@ -30,6 +30,120 @@ ModuleRegistry.registerModules([
 
 
 
+export default function BranchStats({ branch, initDataUnsafe, setShowStats }) {
+  const [allUsers, setAllUsers] = useState(null);
+  const [columnDefs, setColumnDefs] = useState(null);
+  const [rowData, setRowData] = useState(null);
+  const [defaultColDef] = useState({
+    sortable: true,
+    filter: "agNumberColumnFilter",
+    filterParams: {
+      filterOptions: ['inRange'],
+      inRangeInclusive: true,
+      buttons: ['apply', 'reset'],
+      closeOnApply: true,
+      maxNumConditions: 1
+    },
+    suppressMovable: true,
+    wrapText: true,
+    cellClass: cellClass
+  });
+
+  // Set Table Theme
+  useEffect(() => {
+    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
+  }, []);
+
+
+  const autoSizeStrategy = useMemo(() => {
+    return {
+      type: 'fitCellContents'
+    };
+  }, []);
+
+
+  const onColumnGroupOpened = useCallback( async (params) => {
+    if (params.columnGroup.level === 1 && params.columnGroup.isExpanded() === true) {
+      const intervals = [];
+
+      for (const column of params.columnGroup.children) {
+        const colIdSplit = column.colId.split('_');
+        intervals.push([colIdSplit[0], colIdSplit[1]]);
+      };
+
+      const branchStats = await fetchBranchStats(branch, allUsers, intervals);
+      const { rows } = transformData(branchStats);
+
+      // Add new data to already existing columns
+      setRowData((prevData) => {
+        return prevData.map((row) => {
+          const newColumns = rows.find((item) => item.user === row.user);
+          return newColumns ? { ...row, ...newColumns } : row;
+        });
+      });
+    };
+
+    // Adjust the width of opened columns
+    if (params.columnGroup.isExpanded() === true){
+      const colArray = params.columnGroup.children.map(col => col.getId());
+      params.api.autoSizeColumns(colArray)
+    }
+  }, [branch, allUsers]);
+
+
+  useEffect(() => {
+    const generateTable = async () => {
+      try {
+        const year = new Date().getFullYear();
+        const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+        const allUserIds = allUsers.map(userObj => userObj.id);
+        const yearlyColumnDefs = generateColumnDefs(year);
+        const intervalsToFetch = calculateIntervals(year);
+        const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
+        const { rows } = transformData(branchStats);
+
+        setAllUsers(allUserIds);
+        setRowData(rows);
+        setColumnDefs([
+          {
+            field: "user",
+            headerName: "Позывной",
+            pinned: 'left',
+            filter: null,
+            cellClass: null
+          },
+          ...yearlyColumnDefs
+        ]);
+      } catch (error) {
+        
+      };
+    };
+
+    generateTable();
+  }, [branch, initDataUnsafe])
+
+
+  return (
+    <div className='w-full h-full flex flex-col fixed inset-0 bg-gray-white dark:bg-neutral-900'>
+      <div className='w-full h-full flex-1 overflow-hidden'>
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          onColumnGroupOpened={onColumnGroupOpened}
+          autoSizeStrategy={autoSizeStrategy}
+          suppressColumnVirtualisation={true} // to autosize columns not in viewport
+          localeText={localeText}
+          gridOptions={{
+            theme: gridTheme,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+
 async function fetchBranchStats (branch, user_ids, dateRanges) {
   try {
     const response = await api.post('/api/stats', {
@@ -146,115 +260,4 @@ const cellClass = ( params ) => {
   ){
     return 'text-[#ff0000]'
   }
-}
-
-
-export default function BranchStats({ branch, initDataUnsafe }) {
-  const [allUsers, setAllUsers] = useState(null);
-  const [columnDefs, setColumnDefs] = useState(null);
-  const [rowData, setRowData] = useState(null);
-  const [defaultColDef] = useState({
-    sortable: true,
-    filter: "agNumberColumnFilter",
-    filterParams: {
-      filterOptions: ['inRange'],
-      inRangeInclusive: true,
-      buttons: ['apply', 'reset'],
-      closeOnApply: true,
-      maxNumConditions: 1
-    },
-    suppressMovable: true,
-    wrapText: true,
-    cellClass: cellClass
-  });
-
-
-   // Set Table Theme
-   useEffect(() => {
-    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
-  }, []);
-
-
-  const autoSizeStrategy = useMemo(() => {
-    return {
-      type: 'fitCellContents'
-    };
-  }, []);
-
-
-  const onColumnGroupOpened = useCallback( async (params) => {
-    if (params.columnGroup.level === 1 && params.columnGroup.isExpanded() === true) {
-      const intervals = [];
-
-      for (const column of params.columnGroup.children) {
-        const colIdSplit = column.colId.split('_');
-        intervals.push([colIdSplit[0], colIdSplit[1]]);
-      };
-
-      const branchStats = await fetchBranchStats(branch, allUsers, intervals);
-      const { rows } = transformData(branchStats);
-
-      // Add new data to already existing columns
-      setRowData((prevData) => {
-        return prevData.map((row) => {
-          const newColumns = rows.find((item) => item.user === row.user);
-          return newColumns ? { ...row, ...newColumns } : row;
-        });
-      });
-    };
-
-    // Adjust the width of opened columns
-    if (params.columnGroup.isExpanded() === true){
-      const colArray = params.columnGroup.children.map(col => col.getId());
-      params.api.autoSizeColumns(colArray)
-    }
-  }, [branch, allUsers]);
-
-
-  useEffect(() => {
-    const generateTable = async () => {
-      try {
-        const year = new Date().getFullYear();
-        const allUsers = await fetchAllUsers(branch, initDataUnsafe);
-        const allUserIds = allUsers.map(userObj => userObj.id);
-        const yearlyColumnDefs = generateColumnDefs(year);
-        const intervalsToFetch = calculateIntervals(year);
-        const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
-        const { rows } = transformData(branchStats);
-
-        setAllUsers(allUserIds);
-        setRowData(rows);
-        setColumnDefs([
-          {
-            field: "user",
-            headerName: "Позывной",
-            pinned: 'left',
-            filter: null,
-            cellClass: null
-          },
-          ...yearlyColumnDefs
-        ]);
-      } catch (error) {
-        
-      };
-    };
-
-    generateTable();
-  }, [branch, initDataUnsafe])
-
-
-  return (
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        onColumnGroupOpened={onColumnGroupOpened}
-        autoSizeStrategy={autoSizeStrategy}
-        suppressColumnVirtualisation={true} // to autosize columns not in viewport
-        localeText={localeText}
-        gridOptions={{
-          theme: gridTheme,
-        }}
-      />
-  );
 };
