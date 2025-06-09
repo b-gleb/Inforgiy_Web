@@ -46,7 +46,7 @@ function Main() {
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
   const isFirstMount = useRef(true);
-  const [swipeDirection, setSwipeDirection] = useState(null);
+  const [swipeDirection, setSwipeDirection] = useState('left');
 
 
   useEffect(() => {
