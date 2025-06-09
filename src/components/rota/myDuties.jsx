@@ -48,7 +48,7 @@ export default function MyDutiesCard({ branch, user_id, prevDays = 0, nextDays =
         .catch(() => {});
     };
     // Prevent passing empty branch before auth is complete
-    if (branch){
+    if (branch && user_id){
       fetchNextDuty();
     }
   }, [branch, user_id, prevDays, nextDays]);

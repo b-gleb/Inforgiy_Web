@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
@@ -47,7 +48,11 @@ function rowIndexToTime(rowIndex) {
 }
 
 
-export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsafe, setShowWeekly }) {
+export default function WeeklyView() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || null;
+
   const cellRenderer = ( params ) => {
     const value = params.value;
     if (!Array.isArray(value) || value.length === 0){return value};
@@ -100,7 +105,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
   const handleCellClicked = (params) => {
     if (params.colDef.field === 'index') {
-      setShowWeekly(false)
+      navigate(-1);
     }
     else {
       setSelectedCellData({
@@ -162,7 +167,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
   // Telegram UI BackButton & Table Theme
   useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => {setShowWeekly(false)});
+    window.Telegram.WebApp.BackButton.onClick(() => {navigate(-1)});
     window.Telegram.WebApp.BackButton.show();
     document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
 
@@ -171,7 +176,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
       window.Telegram.WebApp.BackButton.offClick();
       window.Telegram.WebApp.BackButton.hide();
     };
-  }, [setShowWeekly]);
+  }, []);
 
 
   useEffect(() => {

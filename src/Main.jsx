@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import api from './services/api.js';
 import { useSwipeable } from 'react-swipeable';
@@ -22,7 +23,6 @@ import deniedAnimationData from "./assets/denied.json";
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp.jsx'));
-const WeeklyView = lazy(() => import('./components/WeeklyView.jsx'));
 const Stats = lazy(() => import('./components/statistics/Stats.jsx'));
 const Animation = lazy(() => import('./components/animation.jsx'));
 
@@ -30,17 +30,18 @@ const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Ор�
 
 
 function Main() {
+  const navigate = useNavigate();
+
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [theme, setTheme] = useState('light');
   const [rotaData, setRotaData] = useState([]);
   const [secondaryRotaData, setSecondaryRotaData] = useState([]);
   const [rotaAdmin, setRotaAdmin] = useState([]);
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [date, setDate] = useState(sessionStorage.getItem('date') || format(new Date(), 'yyyy-MM-dd'));
   const [userBranches, setUserBranches] = useState(null);
-  const [branch, setBranch] = useState(null);
+  const [branch, setBranch] = useState(sessionStorage.getItem('branch'));
   const [isLoading, setIsLoading] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
-  const [showWeekly, setShowWeekly] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
@@ -49,12 +50,12 @@ function Main() {
 
 
   useEffect(() => {
-    if (showUserManagement || showWeekly || showForbidden || showStats) {
+    if (showUserManagement || showForbidden || showStats) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement, showWeekly, showForbidden, showStats]);
+  }, [showUserManagement, showForbidden, showStats]);
 
 
   const storeLastLogin = () => {
@@ -121,10 +122,13 @@ function Main() {
           }
         });
 
-        setRotaAdmin(response.data.rotaAdmin)
-        setUserBranches(response.data.branches)
-        setBranch(Object.keys(response.data.branches)[0])
+        setRotaAdmin(response.data.rotaAdmin);
+        setUserBranches(response.data.branches);
 
+        if (sessionStorage.getItem('branch') === null) {
+          setBranch(Object.keys(response.data.branches)[0]);
+          sessionStorage.setItem('branch', Object.keys(response.data.branches)[0]);
+        }
       }
       catch (error) {
         if (error.response.status === 404 || error.response.status === 403){
@@ -185,7 +189,9 @@ function Main() {
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      setDate(format(addDays(new Date(date), 1), 'yyyy-MM-dd'));
+      const newDate = format(addDays(new Date(date), 1), 'yyyy-MM-dd');
+      setDate(newDate);
+      sessionStorage.setItem('date', newDate);
       setSwipeDirection('left');
       setShowRota(false);
       setTimeout(() => {
@@ -195,7 +201,9 @@ function Main() {
     },
 
     onSwipedRight: () => {
-      setDate(format(addDays(new Date(date), -1), 'yyyy-MM-dd'));
+      const newDate = format(addDays(new Date(date), -1), 'yyyy-MM-dd');
+      setDate(newDate);
+      sessionStorage.setItem('date', newDate);
       setSwipeDirection('right');
       setShowRota(false);
       setTimeout(() => {
@@ -242,6 +250,7 @@ function Main() {
                     key={dept_key}
                     onClick={() => {
                       setBranch(dept_key);
+                      sessionStorage.setItem('branch', dept_key);
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                     }}
                     className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
@@ -261,7 +270,11 @@ function Main() {
                 value={date}
                 min={userBranches[branch].minDate}
                 max={userBranches[branch].maxDate}
-                onChange={(e) => {setDate(e.target.value); window.Telegram.WebApp.HapticFeedback.selectionChanged();}}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  sessionStorage.setItem('date', e.target.value);
+                  window.Telegram.WebApp.HapticFeedback.selectionChanged();
+                }}
                 className='input-field '
               />
             </div>
@@ -270,8 +283,13 @@ function Main() {
             <button
               className='button-icon'
               onClick={() => {
-                setShowWeekly(true);
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                navigate('./weekly', { state: {
+                  branch: branch,
+                  rotaAdmin: rotaAdmin.includes(branch),
+                  maxDuties: userBranches[branch].maxDuties,
+                  initDataUnsafe: initDataUnsafe
+                } });
               }}
             >
               <CalendarDays size={25} className="icon-text"/>
@@ -310,8 +328,9 @@ function Main() {
         user_id={initDataUnsafe?.user?.id ?? null}
       />
 
-      {rotaData !== null
-      ? <AnimatePresence custom={swipeDirection}>
+      {userBranches !== null
+      ? rotaData !== null
+        ? <AnimatePresence custom={swipeDirection}>
           {showRota && (
             <motion.div 
               {...swipeHandlers}
@@ -339,14 +358,17 @@ function Main() {
             </motion.div>
           )}
         </AnimatePresence>
-      : (
-        <Suspense fallback={null}>
-          <div className='size-7/12  mx-auto'>
-            <Animation animationData={shrugAnimationData} />
-            <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
-          </div>
-        </Suspense>
-      )
+        :
+          (
+            <Suspense fallback={null}>
+              <div className='size-7/12  mx-auto'>
+                <Animation animationData={shrugAnimationData} />
+                <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
+              </div>
+            </Suspense>
+          )
+      :
+      <></>
       }
 
       {showForbidden && (
@@ -367,18 +389,6 @@ function Main() {
             branch={branch}
             initDataUnsafe={initDataUnsafe}
             onClose={() => setShowUserManagement(false)}
-          />
-        </Suspense>
-      )}
-
-      {showWeekly && (
-        <Suspense fallback={null}>
-          <WeeklyView
-            branch={branch}
-            rotaAdmin={rotaAdmin.includes(branch)}
-            maxDuties={userBranches[branch].maxDuties}
-            initDataUnsafe={initDataUnsafe}
-            setShowWeekly={setShowWeekly}
           />
         </Suspense>
       )}
