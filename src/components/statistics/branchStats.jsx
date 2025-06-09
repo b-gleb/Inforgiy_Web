@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 import api from '../../services/api.js';
@@ -30,7 +31,12 @@ ModuleRegistry.registerModules([
 
 
 
-export default function BranchStats({ branch, initDataUnsafe, setShowStats }) {
+export default function BranchStats() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { branch, initDataUnsafe } = location.state || null;
+
+
   const [allUsers, setAllUsers] = useState(null);
   const [columnDefs, setColumnDefs] = useState(null);
   const [rowData, setRowData] = useState(null);
@@ -48,6 +54,19 @@ export default function BranchStats({ branch, initDataUnsafe, setShowStats }) {
     wrapText: true,
     cellClass: cellClass
   });
+
+  // Telegram UI BackButton
+  useEffect(() => {
+    window.Telegram.WebApp.BackButton.onClick(() => {navigate(-1);});
+    window.Telegram.WebApp.BackButton.show();
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      window.Telegram.WebApp.BackButton.offClick();
+      window.Telegram.WebApp.BackButton.hide();
+    };
+  }, []);
+
 
   // Set Table Theme
   useEffect(() => {

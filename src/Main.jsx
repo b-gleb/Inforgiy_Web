@@ -23,7 +23,6 @@ import deniedAnimationData from "./assets/denied.json";
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp.jsx'));
-const Stats = lazy(() => import('./components/statistics/Stats.jsx'));
 const Animation = lazy(() => import('./components/animation.jsx'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
@@ -42,7 +41,6 @@ function Main() {
   const [branch, setBranch] = useState(sessionStorage.getItem('branch'));
   const [isLoading, setIsLoading] = useState(false);
   const [showUserManagement, setShowUserManagement] = useState(false);
-  const [showStats, setShowStats] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
   const isFirstMount = useRef(true);
@@ -50,12 +48,12 @@ function Main() {
 
 
   useEffect(() => {
-    if (showUserManagement || showForbidden || showStats) {
+    if (showUserManagement || showForbidden) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement, showForbidden, showStats]);
+  }, [showUserManagement, showForbidden]);
 
 
   const storeLastLogin = () => {
@@ -289,7 +287,7 @@ function Main() {
                   rotaAdmin: rotaAdmin.includes(branch),
                   maxDuties: userBranches[branch].maxDuties,
                   initDataUnsafe: initDataUnsafe
-                } });
+                }});
               }}
             >
               <CalendarDays size={25} className="icon-text"/>
@@ -301,8 +299,11 @@ function Main() {
                 <button
                   className='button-icon'
                   onClick={() => {
-                    setShowStats(true);
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                    navigate('./branchStats', { state: {
+                      branch: branch,
+                      initDataUnsafe: initDataUnsafe
+                    }});
                   }}
                 >
                   <ChartNoAxesCombined size={25} className='icon-text'/>
@@ -389,16 +390,6 @@ function Main() {
             branch={branch}
             initDataUnsafe={initDataUnsafe}
             onClose={() => setShowUserManagement(false)}
-          />
-        </Suspense>
-      )}
-
-      {showStats && (
-        <Suspense fallback={null}>
-          <Stats
-            branch={branch}
-            initDataUnsafe={initDataUnsafe}
-            setShowStats={setShowStats}  
           />
         </Suspense>
       )}
