@@ -70,7 +70,7 @@ export default function BranchStats() {
 
   // Set Table Theme
   useEffect(() => {
-    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
+    document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
   }, []);
 
 

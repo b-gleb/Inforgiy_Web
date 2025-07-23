@@ -32,7 +32,6 @@ function Main() {
   const navigate = useNavigate();
 
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
-  const [theme, setTheme] = useState('light');
   const [rotaData, setRotaData] = useState([]);
   const [secondaryRotaData, setSecondaryRotaData] = useState([]);
   const [rotaAdmin, setRotaAdmin] = useState([]);
@@ -75,11 +74,11 @@ function Main() {
     } else if (Object.keys(window.Telegram.WebApp.initDataUnsafe).length === 0) {
       console.log('Using mock Telegram data');
       console.log(import.meta.env.VITE_INIT_DATA_UNSAFE);
-      setTheme('light');
+      sessionStorage.setItem('theme', 'light');
       setInitDataUnsafe(JSON.parse(import.meta.env.VITE_INIT_DATA_UNSAFE));
     } else {
       console.log('Using real Telegram data');
-      setTheme(window.Telegram.WebApp.colorScheme);
+      sessionStorage.setItem('theme', window.Telegram.WebApp.colorScheme);
       setInitDataUnsafe(window.Telegram.WebApp.initDataUnsafe);
       window.Telegram.WebApp.disableVerticalSwipes();
       window.Telegram.WebApp.expand();
@@ -233,7 +232,7 @@ function Main() {
 
 
   return (
-    <div className={`app ${theme}`}>
+    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
       <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
 
       {isLoading && <Loading />}

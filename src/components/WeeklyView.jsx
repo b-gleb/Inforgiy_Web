@@ -169,7 +169,7 @@ export default function WeeklyView() {
   useEffect(() => {
     window.Telegram.WebApp.BackButton.onClick(() => {navigate(-1)});
     window.Telegram.WebApp.BackButton.show();
-    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
+    document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
 
     // Cleanup the event listener when the component unmounts
     return () => {
@@ -238,7 +238,7 @@ export default function WeeklyView() {
 
 
   return (
-    <>
+    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
       {isLoading && <Loading />}
 
       {rowData && (
@@ -267,7 +267,7 @@ export default function WeeklyView() {
         initDataUnsafe={initDataUnsafe}
         closePopup={closePopup}
       />
-    </>
+    </div>
   );
 };
 
