@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import api from './services/api.js';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 // Custom components
 import RotaHour from './components/rota/rota.jsx';
@@ -30,6 +30,7 @@ const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Ор�
 
 function Main() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [rotaData, setRotaData] = useState([]);
@@ -46,6 +47,28 @@ function Main() {
   const [swipeDirection, setSwipeDirection] = useState(null);
 
 
+  // Prevent page refresh to trigger main page opening with the wrong state
+  useEffect(() => {
+    const { showUserManagement, toastMessage, ...rest } = location.state || {};    
+
+    if (showUserManagement) {
+      setShowUserManagement(showUserManagement);
+    }
+
+    if (toastMessage){
+      toast.success(toastMessage);
+    }
+
+    if (showUserManagement || toastMessage) {
+      navigate(location.pathname, {
+        replace: true,
+        state: rest,
+      });
+    }
+  }, [navigate, location.state]);
+
+
+  // Prevent main page from scorlling when a pop-up is open on top
   useEffect(() => {
     if (showUserManagement || showForbidden) {
       document.body.style.overflow = 'hidden';

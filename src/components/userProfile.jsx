@@ -7,6 +7,8 @@ import UserEditForm from "./rota/userEditForm";
 const PersonalStats = lazy(() => import('./statistics/personalStats'));
 const MyDutiesCard = lazy(() => import('./rota/myDuties'));
 
+// Styles
+import '../styles/App.css';
 
 const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
   return (
@@ -61,52 +63,59 @@ export default function UserProfile({ branch, editingUser, setEditingUser, initD
     }
   }, [editingUser])
 
+  // Opening and closing the sections
+  const handleToggle = (section) => {
+    setOpenSection((prev) => (prev === section ? null : section));
+  };
+
   return (
-    <>
-
-      <CollapsibleSection
-        title={'Профиль'}
-        isOpen={openSection === "settings"}
-        onClick={() => handleToggle("settings")}
-      >
-        <UserEditForm
-          branch={branch}
-          editingUser={editingUser}
-          setEditingUser={setEditingUser}
-          initDataUnsafe={initDataUnsafe}
-        />
-      </CollapsibleSection>
-
-
-      <CollapsibleSection
-        title={'Смены'}
-        isOpen={openSection === "duties"}
-        onClick={() => handleToggle("duties")}
-      >
-        <Suspense fallback={null}>
-          <MyDutiesCard
+    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
+      <div className="popup">
+        <CollapsibleSection
+          title={'Профиль'}
+          isOpen={openSection === "settings"}
+          onClick={() => handleToggle("settings")}
+        >
+          <UserEditForm
             branch={branch}
-            user_id={editingUser.id}
-            prevDays={14}
-            nextDays={30}
+            User={editingUser}
+            initDataUnsafe={initDataUnsafe}
           />
-        </Suspense>
-      </CollapsibleSection>
+        </CollapsibleSection>
+
+      {editingUser.id !== null && (
+        <>
+          <CollapsibleSection
+            title={'Смены'}
+            isOpen={openSection === "duties"}
+            onClick={() => handleToggle("duties")}
+          >
+            <Suspense fallback={null}>
+              <MyDutiesCard
+                branch={branch}
+                user_id={editingUser.id}
+                prevDays={14}
+                nextDays={30}
+              />
+            </Suspense>
+          </CollapsibleSection>
 
 
-      <CollapsibleSection
-        title={'Статистика'}
-        isOpen={openSection === "personal_stats"}
-        onClick={() => handleToggle("personal_stats")}
-      >
-        <Suspense fallback={null}>
-          <PersonalStats
-            branch={branch}
-            user_id={editingUser.id}
-          />
-        </Suspense>
-      </CollapsibleSection>
-
-    </>
+          <CollapsibleSection
+            title={'Статистика'}
+            isOpen={openSection === "personal_stats"}
+            onClick={() => handleToggle("personal_stats")}
+          >
+            <Suspense fallback={null}>
+              <PersonalStats
+                branch={branch}
+                user_id={editingUser.id}
+              />
+            </Suspense>
+          </CollapsibleSection>
+        </>
+      )}
+    </div>
+  </div>
   )
 }
