@@ -41,13 +41,13 @@ export default function UserSearchPopUp({
 
   // Fetch all users
   useEffect(() => {
-    const fetchUsers = () => {
-      fetchAllUsers(branch, initDataUnsafe)
-        .then((result) => {setAllUsers(result); setFilteredUsers(result)})
-        .catch(() => {});
-    };
+    fetchAllUsers(branch, initDataUnsafe)
+      .then((result) => {
+        setAllUsers(result);
+        setFilteredUsers(result)
+      })
+      .catch(() => {});
 
-    fetchUsers();
   }, [branch, initDataUnsafe]);
 
 
