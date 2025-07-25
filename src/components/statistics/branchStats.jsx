@@ -34,9 +34,6 @@ ModuleRegistry.registerModules([
 export default function BranchStats() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { branch, initDataUnsafe } = location.state || null;
-
-
   const [allUsers, setAllUsers] = useState(null);
   const [columnDefs, setColumnDefs] = useState(null);
   const [rowData, setRowData] = useState(null);
@@ -54,6 +51,18 @@ export default function BranchStats() {
     wrapText: true,
     cellClass: cellClass
   });
+
+  // Checking if all the neccessary location states exist, otherwise redirect
+  const { branch, initDataUnsafe } = location.state || {};
+  useEffect(() => {
+    if (!branch || !initDataUnsafe){
+      navigate('/Inforgiy_Web/', { replace: true })
+    }
+  }, [navigate, branch, initDataUnsafe])
+
+  if (!branch || !initDataUnsafe){
+    return null;
+  };
 
   // Telegram UI BackButton
   useEffect(() => {
