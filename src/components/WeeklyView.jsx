@@ -51,7 +51,19 @@ function rowIndexToTime(rowIndex) {
 export default function WeeklyView() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || null;
+
+  // Checking if all the neccessary location states exist, otherwise redirect
+  const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || {};
+  useEffect(() => {
+    if (!branch || !rotaAdmin || !maxDuties || !initDataUnsafe){
+      navigate('/Inforgiy_Web/', { replace: true })
+    }
+  }, [navigate, branch, rotaAdmin, maxDuties, initDataUnsafe])
+
+  if (!branch || !rotaAdmin || !maxDuties || !initDataUnsafe){
+    return null;
+  };
+
 
   const cellRenderer = ( params ) => {
     const value = params.value;
