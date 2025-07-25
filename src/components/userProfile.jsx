@@ -1,4 +1,5 @@
 import { useState, useEffect, Suspense, lazy } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -47,11 +48,21 @@ const CollapsibleSection = ({ title, isOpen, onClick, children }) => {
 };
 
 
-export default function UserProfile({ branch, editingUser, setEditingUser, initDataUnsafe }){
+export default function UserProfile(){
+  const location = useLocation();
+  const navigate = useNavigate();
   const [openSection, setOpenSection] = useState('settings');
 
-  const handleToggle = (section) => {
-    setOpenSection((prev) => (prev === section ? null : section));
+  // Checking if all the neccessary location states exist, otherwise redirect
+  const { branch, editingUser, initDataUnsafe } = location.state || {};
+  useEffect(() => {
+    if (!branch || !editingUser || !initDataUnsafe){
+      navigate('/Inforgiy_Web/', { replace: true })
+    }
+  }, [navigate, branch, editingUser, initDataUnsafe])
+
+  if (!branch || !editingUser || !initDataUnsafe){
+    return null;
   };
 
   // Telegram UI Back Button
