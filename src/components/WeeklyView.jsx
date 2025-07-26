@@ -179,13 +179,17 @@ export default function WeeklyView() {
 
   // Telegram UI BackButton & Table Theme
   useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => {navigate(-1)});
+    const handleBackClick = () => {
+      navigate(-1);
+    };
+
+    window.Telegram.WebApp.BackButton.onClick(handleBackClick);
     window.Telegram.WebApp.BackButton.show();
     document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
 
     // Cleanup the event listener when the component unmounts
     return () => {
-      window.Telegram.WebApp.BackButton.offClick();
+      window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
     };
   }, []);

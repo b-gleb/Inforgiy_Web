@@ -67,10 +67,16 @@ export default function UserProfile(){
 
   // Telegram UI Back Button
   useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => setEditingUser(null));
+    const handleBackClick = () => {
+      navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
+    };
+
+    window.Telegram.WebApp.BackButton.onClick(handleBackClick);
+    window.Telegram.WebApp.BackButton.show();
 
     return () => {
-      window.Telegram.WebApp.BackButton.offClick(() => setEditingUser(null));
+      window.Telegram.WebApp.BackButton.offClick(handleBackClick);
+      window.Telegram.WebApp.BackButton.hide();
     }
   }, [editingUser])
 
