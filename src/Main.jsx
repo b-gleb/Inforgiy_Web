@@ -288,8 +288,8 @@ function Main() {
               <input
                 type="date"
                 value={date}
-                min={userBranches[branch].minDate}
-                max={userBranches[branch].maxDate}
+                min="2024-12-23"
+                max={format(addDays(new Date(), 365), 'yyyy-MM-dd')}
                 onChange={(e) => {
                   setDate(e.target.value);
                   sessionStorage.setItem('date', e.target.value);
