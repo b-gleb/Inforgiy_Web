@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 import api from '../../services/api.js';
@@ -28,6 +29,151 @@ ModuleRegistry.registerModules([
   LocaleModule
 ]);
 
+
+
+export default function BranchStats() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [allUsers, setAllUsers] = useState(null);
+  const [columnDefs, setColumnDefs] = useState(null);
+  const [rowData, setRowData] = useState(null);
+  const [defaultColDef] = useState({
+    sortable: true,
+    filter: "agNumberColumnFilter",
+    filterParams: {
+      filterOptions: ['inRange'],
+      inRangeInclusive: true,
+      buttons: ['apply', 'reset'],
+      closeOnApply: true,
+      maxNumConditions: 1
+    },
+    suppressMovable: true,
+    wrapText: true,
+    cellClass: cellClass
+  });
+
+  // Checking if all the neccessary location states exist, otherwise redirect
+  const { branch, initDataUnsafe } = location.state || {};
+  useEffect(() => {
+    if (!branch || !initDataUnsafe){
+      navigate('/Inforgiy_Web/', { replace: true })
+    }
+  }, [navigate, branch, initDataUnsafe])
+
+  if (!branch || !initDataUnsafe){
+    return null;
+  };
+
+  // Telegram UI BackButton
+  useEffect(() => {
+    const handleBackClick = () => {
+      navigate(-1);
+    };
+
+    window.Telegram.WebApp.BackButton.onClick(handleBackClick);
+    window.Telegram.WebApp.BackButton.show();
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      window.Telegram.WebApp.BackButton.offClick(handleBackClick);
+      window.Telegram.WebApp.BackButton.hide();
+    };
+  }, []);
+
+
+  // Set Table Theme
+  useEffect(() => {
+    document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
+  }, []);
+
+
+  const autoSizeStrategy = useMemo(() => {
+    return {
+      type: 'fitCellContents'
+    };
+  }, []);
+
+
+  const onColumnGroupOpened = useCallback( async (params) => {
+    if (params.columnGroup.level === 1 && params.columnGroup.isExpanded() === true) {
+      const intervals = [];
+
+      for (const column of params.columnGroup.children) {
+        const colIdSplit = column.colId.split('_');
+        intervals.push([colIdSplit[0], colIdSplit[1]]);
+      };
+
+      const branchStats = await fetchBranchStats(branch, allUsers, intervals);
+      const { rows } = transformData(branchStats);
+
+      // Add new data to already existing columns
+      setRowData((prevData) => {
+        return prevData.map((row) => {
+          const newColumns = rows.find((item) => item.user === row.user);
+          return newColumns ? { ...row, ...newColumns } : row;
+        });
+      });
+    };
+
+    // Adjust the width of opened columns
+    if (params.columnGroup.isExpanded() === true){
+      const colArray = params.columnGroup.children.map(col => col.getId());
+      params.api.autoSizeColumns(colArray)
+    }
+  }, [branch, allUsers]);
+
+
+  useEffect(() => {
+    const generateTable = async () => {
+      try {
+        const year = new Date().getFullYear();
+        const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+        const allUserIds = allUsers.map(userObj => userObj.id);
+        const yearlyColumnDefs = generateColumnDefs(year);
+        const intervalsToFetch = calculateIntervals(year);
+        const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
+        const { rows } = transformData(branchStats);
+
+        setAllUsers(allUserIds);
+        setRowData(rows);
+        setColumnDefs([
+          {
+            field: "user",
+            headerName: "Позывной",
+            pinned: 'left',
+            filter: null,
+            cellClass: null
+          },
+          ...yearlyColumnDefs
+        ]);
+      } catch (error) {
+        
+      };
+    };
+
+    generateTable();
+  }, [branch, initDataUnsafe])
+
+
+  return (
+    <div className='w-full h-full flex flex-col fixed inset-0 bg-gray-white dark:bg-neutral-900'>
+      <div className='w-full h-full flex-1 overflow-hidden'>
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          onColumnGroupOpened={onColumnGroupOpened}
+          autoSizeStrategy={autoSizeStrategy}
+          suppressColumnVirtualisation={true} // to autosize columns not in viewport
+          localeText={localeText}
+          gridOptions={{
+            theme: gridTheme,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
 
 
 async function fetchBranchStats (branch, user_ids, dateRanges) {
@@ -146,115 +292,4 @@ const cellClass = ( params ) => {
   ){
     return 'text-[#ff0000]'
   }
-}
-
-
-export default function BranchStats({ branch, initDataUnsafe }) {
-  const [allUsers, setAllUsers] = useState(null);
-  const [columnDefs, setColumnDefs] = useState(null);
-  const [rowData, setRowData] = useState(null);
-  const [defaultColDef] = useState({
-    sortable: true,
-    filter: "agNumberColumnFilter",
-    filterParams: {
-      filterOptions: ['inRange'],
-      inRangeInclusive: true,
-      buttons: ['apply', 'reset'],
-      closeOnApply: true,
-      maxNumConditions: 1
-    },
-    suppressMovable: true,
-    wrapText: true,
-    cellClass: cellClass
-  });
-
-
-   // Set Table Theme
-   useEffect(() => {
-    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
-  }, []);
-
-
-  const autoSizeStrategy = useMemo(() => {
-    return {
-      type: 'fitCellContents'
-    };
-  }, []);
-
-
-  const onColumnGroupOpened = useCallback( async (params) => {
-    if (params.columnGroup.level === 1 && params.columnGroup.isExpanded() === true) {
-      const intervals = [];
-
-      for (const column of params.columnGroup.children) {
-        const colIdSplit = column.colId.split('_');
-        intervals.push([colIdSplit[0], colIdSplit[1]]);
-      };
-
-      const branchStats = await fetchBranchStats(branch, allUsers, intervals);
-      const { rows } = transformData(branchStats);
-
-      // Add new data to already existing columns
-      setRowData((prevData) => {
-        return prevData.map((row) => {
-          const newColumns = rows.find((item) => item.user === row.user);
-          return newColumns ? { ...row, ...newColumns } : row;
-        });
-      });
-    };
-
-    // Adjust the width of opened columns
-    if (params.columnGroup.isExpanded() === true){
-      const colArray = params.columnGroup.children.map(col => col.getId());
-      params.api.autoSizeColumns(colArray)
-    }
-  }, [branch, allUsers]);
-
-
-  useEffect(() => {
-    const generateTable = async () => {
-      try {
-        const year = new Date().getFullYear();
-        const allUsers = await fetchAllUsers(branch, initDataUnsafe);
-        const allUserIds = allUsers.map(userObj => userObj.id);
-        const yearlyColumnDefs = generateColumnDefs(year);
-        const intervalsToFetch = calculateIntervals(year);
-        const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
-        const { rows } = transformData(branchStats);
-
-        setAllUsers(allUserIds);
-        setRowData(rows);
-        setColumnDefs([
-          {
-            field: "user",
-            headerName: "Позывной",
-            pinned: 'left',
-            filter: null,
-            cellClass: null
-          },
-          ...yearlyColumnDefs
-        ]);
-      } catch (error) {
-        
-      };
-    };
-
-    generateTable();
-  }, [branch, initDataUnsafe])
-
-
-  return (
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        onColumnGroupOpened={onColumnGroupOpened}
-        autoSizeStrategy={autoSizeStrategy}
-        suppressColumnVirtualisation={true} // to autosize columns not in viewport
-        localeText={localeText}
-        gridOptions={{
-          theme: gridTheme,
-        }}
-      />
-  );
 };

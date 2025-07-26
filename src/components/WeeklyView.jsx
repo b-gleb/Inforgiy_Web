@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
@@ -47,7 +48,23 @@ function rowIndexToTime(rowIndex) {
 }
 
 
-export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsafe, setShowWeekly }) {
+export default function WeeklyView() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Checking if all the neccessary location states exist, otherwise redirect
+  const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || {};
+  useEffect(() => {
+    if (!branch || !rotaAdmin || !maxDuties || !initDataUnsafe){
+      navigate('/Inforgiy_Web/', { replace: true })
+    }
+  }, [navigate, branch, rotaAdmin, maxDuties, initDataUnsafe])
+
+  if (!branch || !rotaAdmin || !maxDuties || !initDataUnsafe){
+    return null;
+  };
+
+
   const cellRenderer = ( params ) => {
     const value = params.value;
     if (!Array.isArray(value) || value.length === 0){return value};
@@ -100,7 +117,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
   const handleCellClicked = (params) => {
     if (params.colDef.field === 'index') {
-      setShowWeekly(false)
+      navigate(-1);
     }
     else {
       setSelectedCellData({
@@ -162,16 +179,20 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
   // Telegram UI BackButton & Table Theme
   useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => {setShowWeekly(false)});
+    const handleBackClick = () => {
+      navigate(-1);
+    };
+
+    window.Telegram.WebApp.BackButton.onClick(handleBackClick);
     window.Telegram.WebApp.BackButton.show();
-    document.body.dataset.agThemeMode = window.Telegram.WebApp.colorScheme;
+    document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
 
     // Cleanup the event listener when the component unmounts
     return () => {
-      window.Telegram.WebApp.BackButton.offClick();
+      window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
     };
-  }, [setShowWeekly]);
+  }, []);
 
 
   useEffect(() => {
@@ -233,7 +254,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
 
 
   return (
-    <>
+    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
       {isLoading && <Loading />}
 
       {rowData && (
@@ -262,7 +283,7 @@ export default function WeeklyView({ branch, rotaAdmin, maxDuties, initDataUnsaf
         initDataUnsafe={initDataUnsafe}
         closePopup={closePopup}
       />
-    </>
+    </div>
   );
 };
 

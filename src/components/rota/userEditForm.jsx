@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import api from '../../services/api.js';
 import { toast } from 'react-toastify';
@@ -5,7 +7,9 @@ import { toast } from 'react-toastify';
 import catchResponseError from '../../utils/responseError';
 
 
-export default function UserEditForm({ branch, editingUser, setEditingUser, initDataUnsafe }){
+export default function UserEditForm({ branch, User, initDataUnsafe }){
+    const navigate = useNavigate();
+    const [editingUser, setEditingUser] = useState(User)
     const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный", 3: "Чёрный", 4: "Фиолетовый", 5: "Оранжевый", 6: "Жёлтый"};
   
     const handleChange = (e) => {
@@ -31,7 +35,7 @@ export default function UserEditForm({ branch, editingUser, setEditingUser, init
   
         if (response.status === 200){
           window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-          toast.success('Пользователь удален');
+          toast.success('Пользователь удален!');
         };
   
       } catch (error) {
@@ -52,9 +56,11 @@ export default function UserEditForm({ branch, editingUser, setEditingUser, init
         const response = await api.post('/api/updateUser', data);
   
         if (response.status === 200){
-          setEditingUser(null);
           window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-          toast.success('Пользователь обновлен!')
+          navigate('/Inforgiy_Web/', { state: {
+            showUserManagement: true,
+            toastMessage: 'Пользователь обновлен!'
+          } });
         };
       } catch (error) {
         // Handle error 404 separately
@@ -123,17 +129,25 @@ export default function UserEditForm({ branch, editingUser, setEditingUser, init
               className="button-secondary w-auto"
               onClick={() => {
                 handleRemoveUser(branch, editingUser.id, initDataUnsafe);
-                setEditingUser(null);
+                navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });   
               }}
             >
               <Trash2 color='red' size={25}/>
             </button>
           )}
-          <button type="button" onClick={() => {setEditingUser(null); window.Telegram.WebApp.HapticFeedback.impactOccurred('light');}} className="button-secondary w-full">Отменить</button>
+          <button
+            type="button"
+            onClick={() => {
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+              navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
+            }}
+            className="button-secondary w-full">
+            Отменить
+          </button>
+
           <button type="submit" className="button-primary">Сохранить</button>
         </div>
       </form>
-  
       </>
     )
   }

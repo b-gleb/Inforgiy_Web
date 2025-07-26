@@ -1,4 +1,5 @@
 import { useState, useEffect, Suspense, lazy } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, NotepadText, ChartColumn, User } from "lucide-react";
 
@@ -7,6 +8,8 @@ import UserEditForm from "./rota/userEditForm";
 const PersonalStats = lazy(() => import('./statistics/personalStats'));
 const MyDutiesCard = lazy(() => import('./rota/myDuties'));
 
+// Styles
+import '../styles/App.css';
 
 const CollapsibleSection = ({ title, icon: Icon, isOpen, onClick, children }) => {
   return (
@@ -48,71 +51,94 @@ const CollapsibleSection = ({ title, icon: Icon, isOpen, onClick, children }) =>
 };
 
 
-export default function UserProfile({ branch, editingUser, setEditingUser, initDataUnsafe }){
+export default function UserProfile(){
+  const location = useLocation();
+  const navigate = useNavigate();
   const [openSection, setOpenSection] = useState('settings');
 
-  const handleToggle = (section) => {
-    setOpenSection((prev) => (prev === section ? null : section));
+  // Checking if all the neccessary location states exist, otherwise redirect
+  const { branch, editingUser, initDataUnsafe } = location.state || {};
+  useEffect(() => {
+    if (!branch || !editingUser || !initDataUnsafe){
+      navigate('/Inforgiy_Web/', { replace: true })
+    }
+  }, [navigate, branch, editingUser, initDataUnsafe])
+
+  if (!branch || !editingUser || !initDataUnsafe){
+    return null;
   };
 
   // Telegram UI Back Button
   useEffect(() => {
-    window.Telegram.WebApp.BackButton.onClick(() => setEditingUser(null));
+    const handleBackClick = () => {
+      navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
+    };
+
+    window.Telegram.WebApp.BackButton.onClick(handleBackClick);
+    window.Telegram.WebApp.BackButton.show();
 
     return () => {
-      window.Telegram.WebApp.BackButton.offClick(() => setEditingUser(null));
+      window.Telegram.WebApp.BackButton.offClick(handleBackClick);
+      window.Telegram.WebApp.BackButton.hide();
     }
   }, [editingUser])
 
+  // Opening and closing the sections
+  const handleToggle = (section) => {
+    setOpenSection((prev) => (prev === section ? null : section));
+  };
+
   return (
-    <>
-
-      <CollapsibleSection
-        title={'Профиль'}
-        icon={User}
-        isOpen={openSection === "settings"}
-        onClick={() => handleToggle("settings")}
-      >
-        <UserEditForm
-          branch={branch}
-          editingUser={editingUser}
-          setEditingUser={setEditingUser}
-          initDataUnsafe={initDataUnsafe}
-        />
-      </CollapsibleSection>
-
-
-      <CollapsibleSection
-        title={'Смены'}
-        icon={NotepadText}
-        isOpen={openSection === "duties"}
-        onClick={() => handleToggle("duties")}
-      >
-        <Suspense fallback={null}>
-          <MyDutiesCard
+    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
+      <div className="popup">
+        <CollapsibleSection
+          title={'Профиль'}
+          icon={User}
+          isOpen={openSection === "settings"}
+          onClick={() => handleToggle("settings")}
+        >
+          <UserEditForm
             branch={branch}
-            user_id={editingUser.id}
-            prevDays={14}
-            nextDays={30}
+            User={editingUser}
+            initDataUnsafe={initDataUnsafe}
           />
-        </Suspense>
-      </CollapsibleSection>
+        </CollapsibleSection>
+
+      {editingUser.id !== null && (
+        <>
+          <CollapsibleSection
+            title={'Смены'}
+            icon={NotepadText}
+            isOpen={openSection === "duties"}
+            onClick={() => handleToggle("duties")}
+          >
+            <Suspense fallback={null}>
+              <MyDutiesCard
+                branch={branch}
+                user_id={editingUser.id}
+                prevDays={14}
+                nextDays={30}
+              />
+            </Suspense>
+          </CollapsibleSection>
 
 
-      <CollapsibleSection
-        title={'Статистика'}
-        icon={ChartColumn}
-        isOpen={openSection === "personal_stats"}
-        onClick={() => handleToggle("personal_stats")}
-      >
-        <Suspense fallback={null}>
-          <PersonalStats
-            branch={branch}
-            user_id={editingUser.id}
-          />
-        </Suspense>
-      </CollapsibleSection>
-
-    </>
+          <CollapsibleSection
+            title={'Статистика'}
+            icon={ChartColumn}
+            isOpen={openSection === "personal_stats"}
+            onClick={() => handleToggle("personal_stats")}
+          >
+            <Suspense fallback={null}>
+              <PersonalStats
+                branch={branch}
+                user_id={editingUser.id}
+              />
+            </Suspense>
+          </CollapsibleSection>
+        </>
+      )}
+    </div>
+  </div>
   )
 }
