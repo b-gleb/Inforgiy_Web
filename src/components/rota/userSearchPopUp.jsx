@@ -6,9 +6,6 @@ import { motion } from 'framer-motion';
 import fetchAllUsers from '../../services/fetchAllUsers';
 import updateRota from '../../services/updateRota';
 
-// Lazy Loading
-const UserProfile = lazy(() => import('../userProfile'));
-const UserEditForm = lazy(() => import('./userEditForm'));
 
 export default function UserSearchPopUp({ 
   mode,
