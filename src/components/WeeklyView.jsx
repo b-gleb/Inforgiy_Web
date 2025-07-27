@@ -353,7 +353,6 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
             <h3 className="text-sm font-medium mb-2 text-gray-500">{format(date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(rowIndex)}</h3>
 
             <div>
-              {/* TODO: Add animation? */}
               {Object.values(selectedCellData.users).length > 0 ? (
                 Object.values(selectedCellData.users).map((user, index) => (
                   <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
