@@ -186,7 +186,10 @@ export default function PersonalStats({ branch, user_id }) {
       }
     },
     legend: {
-      show: false
+      show: true,
+      labels: {
+        colors: '#808080'
+      },
     },
     stroke: {
       width: [2, 4],
@@ -224,11 +227,11 @@ export default function PersonalStats({ branch, user_id }) {
 
         setDayByDaySeries([
           {
-            name: "Previous month",
+            name: "Прошлый месяц",
             data: response.data[1].data.map(item => item.cumulativeCount)
           },
           {
-            name: "This month",
+            name: "Текущий месяц",
             data: response.data[0].data.map(item => item.cumulativeCount)
           },
         ]);
