@@ -43,6 +43,7 @@ function Main() {
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
+  const [showStatDropdown, setShowStatDropdown] = useState(false);
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
 
@@ -315,21 +316,45 @@ function Main() {
               <CalendarDays size={25} className="icon-text"/>
             </button>
 
-
+            {/* TODO: Setup permissions to show stats buttons, close pop-up on branch switch*/}
             {rotaAdmin.includes(branch) && (
               <>
-                <button
-                  className='button-icon'
-                  onClick={() => {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                    navigate('./branchStats', { state: {
-                      branch: branch,
-                      initDataUnsafe: initDataUnsafe
-                    }});
-                  }}
-                >
-                  <ChartNoAxesCombined size={25} className='icon-text'/>
-                </button>
+                <div className='relative inline-block'>
+                  <button
+                    className='button-icon'
+                    onClick={() => {
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                      setShowStatDropdown(prev => !prev);
+                    }}
+                  >
+                    <ChartNoAxesCombined size={25} className='icon-text'/>
+                  </button>
+
+                  {showStatDropdown && (
+                    <div className='dropdown-container'>
+                      <button
+                        className='dropdown-button'
+                        // onClick={() => handleNavigate('./personalStats')}
+                      >
+                        Личная статистика
+                      </button>
+
+                      <button
+                        className='dropdown-button'
+                        onClick={() => {
+                          window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                          navigate('./branchStats', { state: {
+                            branch: branch,
+                            initDataUnsafe: initDataUnsafe
+                          }});
+                        }}
+                      >
+                        Сводная статистика
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
 
                 <button
                   className='button-icon'
