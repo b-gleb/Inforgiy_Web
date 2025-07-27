@@ -54,13 +54,14 @@ export default function WeeklyView() {
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || {};
+  const requiredParams = [branch, rotaAdmin, maxDuties, initDataUnsafe];
   useEffect(() => {
-    if (!branch || !rotaAdmin || !maxDuties || !initDataUnsafe){
+    if (requiredParams.some(param => param === undefined)) {
       navigate('/Inforgiy_Web/', { replace: true })
     }
-  }, [navigate, branch, rotaAdmin, maxDuties, initDataUnsafe])
+  }, [navigate, requiredParams])
 
-  if (!branch || !rotaAdmin || !maxDuties || !initDataUnsafe){
+  if (requiredParams.some(param => param === undefined)){
     return null;
   };
 

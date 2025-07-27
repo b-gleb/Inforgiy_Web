@@ -58,13 +58,14 @@ export default function UserProfile(){
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, editingUser, initDataUnsafe } = location.state || {};
+  const requiredParams = [branch, editingUser, initDataUnsafe];
   useEffect(() => {
-    if (!branch || !editingUser || !initDataUnsafe){
+    if (requiredParams.some(param => param === undefined)){
       navigate('/Inforgiy_Web/', { replace: true })
     }
-  }, [navigate, branch, editingUser, initDataUnsafe])
+  }, [navigate, requiredParams])
 
-  if (!branch || !editingUser || !initDataUnsafe){
+  if (requiredParams.some(param => param === undefined)){
     return null;
   };
 

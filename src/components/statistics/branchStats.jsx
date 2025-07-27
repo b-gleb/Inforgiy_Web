@@ -54,13 +54,14 @@ export default function BranchStats() {
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, initDataUnsafe } = location.state || {};
+  const requiredParams = [branch, initDataUnsafe];
   useEffect(() => {
-    if (!branch || !initDataUnsafe){
+    if (requiredParams.some(param => param === undefined)){
       navigate('/Inforgiy_Web/', { replace: true })
     }
-  }, [navigate, branch, initDataUnsafe])
+  }, [navigate, requiredParams])
 
-  if (!branch || !initDataUnsafe){
+  if (requiredParams.some(param => param === undefined)){
     return null;
   };
 
