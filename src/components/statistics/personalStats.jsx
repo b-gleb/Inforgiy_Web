@@ -269,6 +269,7 @@ export default function PersonalStats({ branch, user_id }) {
       />
     </div>
 
+    <h2 className='text-xs mt-6 text-gray-500 dark:text-[#808080]'>Количество смен за последние 12 недель</h2>
     <div className="w-full max-w-md mx-auto px-2">
       {weeklyChartSeries ?
         <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
@@ -277,6 +278,7 @@ export default function PersonalStats({ branch, user_id }) {
       }
     </div>
 
+    <h2 className='text-xs text-gray-500 dark:text-[#808080]'>Количество смен относительно прошлого месяца</h2>
     <div className="w-full max-w-md mx-auto px-2">
       {dayByDaySeries ?
         <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
