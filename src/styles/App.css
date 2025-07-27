@@ -55,6 +55,29 @@
   text-black dark:text-gray-400
 }
 
+/* TODO:  Modify dropdown styles*/
+.dropdown-container { @apply
+  absolute
+  top-full
+  left-0
+  shadow-md
+  rounded-xl
+  mt-2
+  z-50
+
+  bg-white dark:bg-neutral-700
+}
+
+.dropdown-button { @apply
+  block
+  w-full
+  px-3
+  py-2
+  text-left
+
+  bg-white dark:bg-neutral-700
+}
+
 .button-primary { @apply
   w-full
   mb-2
