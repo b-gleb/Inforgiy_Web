@@ -8,7 +8,7 @@ export default async function userDuties (branch, user_id, startDate, endDate) {
     const response = await api.get('/api/userDuties', {
       params: {
         branch: branch,
-        user_id: user_id,
+        userId: user_id,
         startDate: format(startDate, 'yyyy-MM-dd'),
         endDate: format(endDate, 'yyyy-MM-dd')
       }
