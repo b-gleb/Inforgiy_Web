@@ -6,8 +6,8 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
     "@vitejs/plugin-react-swc": "^3.11.0",
-    "ag-grid-community": "^34.0.2",
-    "ag-grid-react": "^34.0.2",
+    "ag-grid-community": "^34.1.0",
+    "ag-grid-react": "^34.1.0",
     "apexcharts": "^5.3.1",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",

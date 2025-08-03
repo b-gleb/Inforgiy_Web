@@ -167,6 +167,7 @@ export default function BranchStats() {
           autoSizeStrategy={autoSizeStrategy}
           suppressColumnVirtualisation={true} // to autosize columns not in viewport
           localeText={localeText}
+          hidePaddedHeaderRows={true}
           gridOptions={{
             theme: gridTheme,
           }}
