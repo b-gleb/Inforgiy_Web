@@ -178,11 +178,11 @@ export default function BranchStats() {
 };
 
 
-async function fetchBranchStats (branch, user_ids, dateRanges) {
+async function fetchBranchStats (branch, userIds, dateRanges) {
   try {
     const response = await api.post('/api/stats', {
       branch: branch,
-      user_ids: user_ids,
+      userIds: userIds,
       dateRanges: dateRanges
     });
 
@@ -273,15 +273,18 @@ function generateColumnDefs(year) {
 function transformData(data) {
   const rows = [];
 
-  for (const [user, entries] of Object.entries(data)) {
-      const row = { user };
+  data.forEach(entry => {
+    const {user, data} = entry;
+    const row = {user: user.nick};
+    
+    for (const entry of data) {
+      const range = `${entry.dateRange[0].split("T")[0]}_${entry.dateRange[1].split("T")[0]}`;
+      row[range] = entry.count;
+    };
       
-      for (const entry of entries) {
-          const range = `${entry.dateRange[0].split("T")[0]}_${entry.dateRange[1].split("T")[0]}`;
-          row[range] = entry.count;
-      };
-      rows.push(row);
-  };
+    rows.push(row);
+  });
+  
   return { rows };
 };
 
