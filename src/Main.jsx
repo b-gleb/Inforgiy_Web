@@ -208,6 +208,7 @@ function Main() {
     };
   
     fetchRotaData();
+    setShowStatDropdown(false);
   }, [branch, date]);
 
   const swipeHandlers = useSwipeable({
