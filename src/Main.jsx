@@ -319,54 +319,62 @@ function Main() {
               <CalendarDays size={25} className="icon-text"/>
             </button>
 
-            {/* TODO: Setup permissions to show stats buttons, close pop-up on branch switch*/}
-            {rotaAdmin.includes(branch) && (
-              <>
-                <div className='relative inline-block'>
-                  <button
-                    className='button-icon'
-                    onClick={() => {
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                      setShowStatDropdown(prev => !prev);
-                    }}
-                  >
-                    <ChartNoAxesCombined size={25} className='icon-text'/>
-                  </button>
+            <div className='relative inline-block'>
+              <button
+                className='button-icon'
+                onClick={() => {
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                  if (rotaAdmin.includes(branch)) {
+                    setShowStatDropdown(prev => !prev);
+                  }
+                  else {
+                    setShowPersonalStats(true);
+                  };
+                }}
+              >
+                <ChartNoAxesCombined size={25} className='icon-text'/>
+              </button>
 
+              {showStatDropdown && (
+                <div className='dropdown-container'>
+                  <button
+                    className='dropdown-button'
                     onClick={() => {
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                       setShowPersonalStats(true);
                     }}
+                  >
+                    Личная
+                  </button>
 
-                      <div className='border-t border-neutral-300 dark:border-neutral-500'/>
+                  <div className='border-t border-neutral-300 dark:border-neutral-500'/>
 
-                      <button
-                        className='dropdown-button'
-                        onClick={() => {
-                          window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                          navigate('./branchStats', { state: {
-                            branch: branch,
-                            initDataUnsafe: initDataUnsafe
-                          }});
-                        }}
-                      >
-                        Сводная статистика
-                      </button>
-                    </div>
-                  )}
+                  <button
+                    className='dropdown-button'
+                    onClick={() => {
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                      navigate('./branchStats', { state: {
+                        branch: branch,
+                        initDataUnsafe: initDataUnsafe
+                      }});
+                    }}
+                  >
+                    Сводная
+                  </button>
                 </div>
+              )}
+            </div>
                 
-
-                <button
-                  className='button-icon'
-                  onClick={() => {
-                    setShowUserManagement(true);
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                  }}
-                >
-                  <Settings size={25} className="icon-text"/>
-                </button>
-              </>
+            {rotaAdmin.includes(branch) && (
+              <button
+                className='button-icon'
+                onClick={() => {
+                  setShowUserManagement(true);
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }}
+              >
+                <Settings size={25} className="icon-text"/>
+              </button>
             )}
           </div>
         </>
