@@ -339,6 +339,8 @@ function Main() {
                         Личная статистика
                       </button>
 
+                      <div className='border-t border-neutral-300 dark:border-neutral-500'/>
+
                       <button
                         className='dropdown-button'
                         onClick={() => {
