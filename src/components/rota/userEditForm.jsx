@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
-import api from '../../services/api.js';
 import { toast } from 'react-toastify';
 
+import { userColors } from '../../utils/userColors.js';
+import api from '../../services/api.js';
 import catchResponseError from '../../utils/responseError';
 
 
 export default function UserEditForm({ branch, User, initDataUnsafe }){
     const navigate = useNavigate();
     const [editingUser, setEditingUser] = useState(User)
-    const userColors = {0: "Синий", 1: "Зелёный", 2: "Красный", 3: "Чёрный", 4: "Фиолетовый", 5: "Оранжевый", 6: "Жёлтый"};
   
     const handleChange = (e) => {
       const {name, value} = e.target;
