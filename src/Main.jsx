@@ -23,6 +23,7 @@ import deniedAnimationData from "./assets/denied.json";
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp.jsx'));
+const PersonalStats = lazy(() => import('./components/statistics/personalStats.jsx'));
 const Animation = lazy(() => import('./components/animation.jsx'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
@@ -44,6 +45,7 @@ function Main() {
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
   const [showStatDropdown, setShowStatDropdown] = useState(false);
+  const [showPersonalStats, setShowPersonalStats] = useState(false);
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
 
@@ -71,12 +73,12 @@ function Main() {
 
   // Prevent main page from scorlling when a pop-up is open on top
   useEffect(() => {
-    if (showUserManagement || showForbidden) {
+    if (showUserManagement || showPersonalStats || showForbidden) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement, showForbidden]);
+  }, [showUserManagement, showPersonalStats, showForbidden]);
 
 
   const storeLastLogin = () => {
@@ -330,14 +332,10 @@ function Main() {
                     <ChartNoAxesCombined size={25} className='icon-text'/>
                   </button>
 
-                  {showStatDropdown && (
-                    <div className='dropdown-container'>
-                      <button
-                        className='dropdown-button'
-                        // onClick={() => handleNavigate('./personalStats')}
-                      >
-                        Личная статистика
-                      </button>
+                    onClick={() => {
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                      setShowPersonalStats(true);
+                    }}
 
                       <div className='border-t border-neutral-300 dark:border-neutral-500'/>
 
@@ -440,6 +438,18 @@ function Main() {
             initDataUnsafe={initDataUnsafe}
             onClose={() => setShowUserManagement(false)}
           />
+        </Suspense>
+      )}
+
+      {/* TODO: Add back button to close the popup */}
+      {showPersonalStats && (
+        <Suspense fallback={null}>
+          <div className='popup'>
+            <PersonalStats
+              branch={branch}
+              user_id={initDataUnsafe.user.id}
+            />
+          </div>
         </Suspense>
       )}
 
