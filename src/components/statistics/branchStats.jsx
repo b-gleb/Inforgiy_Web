@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
+
 import api from '../../services/api.js';
 import fetchAllUsers from '../../services/fetchAllUsers';
 import catchResponseError from '../../utils/responseError';
+import { userColors } from '../../utils/userColors.js';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
@@ -14,6 +16,7 @@ import {
   ModuleRegistry,
   ValidationModule,
   NumberFilterModule,
+  ExternalFilterModule,
   ClientSideRowModelModule,
   ColumnAutoSizeModule,
   CellStyleModule,
@@ -23,6 +26,7 @@ import {
 ModuleRegistry.registerModules([
   ValidationModule,
   NumberFilterModule,
+  ExternalFilterModule,
   ClientSideRowModelModule,
   ColumnAutoSizeModule,
   CellStyleModule,
@@ -34,6 +38,9 @@ ModuleRegistry.registerModules([
 export default function BranchStats() {
   const location = useLocation();
   const navigate = useNavigate();
+  const gridRef = useRef(null);
+  let colorFilter = 'all';
+  const [colorMap, setColorMap] = useState({'all': 'Все цвета'});
   const [allUsers, setAllUsers] = useState(null);
   const [columnDefs, setColumnDefs] = useState(null);
   const [rowData, setRowData] = useState(null);
@@ -124,6 +131,33 @@ export default function BranchStats() {
   }, [branch, allUsers]);
 
 
+  const isExternalFilterPresent = useCallback(() => {
+    return colorFilter !== "all";
+  }, []);
+
+
+
+  const externalFilterChanged = useCallback((newValue) => {
+    colorFilter = newValue
+    gridRef.current.api.onFilterChanged();
+  }, []);
+
+
+  const doesExternalFilterPass = useCallback((node) => {
+    if (node.data) {
+      if (node.data.user.color == colorFilter) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+    else {
+      return true;
+    };
+  }, [colorFilter]);
+
+
   useEffect(() => {
     const generateTable = async () => {
       try {
@@ -134,7 +168,9 @@ export default function BranchStats() {
         const intervalsToFetch = calculateIntervals(year);
         const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
         const { rows } = transformData(branchStats);
+        const colors = getColorMap(rows);
 
+        setColorMap(colors);
         setAllUsers(allUserIds);
         setRowData(rows);
         setColumnDefs([
@@ -143,6 +179,7 @@ export default function BranchStats() {
             headerName: "Позывной",
             pinned: 'left',
             filter: null,
+            valueGetter: (params) => params.data.user?.nick || '???',
             cellClass: null
           },
           ...yearlyColumnDefs
@@ -157,12 +194,35 @@ export default function BranchStats() {
 
 
   return (
-    <div className='w-full h-full flex flex-col fixed inset-0 bg-gray-white dark:bg-neutral-900'>
+    <div className={`w-full h-full flex flex-col fixed inset-0 bg-gray-white dark:bg-[#1f2836] ${sessionStorage.getItem('theme') || 'light'}`}>
+        <div className='ml-1 text-black dark:text-[#D9D6D6] text-sm'>
+          <label htmlFor='colorFilter'>Цвет: </label>
+          <select
+            name='coloFilter'
+            id='colorFilter'
+            onChange={(e) => externalFilterChanged(e.target.value)}
+          >
+            {Object.keys(colorMap).map((colorId) => {
+              return (
+                <option
+                  key={colorId}
+                  value={colorId}
+                >
+                  {colorMap[colorId]}
+                </option>
+              )
+            })}
+          </select>
+        </div>
+
       <div className='w-full h-full flex-1 overflow-hidden'>
         <AgGridReact
+          ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
+          isExternalFilterPresent={isExternalFilterPresent}
+          doesExternalFilterPass={doesExternalFilterPass}
           onColumnGroupOpened={onColumnGroupOpened}
           autoSizeStrategy={autoSizeStrategy}
           suppressColumnVirtualisation={true} // to autosize columns not in viewport
@@ -275,7 +335,7 @@ function transformData(data) {
 
   data.forEach(entry => {
     const {user, data} = entry;
-    const row = {user: user.nick};
+    const row = {user};
     
     for (const entry of data) {
       const range = `${entry.dateRange[0].split("T")[0]}_${entry.dateRange[1].split("T")[0]}`;
@@ -284,8 +344,26 @@ function transformData(data) {
       
     rows.push(row);
   });
-  
+
   return { rows };
+};
+
+
+const getColorMap = (data) => {
+  const colorMap = {all: 'Все цвета'};
+  const seenColors = new Set();
+
+  for (const item of data) {
+    const color = item.user?.color;
+    if (color != null && !seenColors.has(color)) {
+      seenColors.add(color);
+      if (userColors[color]) {
+        colorMap[color] = userColors[color];
+      }
+    }
+  };
+
+  return colorMap;
 };
 
 
