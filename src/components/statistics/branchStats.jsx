@@ -117,7 +117,7 @@ export default function BranchStats() {
       // Add new data to already existing columns
       setRowData((prevData) => {
         return prevData.map((row) => {
-          const newColumns = rows.find((item) => item.user === row.user);
+          const newColumns = rows.find((item) => item.user.nick === row.user.nick);
           return newColumns ? { ...row, ...newColumns } : row;
         });
       });
