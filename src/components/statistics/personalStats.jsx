@@ -42,7 +42,7 @@ export default function PersonalStats({ branch, user_id }) {
       try {
         const response = await api.post('/api/stats', {
           branch: branch,
-          user_ids: [user_id],
+          userIds: [user_id],
           dateRanges: [
             getWeekRange(now),
             getWeekRange(subWeeks(now, 1)),
@@ -52,7 +52,7 @@ export default function PersonalStats({ branch, user_id }) {
           ]
         });
 
-        const stats  = Object.values(response.data)[0];
+        const stats  = response.data[0].data;
         setPersonalStatsData({
           currentWeek: stats[0].count,
           previousWeek: stats[1].count,
@@ -115,14 +115,13 @@ export default function PersonalStats({ branch, user_id }) {
         
         const response = await api.post('/api/stats', {
           branch: branch,
-          user_ids: [user_id],
+          userIds: [user_id],
           dateRanges: weekRanges
         });
-        const user_nick = Object.keys(response.data)[0];
 
         setWeeklyChartSeries([{
-          name: user_nick,
-          data: response.data[user_nick].map(item => item.count)
+          name: response.data[0].user.nick,
+          data: response.data[0].data.map(item => item.count)
         }]);
 
         setWeeklyChartOptions(prevOptions => ({
