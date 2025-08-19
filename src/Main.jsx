@@ -466,7 +466,6 @@ function Main() {
         </Suspense>
       )}
 
-      {/* TODO: Add back button to close the popup */}
       {showPersonalStats && (
         <Suspense fallback={null}>
           <div className='popup'>
