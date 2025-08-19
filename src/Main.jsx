@@ -81,6 +81,22 @@ function Main() {
   }, [showUserManagement, showPersonalStats, showForbidden]);
 
 
+  useEffect(() => {
+    const handleBackClick = () => {
+      setShowPersonalStats(false);
+    };
+
+    if (showPersonalStats) {
+      window.Telegram.WebApp.BackButton.onClick(handleBackClick);
+      window.Telegram.WebApp.BackButton.show();
+    }
+    else {
+      window.Telegram.WebApp.BackButton.offClick(handleBackClick);
+      window.Telegram.WebApp.BackButton.hide();
+    };
+  }, [showPersonalStats]);
+
+
   const storeLastLogin = () => {
     const currentDateTime = new Date().toISOString();
     window.Telegram.WebApp.CloudStorage.setItem("lastLogin", currentDateTime, (err, success) => {
