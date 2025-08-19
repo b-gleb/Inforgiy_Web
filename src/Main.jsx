@@ -23,6 +23,7 @@ import deniedAnimationData from "./assets/denied.json";
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp.jsx'));
+const PersonalStats = lazy(() => import('./components/statistics/personalStats.jsx'));
 const Animation = lazy(() => import('./components/animation.jsx'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
@@ -43,6 +44,8 @@ function Main() {
   const [showUserManagement, setShowUserManagement] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
+  const [showStatDropdown, setShowStatDropdown] = useState(false);
+  const [showPersonalStats, setShowPersonalStats] = useState(false);
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
 
@@ -70,12 +73,28 @@ function Main() {
 
   // Prevent main page from scorlling when a pop-up is open on top
   useEffect(() => {
-    if (showUserManagement || showForbidden) {
+    if (showUserManagement || showPersonalStats || showForbidden) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-  }, [showUserManagement, showForbidden]);
+  }, [showUserManagement, showPersonalStats, showForbidden]);
+
+
+  useEffect(() => {
+    const handleBackClick = () => {
+      setShowPersonalStats(false);
+    };
+
+    if (showPersonalStats) {
+      window.Telegram.WebApp.BackButton.onClick(handleBackClick);
+      window.Telegram.WebApp.BackButton.show();
+    }
+    else {
+      window.Telegram.WebApp.BackButton.offClick(handleBackClick);
+      window.Telegram.WebApp.BackButton.hide();
+    };
+  }, [showPersonalStats]);
 
 
   const storeLastLogin = () => {
@@ -205,6 +224,7 @@ function Main() {
     };
   
     fetchRotaData();
+    setShowStatDropdown(false);
   }, [branch, date]);
 
   const swipeHandlers = useSwipeable({
@@ -315,32 +335,62 @@ function Main() {
               <CalendarDays size={25} className="icon-text"/>
             </button>
 
+            <div className='relative inline-block'>
+              <button
+                className='button-icon'
+                onClick={() => {
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                  if (rotaAdmin.includes(branch)) {
+                    setShowStatDropdown(prev => !prev);
+                  }
+                  else {
+                    setShowPersonalStats(true);
+                  };
+                }}
+              >
+                <ChartNoAxesCombined size={25} className='icon-text'/>
+              </button>
 
+              {showStatDropdown && (
+                <div className='dropdown-container'>
+                  <button
+                    className='dropdown-button'
+                    onClick={() => {
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                      setShowPersonalStats(true);
+                    }}
+                  >
+                    Личная
+                  </button>
+
+                  <div className='border-t border-neutral-300 dark:border-neutral-500'/>
+
+                  <button
+                    className='dropdown-button'
+                    onClick={() => {
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                      navigate('./branchStats', { state: {
+                        branch: branch,
+                        initDataUnsafe: initDataUnsafe
+                      }});
+                    }}
+                  >
+                    Сводная
+                  </button>
+                </div>
+              )}
+            </div>
+                
             {rotaAdmin.includes(branch) && (
-              <>
-                <button
-                  className='button-icon'
-                  onClick={() => {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                    navigate('./branchStats', { state: {
-                      branch: branch,
-                      initDataUnsafe: initDataUnsafe
-                    }});
-                  }}
-                >
-                  <ChartNoAxesCombined size={25} className='icon-text'/>
-                </button>
-
-                <button
-                  className='button-icon'
-                  onClick={() => {
-                    setShowUserManagement(true);
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                  }}
-                >
-                  <Settings size={25} className="icon-text"/>
-                </button>
-              </>
+              <button
+                className='button-icon'
+                onClick={() => {
+                  setShowUserManagement(true);
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }}
+              >
+                <Settings size={25} className="icon-text"/>
+              </button>
             )}
           </div>
         </>
@@ -413,6 +463,17 @@ function Main() {
             initDataUnsafe={initDataUnsafe}
             onClose={() => setShowUserManagement(false)}
           />
+        </Suspense>
+      )}
+
+      {showPersonalStats && (
+        <Suspense fallback={null}>
+          <div className='popup'>
+            <PersonalStats
+              branch={branch}
+              user_id={initDataUnsafe.user.id}
+            />
+          </div>
         </Suspense>
       )}
 
