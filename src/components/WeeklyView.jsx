@@ -137,7 +137,7 @@ export default function WeeklyView() {
   const [defaultColDef] = useState({
     sortable: false,
     suppressMovable: true,
-    width: (window.innerWidth * 0.20),
+    width: 75,
     cellRenderer: cellRenderer,
     cellClass: cellClass,
     autoHeight: true,
