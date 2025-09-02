@@ -214,7 +214,7 @@ export default function PersonalStats({ branch, user_id }) {
         const today = new Date();
         const response = await api.post('/api/stats/cumulative', {
           branch: branch,
-          user_id: user_id,
+          userId: user_id,
           dateRanges: [
             [
               format(startOfMonth(today), 'yyyy-MM-dd'),
@@ -227,11 +227,11 @@ export default function PersonalStats({ branch, user_id }) {
         setDayByDaySeries([
           {
             name: "Прошлый месяц",
-            data: response.data[1].data.map(item => item.cumulativeCount)
+            data: response.data[1].data.map(item => item.count)
           },
           {
             name: "Текущий месяц",
-            data: response.data[0].data.map(item => item.cumulativeCount)
+            data: response.data[0].data.map(item => item.count)
           },
         ]);
 
