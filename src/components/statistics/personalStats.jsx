@@ -14,7 +14,7 @@ import catchResponseError from '../../utils/responseError';
 
 function getWeekRange (date) {
   const weekStart = startOfWeek(date, {weekStartsOn: 1});
-  const weekEnd = endOfWeek(date, {weelStartsOn: 1});
+  const weekEnd = endOfWeek(date, {weekStartsOn: 1});
   return [format(weekStart, 'yyyy-MM-dd'), format(weekEnd, 'yyyy-MM-dd')];
 };
 
