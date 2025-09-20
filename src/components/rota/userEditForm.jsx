@@ -33,7 +33,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
           initDataUnsafe: initDataUnsafe
         })
   
-        if (response.status === 200){
+        if (response.status === 204){
           window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
           toast.success('Пользователь удален!');
         };
