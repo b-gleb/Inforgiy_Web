@@ -155,11 +155,7 @@ function Main() {
   useEffect(() => {
     const fetchAuthData = async () => {
       try {
-        const response = await api.get('/api/auth', {
-          params: {
-            initDataUnsafe: initDataUnsafe,
-          }
-        });
+        const response = await api.post('/api/auth', {initDataUnsafe});
 
         setRotaAdmin(response.data.rotaAdmin);
         setUserBranches(response.data.branches);
