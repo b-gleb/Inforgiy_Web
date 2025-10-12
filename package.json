@@ -1,26 +1,26 @@
 {
   "name": "client",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "private": true,
   "homepage": "https://b-gleb.github.io/Inforgiy_Web",
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.13",
+    "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react-swc": "^4.1.0",
     "ag-grid-community": "^34.2.0",
     "ag-grid-react": "^34.2.0",
     "apexcharts": "^5.3.5",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.23.16",
-    "lucide-react": "^0.544.0",
-    "react": "^19.1.1",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.545.0",
+    "react": "^19.2.0",
     "react-apexcharts": "^1.7.0",
-    "react-dom": "^19.1.1",
+    "react-dom": "^19.2.0",
     "react-lottie": "^1.2.10",
-    "react-router-dom": "^7.9.1",
+    "react-router-dom": "^7.9.4",
     "react-swipeable": "^7.0.2",
     "react-toastify": "^11.0.5",
-    "vite": "^7.1.4",
+    "vite": "^7.1.9",
     "vite-plugin-svgr": "^4.5.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
@@ -35,6 +35,6 @@
     "autoprefixer": "^10.4.21",
     "gh-pages": "^6.3.0",
     "postcss": "^8.5.4",
-    "tailwindcss": "^4.1.12"
+    "tailwindcss": "^4.1.14"
   }
 }
