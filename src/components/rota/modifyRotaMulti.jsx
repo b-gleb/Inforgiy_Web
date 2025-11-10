@@ -49,13 +49,12 @@ export default function ModifyRotaMulti({ branch, userId }) {
   };
 
   const handleChangeDay = (day) => {
-    // TODO: modify step clauses
     const newDays = days.includes(day) ? days.filter((d) => d !== day) : [...days, day];
     setDays(newDays);
     if (newDays.length === 0) {
       setStep(2);
       setHours([]);
-    } else {
+    } else if (step === 2 && newDays.length === 1) {
       setStep(3);
     }
 
@@ -65,6 +64,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
   const handleChangeHours = (hour) => {
     const newHours = hours.includes(hour) ? hours.filter((h) => h !== hour) : [...hours, hour];
     setHours(newHours);
+    setAllowOccupied(true);
     newHours.length === 0 ? setStep(3) : setStep(4);
 
     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
