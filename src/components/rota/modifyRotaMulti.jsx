@@ -180,6 +180,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
 
           {/* Submit Button */}
           <Button
+            size="lg"
             className="w-full"
             // TODO: add onclick
           >
