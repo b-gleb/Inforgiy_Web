@@ -37,14 +37,15 @@ export default function ModifyRotaMulti({ branch, userId }) {
       setAllowOccupied(true);
     }
 
-    // TODO: Add haptics
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
   };
 
   const handleChangeDateRange = (range) => {
     setDateRange(range);
     if (range === undefined || range.from === range.to) {setStep(1); setDays([]); setHours([]);}
-    if (range !== undefined && range.from !== range.to) {setStep(2);}
-    // TODO: haptics
+    if (range !== undefined && range.from !== range.to) {setStep(2)}
+
+    window.Telegram.WebApp.HapticFeedback.selectionChanged();
   };
 
   const handleChangeDay = (day) => {
@@ -57,17 +58,21 @@ export default function ModifyRotaMulti({ branch, userId }) {
     } else {
       setStep(3);
     }
+
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
   };
 
   const handleChangeHours = (hour) => {
     const newHours = hours.includes(hour) ? hours.filter((h) => h !== hour) : [...hours, hour];
     setHours(newHours);
     newHours.length === 0 ? setStep(3) : setStep(4);
+
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
   };
 
   const handleChangeAllowOccupied = (checked) => {
     setAllowOccupied(checked)
-    // TODO: Add haptics
+    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
   };
 
   return (
