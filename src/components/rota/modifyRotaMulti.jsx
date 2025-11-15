@@ -76,11 +76,10 @@ export default function ModifyRotaMulti({ branch, userId }) {
   };
 
   return (
-    // TODO: Unify labels
     <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center space-y-6 px-3 pt-3 pb-6">
       {/* Action Selection */}
       <div className="w-full space-y-2">
-        <p className="text-sm font-semibold text-gray-700 text-center">
+        <p className="text-sm font-semibold text-muted-foreground">
           Выберите действие
         </p>
         <ButtonGroup className="w-full flex justify-center">
@@ -99,8 +98,8 @@ export default function ModifyRotaMulti({ branch, userId }) {
 
       {/* Date Range */}
       {step >= 1 && (
-        <div className="w-full space-y-2 text-center">
-          <p className="text-sm font-semibold text-gray-700">Выберите период</p>
+        <div className="w-full space-y-2">
+          <p className="text-sm font-semibold text-muted-foreground text-center">Выберите период</p>
           <Calendar
             mode="range"
             defaultMonth={dateRange?.from}
@@ -108,7 +107,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
             onSelect={(range) => handleChangeDateRange(range)}
             locale={ru}
             weekStartsOn={1}
-            className="rounded-lg border shadow-sm mx-auto"
+            className="rounded-lg border dark:border-input shadow-sm mx-auto"
           />
         </div>
       )}
@@ -116,7 +115,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
       {/* Days of the Week */}
       {step >=2 && (
         <div className="w-full space-y-2">
-          <p className="text-sm font-semibold text-gray-700 text-center">
+          <p className="text-sm font-semibold text-muted-foreground text-center">
             Дни недели
           </p>
           <ButtonGroup className="w-full flex justify-center flex-wrap">
@@ -137,7 +136,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
       {/* Hours of the day */}
       {step >= 3 && (
         <div className="w-full space-y-2">
-          <p className="text-sm font-semibold text-gray-700 text-center">
+          <p className="text-sm font-semibold text-muted-foreground text-center">
             Часы
           </p>
             <div className='w-full grid grid-cols-6 gap-2'>
