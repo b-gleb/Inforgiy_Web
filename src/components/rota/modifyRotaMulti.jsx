@@ -18,14 +18,14 @@ export default function ModifyRotaMulti({ branch, userId }) {
   const [dateRange, setDateRange] = useState(undefined);
   const [days, setDays] = useState([]);
   const [hours, setHours] = useState([]);
-  const [allowOccupied, setAllowOccupied] = useState(true);
+  const [allowOccupiedSlots, setAllowOccupiedSlots] = useState(true);
 
   const actionOptions = {
     'add': '+ Добавить',
     'remove': '– Удалить'
   };
   const dayOptions = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
-  const hourOptions = Array.from({ length: 24 }, (_, i) => String(i + 1));
+  const hourOptions = [...Array(24).keys()];
 
   const handleChangeAction = (selected) => {
     if (selected !== action) {
@@ -34,7 +34,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
       setDateRange(undefined);
       setDays([]);
       setHours([]);
-      setAllowOccupied(true);
+      setAllowOccupiedSlots(true);
     }
 
     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
@@ -64,14 +64,13 @@ export default function ModifyRotaMulti({ branch, userId }) {
   const handleChangeHours = (hour) => {
     const newHours = hours.includes(hour) ? hours.filter((h) => h !== hour) : [...hours, hour];
     setHours(newHours);
-    setAllowOccupied(true);
+    setAllowOccupiedSlots(true);
     newHours.length === 0 ? setStep(3) : setStep(4);
-
     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
   };
 
-  const handleChangeAllowOccupied = (checked) => {
-    setAllowOccupied(checked)
+  const handleChangeAllowOccupiedSlots = (checked) => {
+    setAllowOccupiedSlots(checked)
     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
   };
 
@@ -156,19 +155,19 @@ export default function ModifyRotaMulti({ branch, userId }) {
         </div>
       )}
 
-      {/* allowOccupied */}
+      {/* allowOccupiedSlots */}
       {step >= 4 && (
         <>
           {action === 'add' && (
             <div className="w-full">
               <Field orientation="horizontal" className="justify-center">
                 <Checkbox
-                  id="allowOccupied"
-                  checked={allowOccupied}
-                  onCheckedChange={(checked) => handleChangeAllowOccupied(checked)}
+                  id="allowOccupiedSlots"
+                  checked={allowOccupiedSlots}
+                  onCheckedChange={(checked) => handleChangeAllowOccupiedSlots(checked)}
                 />
                 <FieldContent>
-                  <FieldLabel htmlFor="allowOccupied">
+                  <FieldLabel htmlFor="allowOccupiedSlots">
                     Ставить в занятые смены
                   </FieldLabel>
                   <FieldDescription>
@@ -183,7 +182,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
           <Button
             size="lg"
             className="w-full"
-            // TODO: add onclick
+            onClick={() => handleSubmit()}
           >
             Сохранить
           </Button>
