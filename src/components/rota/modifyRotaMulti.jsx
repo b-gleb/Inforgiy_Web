@@ -160,23 +160,25 @@ export default function ModifyRotaMulti({ branch, userId }) {
       {/* allowOccupied */}
       {step >= 4 && (
         <>
-          <div className="w-full">
-            <Field orientation="horizontal" className="justify-center">
-              <Checkbox
-                id="allowOccupied"
-                checked={allowOccupied}
-                onCheckedChange={(checked) => handleChangeAllowOccupied(checked)}
-              />
-              <FieldContent>
-                <FieldLabel htmlFor="allowOccupied">
-                  Ставить в занятые смены
-                </FieldLabel>
-                <FieldDescription>
-                  Отключите опцию если не хотите добавлять дежурного на уже занятую смену
-                </FieldDescription>
-              </FieldContent>
-            </Field>
-          </div>
+          {action === 'add' && (
+            <div className="w-full">
+              <Field orientation="horizontal" className="justify-center">
+                <Checkbox
+                  id="allowOccupied"
+                  checked={allowOccupied}
+                  onCheckedChange={(checked) => handleChangeAllowOccupied(checked)}
+                />
+                <FieldContent>
+                  <FieldLabel htmlFor="allowOccupied">
+                    Ставить в занятые смены
+                  </FieldLabel>
+                  <FieldDescription>
+                    Отключите опцию если не хотите добавлять дежурного на уже занятую смену
+                  </FieldDescription>
+                </FieldContent>
+              </Field>
+            </div>
+          )}
 
           {/* Submit Button */}
           <Button
