@@ -43,7 +43,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
   const handleChangeDateRange = (range) => {
     setDateRange(range);
     if (range === undefined || range.from === range.to) {setStep(1); setDays([]); setHours([]);}
-    if (range !== undefined && range.from !== range.to) {setStep(2)}
+    if (range !== undefined && range.from !== range.to && step < 2) {setStep(2)}
 
     window.Telegram.WebApp.HapticFeedback.selectionChanged();
   };
@@ -78,7 +78,7 @@ export default function ModifyRotaMulti({ branch, userId }) {
     <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center space-y-6 px-3 pt-3 pb-6">
       {/* Action Selection */}
       <div className="w-full space-y-2">
-        <p className="text-sm font-semibold text-muted-foreground">
+        <p className="text-sm font-semibold text-muted-foreground text-center">
           Выберите действие
         </p>
         <ButtonGroup className="w-full flex justify-center">
