@@ -135,6 +135,7 @@ export default function UserProfile(){
               <ModifyRotaMulti
                 branch={branch}
                 userId={editingUser.id}
+                initDataUnsafe={initDataUnsafe}
               />
             </Suspense>
           </CollapsibleSection>

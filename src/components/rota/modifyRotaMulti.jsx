@@ -1,4 +1,7 @@
 import { useState} from 'react';
+import api from '@/services/api.js';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { ru } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -12,7 +15,7 @@ import {
 } from "@/components/ui/field";
 
 
-export default function ModifyRotaMulti({ branch, userId }) {
+export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
   const [step, setStep] = useState(0);
   const [action, setAction] = useState(null);
   const [dateRange, setDateRange] = useState(undefined);
@@ -72,6 +75,52 @@ export default function ModifyRotaMulti({ branch, userId }) {
   const handleChangeAllowOccupiedSlots = (checked) => {
     setAllowOccupiedSlots(checked)
     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+  };
+
+  const handleSubmit = async() => {
+    let apiUrl;
+    let data = {
+      branch,
+      startDate: dateRange.from,
+      endDate: dateRange.to,
+      timeRanges: hours.map(hour => `${String(hour).padStart(2, "0")}:00 - ${String(hour + 1).padStart(2, "0")}:0`),
+      daysOfWeek: days.map(day => dayOptions.indexOf(day)),
+      userId,
+      initDataUnsafe
+    };
+
+    if (action === 'add') {
+      data = {...data, allowOccupiedSlots}
+      apiUrl = '/api/addRotaMulti';
+    } else if (action === 'remove') {
+      apiUrl = '/api/removeRotaMulti';
+    }
+
+    const requestPromise = api.post(apiUrl, data);
+    
+    toast.promise(
+      requestPromise,
+      {
+        pending: 'Обновляю график...',
+        success: {
+          render({ data }) {
+            return `Изменено ${data.modifiedCount} смен из ${undefined}`;
+          }
+        },
+        error: {
+          render({ data }) {
+            return `Ошибка код: ${data.status}`;
+          }
+        }
+      }
+    )
+
+    try {
+      const response = await requestPromise;
+    } catch (error) {
+      console.error(error);
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
+    }
   };
 
   return (
@@ -188,6 +237,16 @@ export default function ModifyRotaMulti({ branch, userId }) {
           </Button>
         </>
       )}
+
+      <ToastContainer
+        position='bottom-center'
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss={false}
+        draggable={false}
+        theme={window.Telegram.WebApp.colorScheme}
+        limit={4}
+      />
     </div>
   )
 };
