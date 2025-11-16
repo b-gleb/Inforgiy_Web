@@ -2,6 +2,7 @@ import { useState} from 'react';
 import api from '@/services/api.js';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { eachDayOfInterval } from 'date-fns';
 import { ru } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -29,6 +30,12 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
   };
   const dayOptions = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
   const hourOptions = [...Array(24).keys()];
+
+  function countDaysInRange(startDate, endDate, targetDays) {
+    const jsDays = targetDays.map(d => (d + 1) % 7);
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+    return days.filter(d => jsDays.includes(d.getDay())).length;
+  };
 
   const handleChangeAction = (selected) => {
     if (selected !== action) {
@@ -79,12 +86,14 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
 
   const handleSubmit = async() => {
     let apiUrl;
+    const daysOfWeek = days.map(day => dayOptions.indexOf(day));
+    const slotCount = countDaysInRange(dateRange.from, dateRange.to, daysOfWeek) * hours.length;
     let data = {
       branch,
       startDate: dateRange.from,
       endDate: dateRange.to,
-      timeRanges: hours.map(hour => `${String(hour).padStart(2, "0")}:00 - ${String(hour + 1).padStart(2, "0")}:0`),
-      daysOfWeek: days.map(day => dayOptions.indexOf(day)),
+      timeRanges: hours.map(hour => `${String(hour).padStart(2, "0")}:00 - ${String(hour + 1).padStart(2, "0")}:00`),
+      daysOfWeek,
       userId,
       initDataUnsafe
     };
@@ -104,12 +113,12 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
         pending: 'Обновляю график...',
         success: {
           render({ data }) {
-            return `Изменено ${data.modifiedCount} смен из ${undefined}`;
+            return `Изменено ${data.data.modifiedCount} смен из ${slotCount}`;
           }
         },
         error: {
           render({ data }) {
-            return `Ошибка код: ${data.status}`;
+            return `Ошибка #${data.status}`;
           }
         }
       }
