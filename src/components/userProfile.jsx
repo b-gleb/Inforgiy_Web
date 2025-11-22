@@ -1,12 +1,13 @@
 import { useState, useEffect, Suspense, lazy } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, NotepadText, ChartColumn, User } from "lucide-react";
+import { ChevronDown, ChevronUp, NotepadText, ChartColumn, User, Wrench } from "lucide-react";
 
 // Sections
 import UserEditForm from "./rota/userEditForm";
 const PersonalStats = lazy(() => import('./statistics/personalStats'));
 const MyDutiesCard = lazy(() => import('./rota/myDuties'));
+const ModifyRotaMulti = lazy(() => import('./rota/modifyRotaMulti'));
 
 // Styles
 import '../styles/App.css';
@@ -119,6 +120,22 @@ export default function UserProfile(){
                 user_id={editingUser.id}
                 prevDays={14}
                 nextDays={30}
+              />
+            </Suspense>
+          </CollapsibleSection>
+
+
+          <CollapsibleSection
+            title={'Групповые операции'}
+            icon={Wrench}
+            isOpen={openSection === "modify_rota_multi"}
+            onClick={() => handleToggle("modify_rota_multi")}
+          >
+            <Suspense fallback={null}>
+              <ModifyRotaMulti
+                branch={branch}
+                userId={editingUser.id}
+                initDataUnsafe={initDataUnsafe}
               />
             </Suspense>
           </CollapsibleSection>
