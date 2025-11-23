@@ -239,7 +239,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
           {/* Submit Button */}
           <Button
             size="lg"
-            className="w-full"
+            className="w-full font-semibold"
             onClick={() => handleSubmit()}
           >
             Сохранить
