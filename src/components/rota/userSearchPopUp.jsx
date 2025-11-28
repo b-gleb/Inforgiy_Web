@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Button } from '../ui/button';
 
 // APIs
 import fetchAllUsers from '../../services/fetchAllUsers';
@@ -59,7 +60,7 @@ export default function UserSearchPopUp({
 
   return (
     <div className="popup">
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-2">
         <input
           type="text"
           placeholder="Поиск..."
@@ -76,8 +77,9 @@ export default function UserSearchPopUp({
       </div>
 
       {mode === 'user_management' && (
-        <button
-          className='button-primary'
+        <Button
+          size="lg"
+          className="w-full font-semibold mb-2"
           onClick={() => {
             window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
             navigate('./profile', {
@@ -90,7 +92,7 @@ export default function UserSearchPopUp({
           }}
         >
           + Добавить пользователя
-        </button>
+        </Button>
       )}
 
       <div className="search_results_container">
