@@ -6,6 +6,7 @@ import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
+import { Button } from './components/ui/button.jsx';
 
 // Custom components
 import RotaHour from './components/rota/rota.jsx';
@@ -316,8 +317,10 @@ function Main() {
             </div>
               
 
-            <button
-              className='button-icon'
+            <Button
+              variant="outline"
+              size="icon-xl"
+              className="rounded-lg"
               onClick={() => {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                 navigate('./weekly', { state: {
@@ -328,12 +331,14 @@ function Main() {
                 }});
               }}
             >
-              <CalendarDays size={25} className="icon-text"/>
-            </button>
+              <CalendarDays size={25} className="size-6"/>
+            </Button>
 
             <div className='relative inline-block'>
-              <button
-                className='button-icon'
+              <Button
+                variant="outline"
+                size="icon-xl"
+                className='rounded-lg'
                 onClick={() => {
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                   if (rotaAdmin.includes(branch)) {
@@ -344,8 +349,8 @@ function Main() {
                   };
                 }}
               >
-                <ChartNoAxesCombined size={25} className='icon-text'/>
-              </button>
+                <ChartNoAxesCombined size={25} className='size-6'/>
+              </Button>
 
               {showStatDropdown && (
                 <div className='dropdown-container'>
@@ -378,15 +383,17 @@ function Main() {
             </div>
                 
             {rotaAdmin.includes(branch) && (
-              <button
-                className='button-icon'
+              <Button
+                variant="outline"
+                size="icon-xl"
+                className="rounded-lg"
                 onClick={() => {
                   setShowUserManagement(true);
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                 }}
               >
-                <Settings size={25} className="icon-text"/>
-              </button>
+                <Settings size={25} className="size-6"/>
+              </Button>
             )}
           </div>
         </>
