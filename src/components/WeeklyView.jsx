@@ -7,6 +7,7 @@ import api from '../services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
+import { Button } from '@/components/ui/button.jsx';
 import Loading from './loading';
 import catchResponseError from '../utils/responseError';
 
@@ -382,9 +383,11 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
               )}
 
               {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
-                <div className='flex justify-between gap-6'>
-                  <button
-                    className='button-primary'
+                <div className='flex justify-between'>
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-4/5 font-semibold"
                     onClick={() => {
                       handleUpdateCell({
                         type: 'add',
@@ -397,18 +400,19 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                     }}
                   >
                     Взять смену
-                  </button>
+                  </Button>
 
                   {rotaAdmin && (
-                    <button
-                      className='button-secondary'
+                    <Button
+                      variant="outline"
+                      size="icon-lg"
                       onClick={() => {
                         setShowSearch(true);
                         window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       }}
                     >
-                      <UserPlus />
-                    </button>
+                      <UserPlus className='size-6'/>
+                    </Button>
                   )}
                 </div>
               )}
