@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/button';
+import { Input } from "@/components/ui/input";
 
 // APIs
 import fetchAllUsers from '../../services/fetchAllUsers';
@@ -61,12 +62,12 @@ export default function UserSearchPopUp({
   return (
     <div className="popup">
       <div className="flex items-center mb-2">
-        <input
+        <Input
           type="text"
           placeholder="Поиск..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="input-field mr-2"
+          className="mr-2"
         />
         <button 
           onClick={() => onClose()}
