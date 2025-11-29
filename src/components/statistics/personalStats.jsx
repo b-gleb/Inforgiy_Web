@@ -4,13 +4,13 @@ import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, 
 import { ru } from 'date-fns/locale';
 
 // Skeletons
+import { Skeleton } from '@/components/ui/skeleton';
 import BarChartSkeleton from '../skeletons/barChartSkeleton';
 import LineChartSkeleton from '../skeletons/lineChartSkeleton';
 
 // API
 import api from '../../services/api.js';
 import catchResponseError from '../../utils/responseError';
-
 
 function getWeekRange (date) {
   const weekStart = startOfWeek(date, {weekStartsOn: 1});
@@ -300,9 +300,9 @@ const StatCard = ({ label, sublabel, current, previous }) => {
     <div className="flex-1 p-2 rounded-2xl shadow-md bg-white dark:bg-neutral-800">
       <h3 className="text-base font-semibold mb-2 text-gray-500 dark:text-gray-400">{label}</h3>
       {current === null ? (
-        <div className="animate-pulse">
-          <div className="h-10 rounded-sm w-3/4 mb-2 bg-gray-200 dark:bg-neutral-700"></div>
-          <div className="h-4 rounded-sm w-1/2 bg-gray-200 dark:bg-neutral-700"></div>
+        <div className='space-y-2'>
+          <Skeleton className="h-10 w-3/4"/>
+          <Skeleton className="h-4 w-1/2"/>
         </div>
       ) : (
         <>
