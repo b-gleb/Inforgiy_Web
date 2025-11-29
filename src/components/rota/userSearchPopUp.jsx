@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 
 // APIs
@@ -98,51 +98,55 @@ export default function UserSearchPopUp({
 
       <div className="search_results_container">
         {filteredUsers.map((userObj) => (
-          <motion.button
-            initial={{ opacity: 0.5, scale: 0.9 }}
+          <motion.div
+            initial={{ opacity: 0.5, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1, transition: { ease: 'easeOut', duration: 0.2}}}
             key={userObj.id}
-            onClick={() => {
-              if (mode === 'rota'){
-                updateRota({
+          >
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (mode === 'rota'){
+                  updateRota({
+                      type: 'add',
+                      branch: branch,
+                      date: date,
+                      timeRange: timeRange,
+                      modifyUserId: userObj.id,
+                      initDataUnsafe: initDataUnsafe
+                    })
+                    .then((result) => {setRotaData(result)})
+                    .catch(() => {});
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                  onClose();
+                } else if (mode === 'user_management'){
+                  window.Telegram.WebApp.BackButton.offClick(onClose);
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                  navigate('./profile', {
+                    state: {
+                      branch,
+                      editingUser: userObj,
+                      initDataUnsafe
+                    }});
+                } else if (mode === 'rota_weekly'){
+                  handleUpdateCell({
                     type: 'add',
                     branch: branch,
-                    date: date,
-                    timeRange: timeRange,
                     modifyUserId: userObj.id,
                     initDataUnsafe: initDataUnsafe
                   })
-                  .then((result) => {setRotaData(result)})
+                  .then(() => {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    onClose();
+                  })
                   .catch(() => {});
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                onClose();
-              } else if (mode === 'user_management'){
-                window.Telegram.WebApp.BackButton.offClick(onClose);
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                navigate('./profile', {
-                  state: {
-                    branch,
-                    editingUser: userObj,
-                    initDataUnsafe
-                  }});
-              } else if (mode === 'rota_weekly'){
-                handleUpdateCell({
-                  type: 'add',
-                  branch: branch,
-                  modifyUserId: userObj.id,
-                  initDataUnsafe: initDataUnsafe
-                })
-                .then(() => {
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                  onClose();
-                })
-                .catch(() => {});
-              }
-            }}
-            className="search_results_button"
-          >
-            {userObj.nick}
-          </motion.button>
+                }
+              }}
+              className="w-full"
+            >
+              {userObj.nick}
+            </Button>
+          </motion.div>
         ))}
       </div>
     </div>
