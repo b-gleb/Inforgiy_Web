@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-
+import { Button } from "@/components/ui/button";
 import { userColors } from '../../utils/userColors.js';
 import api from '../../services/api.js';
 import catchResponseError from '../../utils/responseError';
@@ -124,28 +124,39 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
         
         <div className='flex space-x-2'>
         {editingUser.id !== null && (
-            <button
+            <Button
               type="button"
-              className="button-secondary w-auto"
+              variant="outline"
+              size="icon-lg"
+              className="flex-none"
               onClick={() => {
                 handleRemoveUser(branch, editingUser.id, initDataUnsafe);
                 navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });   
               }}
             >
-              <Trash2 color='red' size={25}/>
-            </button>
+              <Trash2 color='red' className="size-6"/>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
+            className="flex-1"
             onClick={() => {
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
               navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
             }}
-            className="button-secondary w-full">
+          >
             Отменить
-          </button>
+          </Button>
 
-          <button type="submit" className="button-primary">Сохранить</button>
+          <Button 
+            type="submit"
+            size="lg"
+            className="flex-1 font-semibold"
+          >
+            Сохранить
+          </Button>
         </div>
       </form>
       </>
