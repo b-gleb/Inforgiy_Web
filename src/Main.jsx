@@ -12,6 +12,7 @@ import { Button } from './components/ui/button.jsx';
 import RotaHour from './components/rota/rota.jsx';
 import MyDutiesCard from './components/rota/myDuties.jsx';
 import Loading from './components/loading.jsx';
+import { Input } from './components/ui/input.jsx';
 import catchResponseError from './utils/responseError.jsx';
 
 // CSS
@@ -302,7 +303,7 @@ function Main() {
 
           <div className='flex justify-between items-center space-x-2 mb-3'>
             <div className="button-icon p-2! flex-1">
-              <input
+              <Input
                 type="date"
                 value={date}
                 min="2024-12-23"
@@ -312,7 +313,6 @@ function Main() {
                   sessionStorage.setItem('date', e.target.value);
                   window.Telegram.WebApp.HapticFeedback.selectionChanged();
                 }}
-                className='input-field '
               />
             </div>
               
