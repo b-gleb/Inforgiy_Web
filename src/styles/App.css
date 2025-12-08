@@ -54,7 +54,7 @@
 }
 
 .icon-text { @apply
-  text-black dark:text-gray-400
+  text-black dark:text-muted-foreground
 }
 
 .dropdown-container { @apply
@@ -177,7 +177,7 @@
   text-[0.6rem]
   font-semibold
   mr-1
-  text-[#393939] dark:text-gray-400
+  text-[#393939] dark:text-muted-foreground
 }
 
 .usernames-container { @apply
