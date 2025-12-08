@@ -62,11 +62,10 @@
   top-full
   left-0
   shadow-2xl
-  rounded-xl
+  rounded-md
   mt-2
   z-50
-
-  bg-white dark:bg-neutral-700
+  bg-background dark:bg-input
 }
 
 .dropdown-button { @apply
@@ -74,10 +73,9 @@
   w-full
   px-3
   py-2
-  text-left text-sm dark:text-gray-400
-  rounded-2xl
-
-  bg-white dark:bg-neutral-700
+  text-left text-sm
+  rounded-md
+  bg-background dark:bg-input
 }
 
 .button-primary { @apply
