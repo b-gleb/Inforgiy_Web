@@ -27,30 +27,8 @@
   mx-auto my-0
   py-5
   px-3
-
   bg-gray-100 dark:bg-neutral-900
   dark:text-foreground
-}
-
-.input-field { @apply
-  block
-  w-full
-  p-2
-  border rounded-md
-
-  dark:bg-neutral-700
-  dark:border-neutral-900
-  dark:text-gray-400
-}
-
-.button-icon { @apply
-  flex
-  space-x-2
-  p-4
-  rounded-lg
-  shadow-sm
-
-  bg-white dark:bg-neutral-700
 }
 
 .icon-text { @apply
@@ -76,37 +54,6 @@
   text-left text-sm
   rounded-md
   bg-background dark:bg-input
-}
-
-.button-primary { @apply
-  w-full
-  mb-2
-  p-2
-  font-semibold
-  rounded-md
-
-  bg-[#007aff]
-  text-white 
-}
-
-.button-secondary { @apply
-  mb-2
-  p-2
-  border
-  rounded-md
-
-  dark:border-neutral-500
-  dark:bg-neutral-700
-  dark:text-white
-}
-
-.form-label { @apply
-  block
-  text-sm
-  mb-1
-  font-medium
-
-  text-gray-700 dark:text-gray-400
 }
 
 /* BRANCHES */
@@ -282,16 +229,6 @@
   auto-rows-[38px]
 
   dark:text-gray-400
-}
-
-.search_results_button{ @apply
-  overflow-hidden
-  text-sm
-  h-[38px]
-
-  text-[#393939] dark:text-gray-400
-  dark:bg-neutral-700
-  border rounded-lg border-gray-300 dark:border-neutral-700
 }
 
 /*
