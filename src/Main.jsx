@@ -12,7 +12,8 @@ import { Button } from './components/ui/button.jsx';
 import RotaHour from './components/rota/rota.jsx';
 import MyDutiesCard from './components/rota/myDuties.jsx';
 import Loading from './components/loading.jsx';
-import { Input } from './components/ui/input.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { Separator } from "@/components/ui/separator";
 import catchResponseError from './utils/responseError.jsx';
 
 // CSS
@@ -364,7 +365,7 @@ function Main() {
                     Личная
                   </button>
 
-                  <div className='border-t border-neutral-300 dark:border-neutral-500'/>
+                  <Separator/>
 
                   <button
                     className='dropdown-button'
