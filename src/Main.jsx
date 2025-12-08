@@ -303,7 +303,7 @@ function Main() {
           )}
 
           <div className='flex justify-between items-center space-x-2 mb-3'>
-            <div className="button-icon p-2! flex-1">
+            <div className="p-2! flex-1 rounded-md border bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input dark:border-border dark:hover:bg-input/50">
               <Input
                 type="date"
                 value={date}
