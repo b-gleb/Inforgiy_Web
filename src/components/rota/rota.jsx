@@ -69,7 +69,7 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
                           branch: branch,
                           date: date,
                           timeRange: dutyHour.label,
-                          modifyUserId: userObj.id,
+                          userId: userObj.id,
                           initDataUnsafe: initDataUnsafe
                       })
                         .then((result) => {
@@ -110,7 +110,7 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
                   branch: branch,
                   date: date,
                   timeRange: dutyHour.label,
-                  modifyUserId: initDataUnsafe.user.id,
+                  userId: initDataUnsafe.user.id,
                   initDataUnsafe: initDataUnsafe
                 })
                 .then((result) => {setRotaData(result)})
