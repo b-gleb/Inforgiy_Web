@@ -264,7 +264,7 @@ export default function PersonalStats({ branch, user_id }) {
       />
     </div>
 
-    <h2 className='text-xs mt-6 text-gray-500 dark:text-[#808080]'>Количество смен за последние 12 недель</h2>
+    <h3 className='text-xs mt-6 text-muted-foreground'>Количество смен за последние 12 недель</h3>
     <div className="w-full max-w-md mx-auto px-2">
       {weeklyChartSeries ?
         <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
@@ -273,7 +273,7 @@ export default function PersonalStats({ branch, user_id }) {
       }
     </div>
 
-    <h2 className='text-xs text-gray-500 dark:text-[#808080]'>Количество смен относительно прошлого месяца</h2>
+    <h3 className='text-xs text-muted-foreground'>Количество смен относительно прошлого месяца</h3>
     <div className="w-full max-w-md mx-auto px-2">
       {dayByDaySeries ?
         <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
@@ -294,7 +294,7 @@ const StatCard = ({ label, sublabel, current, previous }) => {
 
   return (
     <div className="flex-1 p-2 rounded-2xl shadow-md bg-white dark:bg-neutral-800">
-      <h3 className="text-base font-semibold mb-2 text-gray-500 dark:text-gray-400">{label}</h3>
+      <h3 className="text-base font-semibold mb-2 text-muted-foreground">{label}</h3>
       {current === null ? (
         <div className='space-y-2'>
           <Skeleton className="h-10 w-3/4"/>
@@ -308,7 +308,7 @@ const StatCard = ({ label, sublabel, current, previous }) => {
               <span className={`text-[0.6rem] ${isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
                 {isPositive ? '↑' : '↓'} {Math.abs(change)}
               </span>
-              <span className="text-[0.6rem] ml-1 text-gray-500 dark:text-gray-400">{sublabel}</span>
+              <span className="text-[0.6rem] ml-1 text-muted-foreground">{sublabel}</span>
             </div>
           )}
         </>
