@@ -105,6 +105,7 @@ export default function UserSearchPopUp({
           >
             <Button
               variant="outline"
+              className="w-full dark:text-white"
               onClick={() => {
                 if (mode === 'rota'){
                   updateRota({
@@ -142,7 +143,6 @@ export default function UserSearchPopUp({
                   .catch(() => {});
                 }
               }}
-              className="w-full"
             >
               {userObj.nick}
             </Button>
