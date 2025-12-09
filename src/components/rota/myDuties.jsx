@@ -31,7 +31,7 @@ function convertToDutyString(hours) {
 }
 
 
-export default function MyDutiesCard({ branch, user_id, prevDays = 0, nextDays = 14 }) {
+export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 14 }) {
   const [nextDuties, setNextDuties] = useState(null);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function MyDutiesCard({ branch, user_id, prevDays = 0, nextDays =
 
       userDuties(
         branch,
-        user_id,
+        userId,
         subDays(today, prevDays),
         addDays(today, nextDays)
       )
@@ -48,10 +48,10 @@ export default function MyDutiesCard({ branch, user_id, prevDays = 0, nextDays =
         .catch(() => {});
     };
     // Prevent passing empty branch before auth is complete
-    if (branch && user_id){
+    if (branch && userId){
       fetchNextDuty();
     }
-  }, [branch, user_id, prevDays, nextDays]);
+  }, [branch, userId, prevDays, nextDays]);
 
 
   return (

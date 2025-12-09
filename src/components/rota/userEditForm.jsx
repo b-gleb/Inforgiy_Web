@@ -25,11 +25,11 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
       }));
     };
   
-    const handleRemoveUser = async (branch, user_id, initDataUnsafe) => {
+    const handleRemoveUser = async (branch, userId, initDataUnsafe) => {
       try {
         const response = await api.post('/api/removeUser', {
           branch: branch,
-          userId: user_id,
+          userId: userId,
           initDataUnsafe: initDataUnsafe
         })
   
