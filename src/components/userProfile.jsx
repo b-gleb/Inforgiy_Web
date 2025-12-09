@@ -1,7 +1,12 @@
-import { useState, useEffect, Suspense, lazy } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, NotepadText, ChartColumn, User, Wrench } from "lucide-react";
+import { NotepadText, ChartColumn, User, Wrench } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 // Sections
 import UserEditForm from "./rota/userEditForm";
@@ -12,50 +17,9 @@ const ModifyRotaMulti = lazy(() => import('./rota/modifyRotaMulti'));
 // Styles
 import '../styles/App.css';
 
-const CollapsibleSection = ({ title, icon: Icon, isOpen, onClick, children }) => {
-  return (
-    <>
-      {/* Header */}
-      <button
-        onClick={onClick}
-        className="w-full flex justify-between items-center px-1 py-3 border-b dark:border-gray-400"
-      >
-        <div className="flex items-center gap-2">
-          {Icon && <Icon className="icon-text" />}
-          <span className="text-lg font-semibold dark:text-gray-400">
-            {title}
-          </span>
-        </div>
-        {isOpen ? (
-          <ChevronUp className="icon-text"/>
-        ) : (
-          <ChevronDown className="icon-text"/>
-        )}
-      </button>
-
-      {/* Content */}
-      <AnimatePresence key={title}>
-        {isOpen && (
-          <motion.div
-            initial={false}
-            animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden mt-2"
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-};
-
-
 export default function UserProfile(){
   const location = useLocation();
   const navigate = useNavigate();
-  const [openSection, setOpenSection] = useState('settings');
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, editingUser, initDataUnsafe } = location.state || {};
@@ -85,78 +49,92 @@ export default function UserProfile(){
     }
   }, [editingUser])
 
-  // Opening and closing the sections
-  const handleToggle = (section) => {
-    setOpenSection((prev) => (prev === section ? null : section));
-  };
+  const accordionClass = "text-lg font-semibold";
+  const accordionTitleClass = "flex items-center gap-2"
 
   return (
     <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
       <div className="popup">
-        <CollapsibleSection
-          title={'Профиль'}
-          icon={User}
-          isOpen={openSection === "settings"}
-          onClick={() => handleToggle("settings")}
+        <Accordion
+          type="single"
+          defaultValue="settings"
+          collapsible
         >
-          <UserEditForm
-            branch={branch}
-            User={editingUser}
-            initDataUnsafe={initDataUnsafe}
-          />
-        </CollapsibleSection>
-
-      {editingUser.id !== null && (
-        <>
-          <CollapsibleSection
-            title={'Смены'}
-            icon={NotepadText}
-            isOpen={openSection === "duties"}
-            onClick={() => handleToggle("duties")}
-          >
-            <Suspense fallback={null}>
-              <MyDutiesCard
+          <AccordionItem value="settings">
+            <AccordionTrigger
+              className={accordionClass}>
+                <div className={accordionTitleClass}>
+                  <User/> Профиль
+                </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <UserEditForm
                 branch={branch}
-                user_id={editingUser.id}
-                prevDays={14}
-                nextDays={30}
-              />
-            </Suspense>
-          </CollapsibleSection>
-
-
-          <CollapsibleSection
-            title={'Групповые операции'}
-            icon={Wrench}
-            isOpen={openSection === "modify_rota_multi"}
-            onClick={() => handleToggle("modify_rota_multi")}
-          >
-            <Suspense fallback={null}>
-              <ModifyRotaMulti
-                branch={branch}
-                userId={editingUser.id}
+                User={editingUser}
                 initDataUnsafe={initDataUnsafe}
               />
-            </Suspense>
-          </CollapsibleSection>
+            </AccordionContent>
+          </AccordionItem>
 
+          {editingUser.id !== null && (
+          <>
+            <AccordionItem value="duties">
+              <AccordionTrigger
+                className={accordionClass}>
+                  <div className={accordionTitleClass}>
+                    <NotepadText/> Смены
+                  </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Suspense fallback={null}>
+                  <MyDutiesCard
+                    branch={branch}
+                    user_id={editingUser.id}
+                    prevDays={14}
+                    nextDays={30}
+                  />
+                </Suspense>
+              </AccordionContent>
+            </AccordionItem>
 
-          <CollapsibleSection
-            title={'Статистика'}
-            icon={ChartColumn}
-            isOpen={openSection === "personal_stats"}
-            onClick={() => handleToggle("personal_stats")}
-          >
-            <Suspense fallback={null}>
-              <PersonalStats
-                branch={branch}
-                user_id={editingUser.id}
-              />
-            </Suspense>
-          </CollapsibleSection>
-        </>
-      )}
+            <AccordionItem value="modify_rota_multi">
+              <AccordionTrigger
+                className={accordionClass}>
+                  <div className={accordionTitleClass}>
+                    <Wrench/> Групповые операции
+                  </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Suspense fallback={null}>
+                  <ModifyRotaMulti
+                    branch={branch}
+                    userId={editingUser.id}
+                    initDataUnsafe={initDataUnsafe}
+                  />
+                </Suspense>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="personal_stats">
+              <AccordionTrigger
+                className={accordionClass}>
+                  <div className={accordionTitleClass}>
+                    <ChartColumn/> Статистика
+                  </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Suspense fallback={null}>
+                  <PersonalStats
+                    branch={branch}
+                    user_id={editingUser.id}
+                  />
+                </Suspense>
+              </AccordionContent>
+            </AccordionItem>
+          </>
+          )}
+        </Accordion>
+      </div>
     </div>
-  </div>
   )
 }

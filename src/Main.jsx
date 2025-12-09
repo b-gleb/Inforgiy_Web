@@ -6,11 +6,14 @@ import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
+import { Button } from './components/ui/button.jsx';
 
 // Custom components
 import RotaHour from './components/rota/rota.jsx';
 import MyDutiesCard from './components/rota/myDuties.jsx';
 import Loading from './components/loading.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { Separator } from "@/components/ui/separator";
 import catchResponseError from './utils/responseError.jsx';
 
 // CSS
@@ -300,8 +303,8 @@ function Main() {
           )}
 
           <div className='flex justify-between items-center space-x-2 mb-3'>
-            <div className="button-icon p-2! flex-1">
-              <input
+            <div className="p-2! flex-1 rounded-md border bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input dark:border-border dark:hover:bg-input/50">
+              <Input
                 type="date"
                 value={date}
                 min="2024-12-23"
@@ -311,13 +314,14 @@ function Main() {
                   sessionStorage.setItem('date', e.target.value);
                   window.Telegram.WebApp.HapticFeedback.selectionChanged();
                 }}
-                className='input-field '
               />
             </div>
               
 
-            <button
-              className='button-icon'
+            <Button
+              variant="outline"
+              size="icon-xl"
+              className="rounded-lg"
               onClick={() => {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                 navigate('./weekly', { state: {
@@ -328,12 +332,14 @@ function Main() {
                 }});
               }}
             >
-              <CalendarDays size={25} className="icon-text"/>
-            </button>
+              <CalendarDays size={25} className="size-6"/>
+            </Button>
 
             <div className='relative inline-block'>
-              <button
-                className='button-icon'
+              <Button
+                variant="outline"
+                size="icon-xl"
+                className='rounded-lg'
                 onClick={() => {
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                   if (rotaAdmin.includes(branch)) {
@@ -344,8 +350,8 @@ function Main() {
                   };
                 }}
               >
-                <ChartNoAxesCombined size={25} className='icon-text'/>
-              </button>
+                <ChartNoAxesCombined size={25} className='size-6'/>
+              </Button>
 
               {showStatDropdown && (
                 <div className='dropdown-container'>
@@ -359,7 +365,7 @@ function Main() {
                     Личная
                   </button>
 
-                  <div className='border-t border-neutral-300 dark:border-neutral-500'/>
+                  <Separator/>
 
                   <button
                     className='dropdown-button'
@@ -378,15 +384,17 @@ function Main() {
             </div>
                 
             {rotaAdmin.includes(branch) && (
-              <button
-                className='button-icon'
+              <Button
+                variant="outline"
+                size="icon-xl"
+                className="rounded-lg"
                 onClick={() => {
                   setShowUserManagement(true);
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                 }}
               >
-                <Settings size={25} className="icon-text"/>
-              </button>
+                <Settings size={25} className="size-6"/>
+              </Button>
             )}
           </div>
         </>

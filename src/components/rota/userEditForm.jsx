@@ -2,7 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-
+import { Field, FieldLabel } from '@/components/ui/field.jsx';
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { userColors } from '../../utils/userColors.js';
 import api from '../../services/api.js';
 import catchResponseError from '../../utils/responseError';
@@ -79,73 +88,90 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
         onSubmit={handleSubmit}
         className="space-y-4"
       >
-        <div>
-          <label htmlFor="username" className="form-label">Telegram</label>
-          <input
-            type="text"
+        <Field>
+          <FieldLabel htmlFor="username">Telegram</FieldLabel>
+          <Input
             id="username"
             name="username"
             value={editingUser.username}
             onChange={handleChange}
             required
             readOnly={editingUser.id !== null}
-            autoComplete='off'
-            className="input-field"
+            autoComplete="off"
           />
-        </div>
-        <div>
-          <label htmlFor="nick" className="form-label">Ник</label>
-          <input
-            type="text"
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="nick">Ник</FieldLabel>
+          <Input
             id="nick"
             name="nick"
             value={editingUser.nick}
             onChange={handleChange}
             required
-            autoComplete='off'
-            className="input-field"
+            autoComplete="off"
           />
-        </div>
-        <div>
-          <label htmlFor="color" className="form-label">Цвет</label>
-          <select
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="color">Цвет</FieldLabel>
+          <Select
             id="color"
             name="color"
-            value={editingUser.color}
-            onChange={handleChange}
-            className="input-field"
+            value={String(editingUser.color)}
+            onValueChange={(val) =>
+              handleChange({ target: { name: "color", value: val } })
+            }
           >
-            {Object.entries(userColors).map(([color_value, color_display]) => (
-              <option key={color_value} value={color_value}>{color_display}</option>
-            ))}
-          </select>
-        </div>
-  
-        
+            <SelectTrigger>
+              <SelectValue/>
+            </SelectTrigger>
+
+            <SelectContent>
+              {Object.entries(userColors).map(([color_value, color_display]) => (
+                <SelectItem key={color_value} value={String(color_value)}>
+                  {color_display}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+
         <div className='flex space-x-2'>
         {editingUser.id !== null && (
-            <button
+            <Button
               type="button"
-              className="button-secondary w-auto"
+              variant="outline"
+              size="icon-lg"
+              className="flex-none"
               onClick={() => {
                 handleRemoveUser(branch, editingUser.id, initDataUnsafe);
                 navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });   
               }}
             >
-              <Trash2 color='red' size={25}/>
-            </button>
+              <Trash2 color='red' className="size-6"/>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
+            className="flex-1"
             onClick={() => {
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
               navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
             }}
-            className="button-secondary w-full">
+          >
             Отменить
-          </button>
+          </Button>
 
-          <button type="submit" className="button-primary">Сохранить</button>
+          <Button 
+            type="submit"
+            size="lg"
+            className="flex-1 font-semibold"
+          >
+            Сохранить
+          </Button>
         </div>
       </form>
       </>
