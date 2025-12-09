@@ -29,7 +29,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
       try {
         const response = await api.post('/api/removeUser', {
           branch: branch,
-          modifyUserId: user_id,
+          userId: user_id,
           initDataUnsafe: initDataUnsafe
         })
   

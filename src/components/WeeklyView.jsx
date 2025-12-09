@@ -365,7 +365,7 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                           handleUpdateCell({
                             type: 'remove',
                             branch: branch,
-                            modifyUserId: user.id,
+                            userId: user.id,
                             initDataUnsafe: initDataUnsafe
                           })
                           .then(window.Telegram.WebApp.HapticFeedback.impactOccurred('light'))
@@ -389,7 +389,7 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                       handleUpdateCell({
                         type: 'add',
                         branch: branch,
-                        modifyUserId: initDataUnsafe.user.id,
+                        userId: initDataUnsafe.user.id,
                         initDataUnsafe: initDataUnsafe
                       })
                       .then(window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'))
