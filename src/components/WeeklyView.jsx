@@ -356,7 +356,7 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
             <div>
               {Object.values(selectedCellData.users).length > 0 ? (
                 Object.values(selectedCellData.users).map((user, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
                     <span className="font-medium">{user.nick}</span>
 
                     {rotaAdmin && (
