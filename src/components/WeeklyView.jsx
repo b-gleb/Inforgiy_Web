@@ -107,7 +107,7 @@ export default function WeeklyView() {
     }
 
     if (value.some(user => user.id === initDataUnsafe.user.id)) {
-      return 'my-duty'
+      return 'bg-input'
     }
   }
 

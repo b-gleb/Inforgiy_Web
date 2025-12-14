@@ -194,11 +194,11 @@ export default function BranchStats() {
 
 
   return (
-    <div className={`w-full h-full flex flex-col fixed inset-0 bg-gray-white dark:bg-[#1f2836] ${sessionStorage.getItem('theme') || 'light'}`}>
+    <div className={`w-full h-full flex flex-col fixed inset-0 bg-background ${sessionStorage.getItem('theme') || 'light'}`}>
         <div className='ml-1 text-black dark:text-[#D9D6D6] text-sm'>
           <label htmlFor='colorFilter'>Цвет: </label>
           <select
-            name='coloFilter'
+            name='colorFilter'
             id='colorFilter'
             onChange={(e) => externalFilterChanged(e.target.value)}
           >
