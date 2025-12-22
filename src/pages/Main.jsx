@@ -1,33 +1,33 @@
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
-import api from './services/api.js';
+import api from '@/services/api.js';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
-import { Button } from './components/ui/button.jsx';
+import { Button } from '@/components/ui/button.jsx';
 
 // Custom components
-import RotaHour from './components/rota/rota.jsx';
-import MyDutiesCard from './components/rota/myDuties.jsx';
-import Loading from './components/loading.jsx';
+import RotaHour from '@/components/rota/rota.jsx';
+import MyDutiesCard from '@/components/rota/myDuties.jsx';
+import Loading from '@/components/loading.jsx';
 import { Input } from '@/components/ui/input.jsx';
 import { Separator } from "@/components/ui/separator";
-import catchResponseError from './utils/responseError.jsx';
+import catchResponseError from '@/utils/responseError.jsx';
 
 // CSS
-import './styles/App.css';
+import '@/styles/App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
-import shrugAnimationData from "./assets/shrug.json";
-import deniedAnimationData from "./assets/denied.json";
+import shrugAnimationData from "@/assets/shrug.json";
+import deniedAnimationData from "@/assets/denied.json";
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp.jsx'));
-const PersonalStats = lazy(() => import('./components/statistics/personalStats.jsx'));
-const Animation = lazy(() => import('./components/animation.jsx'));
+const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp.jsx'));
+const PersonalStats = lazy(() => import('@/components/statistics/personalStats.jsx'));
+const Animation = lazy(() => import('@/components/animation.jsx'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
 

@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import Main from './Main.jsx';
+import Main from './pages/Main.jsx';
 import UserProfile from './components/userProfile.jsx';
 import WeeklyView from './components/WeeklyView.jsx';
 import BranchStats from './components/statistics/branchStats.jsx';
