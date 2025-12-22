@@ -9,15 +9,15 @@ import {
 } from "@/components/ui/accordion"
 
 // Sections
-import UserEditForm from "./rota/userEditForm";
-const PersonalStats = lazy(() => import('./statistics/personalStats'));
-const MyDutiesCard = lazy(() => import('./rota/myDuties'));
-const ModifyRotaMulti = lazy(() => import('./rota/modifyRotaMulti'));
+import UserEditForm from "@/components/rota/userEditForm";
+const PersonalStats = lazy(() => import('@/components/statistics/personalStats'));
+const MyDutiesCard = lazy(() => import('@/components/rota/myDuties'));
+const ModifyRotaMulti = lazy(() => import('@/components/rota/modifyRotaMulti'));
 
 // Styles
-import '../styles/App.css';
+import '@/styles/App.css';
 
-export default function UserProfile(){
+export default function Profile() {
   const location = useLocation();
   const navigate = useNavigate();
 
