@@ -4,17 +4,14 @@ import { format, addDays } from 'date-fns';
 import api from '@/services/api.js';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
-import { Button } from '@/components/ui/button.jsx';
 
 // Custom components
 import BranchSelector from '@/components/BranchSelector';
+import PageSelector from '@/components/PageSelector';
 import RotaHour from '@/components/rota/rota.jsx';
 import MyDutiesCard from '@/components/rota/myDuties.jsx';
 import Loading from '@/components/loading.jsx';
-import { Input } from '@/components/ui/input.jsx';
-import { Separator } from "@/components/ui/separator";
 import catchResponseError from '@/utils/responseError.jsx';
 
 // CSS
@@ -292,101 +289,25 @@ function Main() {
             />
           )}
 
-          <div className='flex justify-between items-center space-x-2 mb-3'>
-            <div className="p-2! flex-1 rounded-md border bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input dark:border-border dark:hover:bg-input/50">
-              <Input
-                type="date"
-                value={date}
-                min="2024-12-23"
-                max={format(addDays(new Date(), 365), 'yyyy-MM-dd')}
-                onChange={(e) => {
-                  setDate(e.target.value);
-                  sessionStorage.setItem('date', e.target.value);
-                  window.Telegram.WebApp.HapticFeedback.selectionChanged();
-                }}
-              />
-            </div>
-              
-
-            <Button
-              variant="outline"
-              size="icon-xl"
-              className="rounded-lg"
-              onClick={() => {
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                navigate('./calendar', { state: {
-                  branch: branch,
-                  rotaAdmin: rotaAdmin.includes(branch),
-                  maxDuties: userBranches[branch].maxDuties,
-                  initDataUnsafe: initDataUnsafe
-                }});
-              }}
-            >
-              <CalendarDays size={25} className="size-6"/>
-            </Button>
-
-            <div className='relative inline-block'>
-              <Button
-                variant="outline"
-                size="icon-xl"
-                className='rounded-lg'
-                onClick={() => {
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                  if (rotaAdmin.includes(branch)) {
-                    setShowStatDropdown(prev => !prev);
-                  }
-                  else {
-                    setShowPersonalStats(true);
-                  };
-                }}
-              >
-                <ChartNoAxesCombined size={25} className='size-6'/>
-              </Button>
-
-              {showStatDropdown && (
-                <div className='dropdown-container'>
-                  <button
-                    className='dropdown-button'
-                    onClick={() => {
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                      setShowPersonalStats(true);
-                    }}
-                  >
-                    Личная
-                  </button>
-
-                  <Separator/>
-
-                  <button
-                    className='dropdown-button'
-                    onClick={() => {
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                      navigate('./stats/overview', { state: {
-                        branch: branch,
-                        initDataUnsafe: initDataUnsafe
-                      }});
-                    }}
-                  >
-                    Сводная
-                  </button>
-                </div>
-              )}
-            </div>
-                
-            {rotaAdmin.includes(branch) && (
-              <Button
-                variant="outline"
-                size="icon-xl"
-                className="rounded-lg"
-                onClick={() => {
-                  setShowUserManagement(true);
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                }}
-              >
-                <Settings size={25} className="size-6"/>
-              </Button>
-            )}
-          </div>
+          <PageSelector 
+            date={date}
+            onDateChange={(newDate) => {
+              setDate(newDate);
+              sessionStorage.setItem('date', newDate);
+            }}
+            branch={branch}
+            isRotaAdmin={rotaAdmin.includes(branch)}
+            userBranches={userBranches}
+            initDataUnsafe={initDataUnsafe}
+            navigate={navigate}
+            showStatDropdown={showStatDropdown}
+            setShowStatDropdown={setShowStatDropdown}
+            onShowPersonalStats={() => setShowPersonalStats(true)}
+            onShowUserManagement={() => {
+              setShowUserManagement(true);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }}
+          />
         </>
       )}
 
