@@ -3,23 +3,23 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
-import api from '../services/api.js';
+import api from '@/services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
 import { Button } from '@/components/ui/button.jsx';
-import Loading from './loading';
-import catchResponseError from '../utils/responseError';
+import Loading from '@/components/loading.jsx';
+import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import updateRota from '../services/updateRota';
+import updateRota from '@/services/updateRota.jsx';
 
 // CSS
-import '../styles/WeeklyView.css';
+import '@/styles/WeeklyView.css';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '../styles/gridTheme';
+import gridTheme from '@/styles/gridTheme.js';
 import {
   ModuleRegistry,
   ValidationModule,
@@ -38,7 +38,7 @@ ModuleRegistry.registerModules([
 ]);
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'))
+const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp'))
 
 const today = startOfToday();
 
@@ -49,7 +49,7 @@ function rowIndexToTime(rowIndex) {
 }
 
 
-export default function WeeklyView() {
+export default function Calendar() {
   const location = useLocation();
   const navigate = useNavigate();
 

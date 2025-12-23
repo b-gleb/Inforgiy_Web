@@ -324,7 +324,7 @@ function Main() {
               className="rounded-lg"
               onClick={() => {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                navigate('./weekly', { state: {
+                navigate('./calendar', { state: {
                   branch: branch,
                   rotaAdmin: rotaAdmin.includes(branch),
                   maxDuties: userBranches[branch].maxDuties,
