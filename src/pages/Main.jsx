@@ -9,6 +9,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Button } from '@/components/ui/button.jsx';
 
 // Custom components
+import BranchSelector from '@/components/BranchSelector';
 import RotaHour from '@/components/rota/rota.jsx';
 import MyDutiesCard from '@/components/rota/myDuties.jsx';
 import Loading from '@/components/loading.jsx';
@@ -28,8 +29,6 @@ import deniedAnimationData from "@/assets/denied.json";
 const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp.jsx'));
 const PersonalStats = lazy(() => import('@/components/statistics/personalStats.jsx'));
 const Animation = lazy(() => import('@/components/animation.jsx'));
-
-const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
 
 
 function Main() {
@@ -282,24 +281,15 @@ function Main() {
       {!isLoading && userBranches && (
         <>
           {Object.keys(userBranches).length >= 2 && (
-            <div className="branches-container">
-              <div className="branches-flexbox">
-                {Object.entries(userBranches).map(([dept_key, dept_value]) => (
-                  <button
-                    key={dept_key}
-                    onClick={() => {
-                      setBranch(dept_key);
-                      sessionStorage.setItem('branch', dept_key);
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                    }}
-                    className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
-                    style={{WebkitTapHighlightColor: 'transparent'}}
-                  >
-                    {departments[dept_key]}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <BranchSelector 
+              userBranches={userBranches}
+              branch={branch}
+              onClick={(key) => {
+                setBranch(key);
+                sessionStorage.setItem('branch', key);
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              }}
+            />
           )}
 
           <div className='flex justify-between items-center space-x-2 mb-3'>
