@@ -3,15 +3,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 
-import api from '../../services/api.js';
-import fetchAllUsers from '../../services/fetchAllUsers';
-import catchResponseError from '../../utils/responseError';
-import { userColors } from '../../utils/userColors.js';
+import api from '@/services/api.js';
+import fetchAllUsers from '@/services/fetchAllUsers';
+import catchResponseError from '@/utils/responseError';
+import { userColors } from '@/utils/userColors.js';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '../../styles/gridTheme';
-import localeText from '../../utils/gridLocale';
+import gridTheme from '@/styles/gridTheme';
+import localeText from '@/utils/gridLocale';
 import {
   ModuleRegistry,
   ValidationModule,
@@ -35,7 +35,7 @@ ModuleRegistry.registerModules([
 
 
 
-export default function BranchStats() {
+export default function StatsOverview() {
   const location = useLocation();
   const navigate = useNavigate();
   const gridRef = useRef(null);

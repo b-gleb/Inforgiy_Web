@@ -371,7 +371,7 @@ function Main() {
                     className='dropdown-button'
                     onClick={() => {
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                      navigate('./branchStats', { state: {
+                      navigate('./stats/overview', { state: {
                         branch: branch,
                         initDataUnsafe: initDataUnsafe
                       }});
