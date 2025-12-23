@@ -113,7 +113,7 @@ export default function UserSearchPopUp({
                       branch: branch,
                       date: date,
                       timeRange: timeRange,
-                      modifyUserId: userObj.id,
+                      userId: userObj.id,
                       initDataUnsafe: initDataUnsafe
                     })
                     .then((result) => {setRotaData(result)})
@@ -133,7 +133,7 @@ export default function UserSearchPopUp({
                   handleUpdateCell({
                     type: 'add',
                     branch: branch,
-                    modifyUserId: userObj.id,
+                    userId: userObj.id,
                     initDataUnsafe: initDataUnsafe
                   })
                   .then(() => {

@@ -392,7 +392,7 @@ function Main() {
 
       <MyDutiesCard 
         branch={branch}
-        user_id={initDataUnsafe?.user?.id ?? null}
+        userId={initDataUnsafe?.user?.id ?? null}
       />
 
       {userBranches !== null
@@ -465,7 +465,7 @@ function Main() {
           <div className='popup'>
             <PersonalStats
               branch={branch}
-              user_id={initDataUnsafe.user.id}
+              userId={initDataUnsafe.user.id}
             />
           </div>
         </Suspense>

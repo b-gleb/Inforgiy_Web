@@ -27,7 +27,7 @@ function getYearRange (date) {
 };
 
 
-export default function PersonalStats({ branch, user_id }) {
+export default function PersonalStats({ branch, userId }) {
   // CARDS
   const [personalStatsData, setPersonalStatsData] = useState(null);
 
@@ -38,7 +38,7 @@ export default function PersonalStats({ branch, user_id }) {
       try {
         const response = await api.post('/api/stats', {
           branch: branch,
-          userIds: [user_id],
+          userIds: [userId],
           dateRanges: [
             getWeekRange(now),
             getWeekRange(subWeeks(now, 1)),
@@ -63,7 +63,7 @@ export default function PersonalStats({ branch, user_id }) {
     };
 
     fetchPersonalStats();
-  }, [branch, user_id])
+  }, [branch, userId])
 
 
   // Weekly Bars
@@ -111,7 +111,7 @@ export default function PersonalStats({ branch, user_id }) {
         
         const response = await api.post('/api/stats', {
           branch: branch,
-          userIds: [user_id],
+          userIds: [userId],
           dateRanges: weekRanges
         });
 
@@ -139,7 +139,7 @@ export default function PersonalStats({ branch, user_id }) {
     };
 
     fetchWeeklyStats();  
-  }, [branch, user_id])
+  }, [branch, userId])
 
 
   // Cumulative month stats
@@ -210,7 +210,7 @@ export default function PersonalStats({ branch, user_id }) {
         const today = new Date();
         const response = await api.post('/api/stats/cumulative', {
           branch: branch,
-          userId: user_id,
+          userId: userId,
           dateRanges: [
             [
               format(startOfMonth(today), 'yyyy-MM-dd'),
@@ -238,7 +238,7 @@ export default function PersonalStats({ branch, user_id }) {
     };
 
     fetchDayByDayStats();
-  }, [branch, user_id])
+  }, [branch, userId])
 
 
   return (
