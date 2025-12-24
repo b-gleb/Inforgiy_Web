@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
-import api from '@/services/api.js';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast, ToastContainer } from 'react-toastify';
@@ -13,6 +12,9 @@ import RotaHour from '@/components/rota/rota.jsx';
 import MyDutiesCard from '@/components/rota/myDuties.jsx';
 import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
+
+// API
+import api, { getRota } from '@/services/api.ts';
 
 // CSS
 import '@/styles/App.css';
@@ -187,22 +189,12 @@ function Main() {
       }
 
       try {
-        const response = await api.get('/api/rota', {
-          params: {
-            branch: branch,
-            date: date,
-          },
-        });
-        setRotaData(response.data);
+        const response = await getRota(branch, date);
+        setRotaData(response);
 
         if (branch === 'di') {
-          const responseSecondary = await api.get('/api/rota', {
-            params: {
-              branch: 'gp',
-              date: date,
-            },
-          });
-          setSecondaryRotaData(responseSecondary.data);
+          const responseSecondary = await getRota('gp', date)
+          setSecondaryRotaData(responseSecondary);
         } else {
           setSecondaryRotaData([])
         };
