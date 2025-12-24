@@ -6,6 +6,7 @@ const api = axios.create({
 });
 
 type Branch = 'lns' | 'gp' | 'di' | 'ryaz' | 'orel';
+type UserId = number;
 type ISODate = `${number}-${number}-${number}`;
 
 export const getRota = async (
@@ -18,6 +19,24 @@ export const getRota = async (
       date
     }
   });
+  return response.data;
+};
+
+export const getUserDuties = async (
+  branch: Branch,
+  userId: UserId,
+  startDate: ISODate,
+  endDate: ISODate
+) => {
+  const response = await api.get('/api/userDuties', {
+    params: {
+      branch,
+      userId,
+      startDate,
+      endDate
+    }
+  });
+
   return response.data;
 };
 

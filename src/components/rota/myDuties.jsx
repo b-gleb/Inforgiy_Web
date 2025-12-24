@@ -2,7 +2,7 @@ import React, { useEffect, useState} from 'react';
 import { format, addDays, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton.jsx';
-import userDuties from '../../services/userDuties.jsx';
+import { getUserDuties } from '@/services/api';
 
 function convertToDutyString(hours) {
   if (!hours || hours.length === 0) return "";
@@ -38,11 +38,11 @@ export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 
     const fetchNextDuty = async () => {
       const today = new Date();
 
-      userDuties(
+      getUserDuties(
         branch,
         userId,
-        subDays(today, prevDays),
-        addDays(today, nextDays)
+        format(subDays(today, prevDays), 'yyyy-MM-dd'),
+        format(addDays(today, nextDays), 'yyyy-MM-dd')
       )
         .then((result) => {setNextDuties(result)})
         .catch(() => {});
