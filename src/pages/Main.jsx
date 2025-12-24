@@ -24,7 +24,7 @@ import deniedAnimationData from "@/assets/denied.json";
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp.jsx'));
-const PersonalStats = lazy(() => import('@/components/statistics/personalStats.jsx'));
+const PersonalStats = lazy(() => import('@/components/stats/personalStats.jsx'));
 const Animation = lazy(() => import('@/components/animation.jsx'));
 
 

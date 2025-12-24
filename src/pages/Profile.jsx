@@ -10,7 +10,7 @@ import {
 
 // Sections
 import UserEditForm from "@/components/rota/userEditForm";
-const PersonalStats = lazy(() => import('@/components/statistics/personalStats'));
+const PersonalStats = lazy(() => import('@/components/stats/personalStats'));
 const MyDutiesCard = lazy(() => import('@/components/rota/myDuties'));
 const ModifyRotaMulti = lazy(() => import('@/components/rota/modifyRotaMulti'));
 
