@@ -162,7 +162,7 @@ export default function StatsOverview() {
     const generateTable = async () => {
       try {
         const year = new Date().getFullYear();
-        const allUsers = await getUsers(branch, initDataUnsafe);
+        const allUsers = await getUsers({branch, initDataUnsafe});
         const allUserIds = allUsers.map(userObj => userObj.id);
         const yearlyColumnDefs = generateColumnDefs(year);
         const intervalsToFetch = calculateIntervals(year);

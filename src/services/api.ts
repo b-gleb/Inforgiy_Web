@@ -15,34 +15,21 @@ type InitDataUnsafe = object;
 // ROTA //
 // //// //
 
-export const getRota = async (
-  branch: Branch,
-  date: ISODate
-) => {
-  const response = await api.get('/api/rota', {
-    params: {
-      branch,
-      date
-    }
-  });
+export const getRota = async (params: {
+  branch: Branch;
+  date: ISODate;
+}) => {
+  const response = await api.get('/api/rota', { params });
   return response.data;
 };
 
-export const getUserDuties = async (
-  branch: Branch,
-  userId: UserId,
-  startDate: ISODate,
-  endDate: ISODate
-) => {
-  const response = await api.get('/api/userDuties', {
-    params: {
-      branch,
-      userId,
-      startDate,
-      endDate
-    }
-  });
-
+export const getUserDuties = async (params: {
+  branch: Branch;
+  userId: UserId;
+  startDate: ISODate;
+  endDate: ISODate;
+}) => {
+  const response = await api.get('/api/userDuties', { params });
   return response.data;
 };
 
@@ -50,13 +37,11 @@ export const getUserDuties = async (
 // USERS //
 // ///// //
 
-export const getUsers = async (
-  branch: Branch,
-  initDataUnsafe: InitDataUnsafe
-) => {
-  const response = await api.post('/api/users', 
-    { branch, initDataUnsafe }
-  );
+export const getUsers = async (params: {
+  branch: Branch;
+  initDataUnsafe: InitDataUnsafe;
+}) => {
+  const response = await api.post('/api/users', params);
 
   return response.data;
 }

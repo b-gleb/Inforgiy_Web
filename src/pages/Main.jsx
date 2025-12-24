@@ -189,11 +189,11 @@ function Main() {
       }
 
       try {
-        const response = await getRota(branch, date);
+        const response = await getRota({branch, date});
         setRotaData(response);
 
         if (branch === 'di') {
-          const responseSecondary = await getRota('gp', date)
+          const responseSecondary = await getRota({branch: 'gp', date})
           setSecondaryRotaData(responseSecondary);
         } else {
           setSecondaryRotaData([])

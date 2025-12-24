@@ -38,12 +38,12 @@ export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 
     const fetchNextDuty = async () => {
       const today = new Date();
 
-      getUserDuties(
+      getUserDuties({
         branch,
         userId,
-        format(subDays(today, prevDays), 'yyyy-MM-dd'),
-        format(addDays(today, nextDays), 'yyyy-MM-dd')
-      )
+        startDate: format(subDays(today, prevDays), 'yyyy-MM-dd'),
+        endDate: format(addDays(today, nextDays), 'yyyy-MM-dd')
+      })
         .then((result) => {setNextDuties(result)})
         .catch(() => {});
     };
