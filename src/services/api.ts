@@ -8,6 +8,7 @@ const api = axios.create({
 type Branch = 'lns' | 'gp' | 'di' | 'ryaz' | 'orel';
 type UserId = number;
 type ISODate = `${number}-${number}-${number}`;
+type DateRange = ISODate[];
 type InitDataUnsafe = object;
 
 // //// //
@@ -53,11 +54,24 @@ export const getUsers = async (
   branch: Branch,
   initDataUnsafe: InitDataUnsafe
 ) => {
-  const response = await api.post('api/users', 
+  const response = await api.post('/api/users', 
     { branch, initDataUnsafe }
   );
 
   return response.data;
 }
+
+// ///// //
+// STATS //
+// ///// //
+
+export const getStats = async (params: {
+  branch: Branch;
+  userIds: UserId[];
+  dateRanges: DateRange[];
+}) => {
+  const response = await api.post('/api/stats', params);
+  return response.data;
+};
 
 export default api;
