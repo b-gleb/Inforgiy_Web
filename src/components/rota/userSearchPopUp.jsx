@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 
 // APIs
-import fetchAllUsers from '../../services/fetchAllUsers';
+import { getUsers } from '@/services/api';
 import updateRota from '../../services/updateRota';
 
 
@@ -40,7 +40,7 @@ export default function UserSearchPopUp({
 
   // Fetch all users
   useEffect(() => {
-    fetchAllUsers(branch, initDataUnsafe)
+    getUsers(branch, initDataUnsafe)
       .then((result) => {
         setAllUsers(result);
         setFilteredUsers(result)

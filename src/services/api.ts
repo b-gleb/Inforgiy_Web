@@ -8,6 +8,11 @@ const api = axios.create({
 type Branch = 'lns' | 'gp' | 'di' | 'ryaz' | 'orel';
 type UserId = number;
 type ISODate = `${number}-${number}-${number}`;
+type InitDataUnsafe = object;
+
+// //// //
+// ROTA //
+// //// //
 
 export const getRota = async (
   branch: Branch,
@@ -39,5 +44,20 @@ export const getUserDuties = async (
 
   return response.data;
 };
+
+// ///// //
+// USERS //
+// ///// //
+
+export const getUsers = async (
+  branch: Branch,
+  initDataUnsafe: InitDataUnsafe
+) => {
+  const response = await api.post('api/users', 
+    { branch, initDataUnsafe }
+  );
+
+  return response.data;
+}
 
 export default api;

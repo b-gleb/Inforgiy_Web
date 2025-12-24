@@ -2,11 +2,11 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
-
-import api from '@/services/api.js';
-import fetchAllUsers from '@/services/fetchAllUsers';
-import catchResponseError from '@/utils/responseError';
 import { userColors } from '@/utils/userColors.js';
+
+// API
+import api, { getUsers } from '@/services/api.js';
+import catchResponseError from '@/utils/responseError';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
@@ -162,7 +162,7 @@ export default function StatsOverview() {
     const generateTable = async () => {
       try {
         const year = new Date().getFullYear();
-        const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+        const allUsers = await getUsers(branch, initDataUnsafe);
         const allUserIds = allUsers.map(userObj => userObj.id);
         const yearlyColumnDefs = generateColumnDefs(year);
         const intervalsToFetch = calculateIntervals(year);
