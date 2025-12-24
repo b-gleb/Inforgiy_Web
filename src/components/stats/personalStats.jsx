@@ -8,7 +8,7 @@ import StatCard from '@/components/stats/StatCard.jsx';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // API
-import api, { getStats } from '@/services/api.js';
+import { getStats, getStatsCumulative } from '@/services/api.js';
 import catchResponseError from '../../utils/responseError.jsx';
 
 function getWeekRange (date) {
@@ -211,9 +211,9 @@ export default function PersonalStats({ branch, userId }) {
     const fetchDayByDayStats = async () => {
       try {
         const today = new Date();
-        const response = await api.post('/api/stats/cumulative', {
-          branch: branch,
-          userId: userId,
+        const response = await getStatsCumulative({
+          branch,
+          userId,
           dateRanges: [
             [
               format(startOfMonth(today), 'yyyy-MM-dd'),
@@ -226,11 +226,11 @@ export default function PersonalStats({ branch, userId }) {
         setDayByDaySeries([
           {
             name: "Прошлый месяц",
-            data: response.data[1].data.map(item => item.count)
+            data: response[1].data.map(item => item.count)
           },
           {
             name: "Текущий месяц",
-            data: response.data[0].data.map(item => item.count)
+            data: response[0].data.map(item => item.count)
           },
         ]);
 

@@ -59,4 +59,13 @@ export const getStats = async (params: {
   return response.data;
 };
 
+export const getStatsCumulative = async (params: {
+  branch: Branch;
+  userId: UserId;
+  dateRanges: DateRange[];
+}) => {
+  const response = await api.post('/api/stats/cumulative', params);
+  return response.data;
+}
+
 export default api;
