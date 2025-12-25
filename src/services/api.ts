@@ -18,6 +18,16 @@ interface UserObj {
   color: number;
 };
 
+// /////// //
+// DEFAULT //
+// /////// //
+export const getAuth = async (params: {
+  initDataUnsafe: InitDataUnsafe;
+}) => {
+  const response = await api.post('/api/auth', params);
+  return response;
+};
+
 // //// //
 // ROTA //
 // //// //

@@ -14,7 +14,7 @@ import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import api, { getRota } from '@/services/api.ts';
+import { getAuth, getRota } from '@/services/api.ts';
 
 // CSS
 import '@/styles/App.css';
@@ -156,7 +156,7 @@ function Main() {
   useEffect(() => {
     const fetchAuthData = async () => {
       try {
-        const response = await api.post('/api/auth', {initDataUnsafe});
+        const response = await getAuth({initDataUnsafe});
 
         setRotaAdmin(response.data.rotaAdmin);
         setUserBranches(response.data.branches);
