@@ -27,7 +27,7 @@ export const getRota = async (params: {
   date: ISODate;
 }) => {
   const response = await api.get('/api/rota', { params });
-  return response.data;
+  return response;
 };
 
 export const getUserDuties = async (params: {
@@ -37,7 +37,7 @@ export const getUserDuties = async (params: {
   endDate: ISODate;
 }) => {
   const response = await api.get('/api/userDuties', { params });
-  return response.data;
+  return response;
 };
 
 // ///// //
@@ -49,7 +49,7 @@ export const getUsers = async (params: {
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/users', params);
-  return response.data;
+  return response;
 };
 
 export const updateUser = async (params: {
@@ -80,7 +80,7 @@ export const getStats = async (params: {
   dateRanges: DateRange[];
 }) => {
   const response = await api.post('/api/stats', params);
-  return response.data;
+  return response;
 };
 
 export const getStatsCumulative = async (params: {
@@ -89,7 +89,7 @@ export const getStatsCumulative = async (params: {
   dateRanges: DateRange[];
 }) => {
   const response = await api.post('/api/stats/cumulative', params);
-  return response.data;
+  return response;
 };
 
 export default api;

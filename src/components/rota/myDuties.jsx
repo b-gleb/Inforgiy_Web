@@ -44,7 +44,7 @@ export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 
         startDate: format(subDays(today, prevDays), 'yyyy-MM-dd'),
         endDate: format(addDays(today, nextDays), 'yyyy-MM-dd')
       })
-        .then((result) => {setNextDuties(result)})
+        .then(({ data }) => {setNextDuties(data)})
         .catch(() => {});
     };
     // Prevent passing empty branch before auth is complete

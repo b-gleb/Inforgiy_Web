@@ -51,7 +51,7 @@ export default function PersonalStats({ branch, userId }) {
           ]
         });
 
-        const stats  = response[0].data;
+        const stats  = response.data[0].data;
         setPersonalStatsData({
           currentWeek: stats[0].count,
           previousWeek: stats[1].count,
@@ -119,8 +119,8 @@ export default function PersonalStats({ branch, userId }) {
         });
 
         setWeeklyChartSeries([{
-          name: response[0].user.nick,
-          data: response[0].data.map(item => item.count)
+          name: response.data[0].user.nick,
+          data: response.data[0].data.map(item => item.count)
         }]);
 
         setWeeklyChartOptions(prevOptions => ({
@@ -226,11 +226,11 @@ export default function PersonalStats({ branch, userId }) {
         setDayByDaySeries([
           {
             name: "Прошлый месяц",
-            data: response[1].data.map(item => item.count)
+            data: response.data[1].data.map(item => item.count)
           },
           {
             name: "Текущий месяц",
-            data: response[0].data.map(item => item.count)
+            data: response.data[0].data.map(item => item.count)
           },
         ]);
 

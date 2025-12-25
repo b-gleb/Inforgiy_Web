@@ -41,9 +41,9 @@ export default function UserSearchPopUp({
   // Fetch all users
   useEffect(() => {
     getUsers({branch, initDataUnsafe})
-      .then((result) => {
-        setAllUsers(result);
-        setFilteredUsers(result)
+      .then(({ data }) => {
+        setAllUsers(data);
+        setFilteredUsers(data)
       })
       .catch(() => {});
 
