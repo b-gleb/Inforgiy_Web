@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
-import api from '@/services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
@@ -12,7 +11,7 @@ import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import { updateRota } from '@/services/api.js';
+import { getRota, updateRota } from '@/services/api.js';
 
 // CSS
 import '@/styles/WeeklyView.css';
@@ -204,11 +203,9 @@ export default function Calendar() {
 
       for (const day of days) {
         try {
-          const response = await api.get('/api/rota', {
-            params: {
-              branch: branch,
-              date: format(day, 'yyyy-MM-dd')
-            }
+          const response = await getRota({
+            branch,
+            date: format(day, 'yyyy-MM-dd')
           });
           fetchedRotaData.push(response.data);
         } catch (error) {
