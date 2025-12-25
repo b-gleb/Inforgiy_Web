@@ -61,6 +61,15 @@ export const updateUser = async (params: {
   return response;
 };
 
+export const removeUser = async (params: {
+  branch: Branch;
+  userId: UserId;
+  initDataUnsafe: InitDataUnsafe;
+}) => {
+  const response = await api.post('/api/removeUser', params);
+  return response;
+};
+
 // ///// //
 // STATS //
 // ///// //

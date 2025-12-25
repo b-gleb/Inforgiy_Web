@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { userColors } from '../../utils/userColors.js';
-import api from '../../services/api.js';
-import { updateUser } from '@/services/api.js';
+import { updateUser, removeUser } from '@/services/api.js';
 import catchResponseError from '../../utils/responseError';
 
 
@@ -37,10 +36,10 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
   
     const handleRemoveUser = async (branch, userId, initDataUnsafe) => {
       try {
-        const response = await api.post('/api/removeUser', {
-          branch: branch,
-          userId: userId,
-          initDataUnsafe: initDataUnsafe
+        const response = await removeUser({
+          branch,
+          userId,
+          initDataUnsafe
         })
   
         if (response.status === 204){
@@ -55,7 +54,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-      
+
       try {
         const response = await updateUser({
           branch,
