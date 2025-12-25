@@ -40,6 +40,18 @@ export const getUserDuties = async (params: {
   return response;
 };
 
+export const updateRota = async (params: {
+  type: string;
+  branch: Branch;
+  date: ISODate;
+  timeRange: string;
+  userId: UserId;
+  initDataUnsafe: InitDataUnsafe;
+}) => {
+  const response = await api.post('/api/updateRota', params);
+  return response;
+};
+
 // ///// //
 // USERS //
 // ///// //

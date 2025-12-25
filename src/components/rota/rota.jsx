@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
 
 // API
-import updateRota from '../../services/updateRota.jsx';
+import { updateRota } from '@/services/api.js';
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
@@ -65,15 +65,15 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
                   className="ml-2"
                     onClick={() => {
                       updateRota({
-                          type: 'remove',
-                          branch: branch,
-                          date: date,
-                          timeRange: dutyHour.label,
-                          userId: userObj.id,
-                          initDataUnsafe: initDataUnsafe
+                        type: 'remove',
+                        branch,
+                        date,
+                        timeRange: dutyHour.label,
+                        userId: userObj.id,
+                        initDataUnsafe
                       })
-                        .then((result) => {
-                          setRotaData(result);
+                        .then(({ data }) => {
+                          setRotaData(data);
                           window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                         })
                         .catch(() => {});
@@ -107,13 +107,13 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
             onClick={() => {
               updateRota({
                   type: 'add',
-                  branch: branch,
-                  date: date,
+                  branch,
+                  date,
                   timeRange: dutyHour.label,
                   userId: initDataUnsafe.user.id,
-                  initDataUnsafe: initDataUnsafe
+                  initDataUnsafe
                 })
-                .then((result) => {setRotaData(result)})
+                .then(({data}) => {setRotaData(data)})
                 .catch(() => {});
               window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
             }}

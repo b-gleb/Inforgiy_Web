@@ -5,9 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 
 // APIs
-import { getUsers } from '@/services/api';
-import updateRota from '../../services/updateRota';
-
+import { getUsers, updateRota } from '@/services/api';
 
 export default function UserSearchPopUp({ 
   mode,
@@ -116,7 +114,7 @@ export default function UserSearchPopUp({
                       userId: userObj.id,
                       initDataUnsafe: initDataUnsafe
                     })
-                    .then((result) => {setRotaData(result)})
+                    .then(({ data }) => {setRotaData(data)})
                     .catch(() => {});
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                   onClose();

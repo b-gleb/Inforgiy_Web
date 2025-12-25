@@ -12,7 +12,7 @@ import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import updateRota from '@/services/updateRota.jsx';
+import { updateRota } from '@/services/api.js';
 
 // CSS
 import '@/styles/WeeklyView.css';
@@ -306,14 +306,14 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
     updateRota(updateParams)
-      .then((result) => {
+      .then(({ data }) => {
         selectedCellData.rowNode.setDataValue(
           selectedCellData.column,
-          result[rowIndex].users
+          data[rowIndex].users
         );
         setSelectedCellData(prevState => ({
           ...prevState,
-          users: result[rowIndex].users
+          users: data[rowIndex].users
         }));
       })
       .catch(() => {});
