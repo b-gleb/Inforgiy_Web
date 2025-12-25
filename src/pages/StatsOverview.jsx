@@ -5,7 +5,7 @@ import { ru } from "date-fns/locale";
 import { userColors } from '@/utils/userColors.js';
 
 // API
-import api, { getUsers } from '@/services/api.js';
+import api, { getUsers } from '@/services/api.ts';
 import catchResponseError from '@/utils/responseError';
 
 // AG Grid

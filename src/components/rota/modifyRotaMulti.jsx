@@ -1,5 +1,5 @@
 import { useState} from 'react';
-import api from '@/services/api.js';
+import api from '@/services/api.ts';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { eachDayOfInterval } from 'date-fns';

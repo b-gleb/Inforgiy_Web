@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { userColors } from '../../utils/userColors.js';
-import { updateUser, removeUser } from '@/services/api.js';
+import { updateUser, removeUser } from '@/services/api.ts';
 import catchResponseError from '../../utils/responseError';
 
 

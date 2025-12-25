@@ -8,7 +8,7 @@ import StatCard from '@/components/stats/StatCard.jsx';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // API
-import { getStats, getStatsCumulative } from '@/services/api.js';
+import { getStats, getStatsCumulative } from '@/services/api.ts';
 import catchResponseError from '../../utils/responseError.jsx';
 
 function getWeekRange (date) {

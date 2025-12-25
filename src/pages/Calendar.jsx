@@ -11,7 +11,7 @@ import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import { getRota, updateRota } from '@/services/api.js';
+import { getRota, updateRota } from '@/services/api.ts';
 
 // CSS
 import '@/styles/WeeklyView.css';
