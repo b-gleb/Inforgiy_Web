@@ -11,6 +11,13 @@ type ISODate = `${number}-${number}-${number}`;
 type DateRange = ISODate[];
 type InitDataUnsafe = object;
 
+interface UserObj {
+  id: UserId;
+  username: string;
+  nick: string;
+  color: number;
+};
+
 // //// //
 // ROTA //
 // //// //
@@ -42,9 +49,17 @@ export const getUsers = async (params: {
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/users', params);
-
   return response.data;
-}
+};
+
+export const updateUser = async (params: {
+  branch: Branch;
+  userObj: UserObj;
+  initDataUnsafe: InitDataUnsafe;
+}) => {
+  const response = await api.post('/api/updateUser', params);
+  return response;
+};
 
 // ///// //
 // STATS //
@@ -66,6 +81,6 @@ export const getStatsCumulative = async (params: {
 }) => {
   const response = await api.post('/api/stats/cumulative', params);
   return response.data;
-}
+};
 
 export default api;

@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { userColors } from '../../utils/userColors.js';
 import api from '../../services/api.js';
+import { updateUser } from '@/services/api.js';
 import catchResponseError from '../../utils/responseError';
 
 
@@ -54,15 +55,13 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-  
-      const data = {
-        branch: branch,
-        userObj: editingUser,
-        initDataUnsafe: initDataUnsafe
-      };
-  
+      
       try {
-        const response = await api.post('/api/updateUser', data);
+        const response = await updateUser({
+          branch,
+          userObj: editingUser,
+          initDataUnsafe
+        });
   
         if (response.status === 200){
           window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
