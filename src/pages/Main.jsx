@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast, ToastContainer } from 'react-toastify';
 
 // Custom components
 import BranchSelector from '@/components/BranchSelector';
@@ -18,7 +17,6 @@ import { getAuth, getRota } from '@/services/api.ts';
 
 // CSS
 import '@/styles/App.css';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Animations
 import shrugAnimationData from "@/assets/shrug.json";
@@ -53,17 +51,13 @@ function Main() {
 
   // Prevent page refresh to trigger main page opening with the wrong state
   useEffect(() => {
-    const { showUserManagement, toastMessage, ...rest } = location.state || {};    
+    const { showUserManagement, ...rest } = location.state || {};    
 
     if (showUserManagement) {
       setShowUserManagement(showUserManagement);
     }
 
-    if (toastMessage){
-      toast.success(toastMessage);
-    }
-
-    if (showUserManagement || toastMessage) {
+    if (showUserManagement) {
       navigate(location.pathname, {
         replace: true,
         state: rest,
@@ -383,16 +377,6 @@ function Main() {
           </div>
         </Suspense>
       )}
-
-      <ToastContainer
-        position='bottom-center'
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss={false}
-        draggable={false}
-        theme={window.Telegram.WebApp.colorScheme}
-        limit={4}
-      />
 
   </div>
   );

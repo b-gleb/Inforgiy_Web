@@ -1,6 +1,6 @@
 import { useState} from 'react';
 import api from '@/services/api.ts';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { eachDayOfInterval } from 'date-fns';
 import { ru } from "date-fns/locale";
@@ -246,16 +246,6 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
           </Button>
         </>
       )}
-
-      <ToastContainer
-        position='bottom-center'
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss={false}
-        draggable={false}
-        theme={window.Telegram.WebApp.colorScheme}
-        limit={4}
-      />
     </div>
   )
 };

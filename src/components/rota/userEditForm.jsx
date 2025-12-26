@@ -63,10 +63,10 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
         });
   
         if (response.status === 200){
+          toast.success('Пользователь обновлен!');
           window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
           navigate('/Inforgiy_Web/', { state: {
-            showUserManagement: true,
-            toastMessage: 'Пользователь обновлен!'
+            showUserManagement: true
           } });
         };
       } catch (error) {
