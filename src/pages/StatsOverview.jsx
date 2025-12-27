@@ -5,7 +5,7 @@ import { ru } from "date-fns/locale";
 import { userColors } from '@/utils/userColors.js';
 
 // API
-import api, { getUsers } from '@/services/api.ts';
+import { getUsers, getStats } from '@/services/api.ts';
 import catchResponseError from '@/utils/responseError';
 
 // AG Grid
@@ -240,10 +240,10 @@ export default function StatsOverview() {
 
 async function fetchBranchStats (branch, userIds, dateRanges) {
   try {
-    const response = await api.post('/api/stats', {
-      branch: branch,
-      userIds: userIds,
-      dateRanges: dateRanges
+    const response = await getStats({
+      branch,
+      userIds,
+      dateRanges
     });
 
     return response.data;
