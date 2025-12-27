@@ -13,13 +13,15 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { userColors } from '../../utils/userColors.js';
-import { updateUser, removeUser } from '@/services/api.ts';
+import { updateUser } from '@/services/api.ts';
 import catchResponseError from '../../utils/responseError';
+import { useRemoveUser } from '@/hooks/userHooks.js';
 
 
 export default function UserEditForm({ branch, User, initDataUnsafe }){
     const navigate = useNavigate();
-    const [editingUser, setEditingUser] = useState(User)
+    const [editingUser, setEditingUser] = useState(User);
+    const removeUser = useRemoveUser();
   
     const handleChange = (e) => {
       const {name, value} = e.target;
@@ -32,24 +34,6 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
         ...prevUser,
         [name]: value
       }));
-    };
-  
-    const handleRemoveUser = async (branch, userId, initDataUnsafe) => {
-      try {
-        const response = await removeUser({
-          branch,
-          userId,
-          initDataUnsafe
-        })
-  
-        if (response.status === 204){
-          window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-          toast.success('Пользователь удален!');
-        };
-  
-      } catch (error) {
-        catchResponseError(error);
-      }
     };
   
     const handleSubmit = async (e) => {
@@ -142,9 +126,13 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
               variant="outline"
               size="icon-lg"
               className="flex-none"
-              onClick={() => {
-                handleRemoveUser(branch, editingUser.id, initDataUnsafe);
-                navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });   
+              onClick={async () => {
+                try {
+                  await removeUser(branch, editingUser.id, initDataUnsafe);
+                  navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
+                } catch {
+                  // error handled globaly by axios
+                }   
               }}
             >
               <Trash2 color='red' className="size-6"/>
