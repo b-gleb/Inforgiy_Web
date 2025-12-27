@@ -1,20 +1,9 @@
 import axios from 'axios';
-import catchResponseError from '@/utils/responseError';
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 const api = axios.create({
   baseURL: apiUrl
 });
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (!error.config?.validateStatus) {
-      catchResponseError(error);
-    }
-    return Promise.reject(error);
-  }
-);
 
 type Branch = 'lns' | 'gp' | 'di' | 'ryaz' | 'orel';
 type UserId = number;
@@ -69,13 +58,7 @@ export const updateRota = async (params: {
   userId: UserId;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post(
-    '/api/updateRota',
-    params,
-    // needed to avoid general toast being show
-    // probably not the best solution
-    {validateStatus: null}
-  );
+  const response = await api.post('/api/updateRota', params);
   return response;
 };
 

@@ -22,8 +22,9 @@ export const useUpdateUser = () => {
         return null;
       }
 
-      // show general toast for all other error types, as endpoint avoids general error handling
+      // show general toast for all other error types
       catchResponseError(error);
+      throw error;
     }
 
 
@@ -32,15 +33,20 @@ export const useUpdateUser = () => {
 
 export const useRemoveUser = () => {
   return useCallback(async (branch, userId, initDataUnsafe) => {
-    const response = await removeUser({
-      branch, userId, initDataUnsafe
-    });
-    
-    if (response.status === 204) {
-      window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-      toast.success("Пользователь удален!");
-    }
+    try {
+      const response = await removeUser({
+        branch, userId, initDataUnsafe
+      });
 
-    return response;
+      if (response.status === 204) {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+        toast.success("Пользователь удален!");
+      }
+
+      return response;
+    } catch (error) {
+      catchResponseError(error);
+      throw error;
+    }
   }, []);
 };

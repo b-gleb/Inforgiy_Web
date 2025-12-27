@@ -37,16 +37,19 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
     const handleSubmit = async (e) => {
       e.preventDefault();
 
-      const result = await updateUser(
-        branch,
-        editingUser,
-        initDataUnsafe
-      );
+      try {
+        const result = await updateUser(
+          branch,
+          editingUser,
+          initDataUnsafe
+        );
 
-      if (result) {
         navigate('/Inforgiy_Web/', { state: {
           showUserManagement: true
         } });
+      }
+      catch {
+        // error handled by hook
       }
     };
   
@@ -117,7 +120,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
                   await removeUser(branch, editingUser.id, initDataUnsafe);
                   navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
                 } catch {
-                  // error handled globaly by axios
+                  // error handled by hook
                 }   
               }}
             >
