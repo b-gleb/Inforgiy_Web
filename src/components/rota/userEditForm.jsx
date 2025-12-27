@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
-import { toast } from 'react-toastify';
 import { Field, FieldLabel } from '@/components/ui/field.jsx';
 import { Input } from "@/components/ui/input";
 import {
@@ -13,14 +12,13 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { userColors } from '../../utils/userColors.js';
-import { updateUser } from '@/services/api.ts';
-import catchResponseError from '../../utils/responseError';
-import { useRemoveUser } from '@/hooks/userHooks.js';
+import { useRemoveUser, useUpdateUser } from '@/hooks/userHooks.js';
 
 
 export default function UserEditForm({ branch, User, initDataUnsafe }){
     const navigate = useNavigate();
     const [editingUser, setEditingUser] = useState(User);
+    const updateUser = useUpdateUser();
     const removeUser = useRemoveUser();
   
     const handleChange = (e) => {
@@ -35,34 +33,22 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
         [name]: value
       }));
     };
-  
+
     const handleSubmit = async (e) => {
       e.preventDefault();
 
-      try {
-        const response = await updateUser({
-          branch,
-          userObj: editingUser,
-          initDataUnsafe
-        });
-  
-        if (response.status === 200){
-          toast.success('Пользователь обновлен!');
-          window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-          navigate('/Inforgiy_Web/', { state: {
-            showUserManagement: true
-          } });
-        };
-      } catch (error) {
-        // Handle error 404 separately
-        if (error.response && error.response.status === 404){
-          toast.warn('Пользователь не найден!');
-          window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-        } else {
-          catchResponseError(error)
-        };
+      const result = await updateUser(
+        branch,
+        editingUser,
+        initDataUnsafe
+      );
+
+      if (result) {
+        navigate('/Inforgiy_Web/', { state: {
+          showUserManagement: true
+        } });
       }
-    }
+    };
   
     return(
       <>

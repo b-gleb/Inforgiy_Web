@@ -9,7 +9,9 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    catchResponseError(error);
+    if (!error.config?.validateStatus) {
+      catchResponseError(error);
+    }
     return Promise.reject(error);
   }
 );
@@ -67,7 +69,13 @@ export const updateRota = async (params: {
   userId: UserId;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post('/api/updateRota', params);
+  const response = await api.post(
+    '/api/updateRota',
+    params,
+    // needed to avoid general toast being show
+    // probably not the best solution
+    {validateStatus: null}
+  );
   return response;
 };
 
