@@ -1,8 +1,8 @@
-import React, { useEffect, useState} from 'react';
-import { format, addDays, subDays } from 'date-fns';
+import React from 'react';
+import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton.jsx';
-import { getUserDuties } from '@/services/api';
+import { useUserDuties } from '@/hooks/rotaHooks';
 
 function convertToDutyString(hours) {
   if (!hours || hours.length === 0) return "";
@@ -26,58 +26,42 @@ function convertToDutyString(hours) {
 
   // Push the last group
   result.push(`${start.toString().padStart(2, "0")}:00-${(end + 1).toString().padStart(2, "0")}:00`);
-
   return result.join("; ");
 }
 
-
 export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 14 }) {
-  const [nextDuties, setNextDuties] = useState(null);
-
-  useEffect(() => {
-    const fetchNextDuty = async () => {
-      const today = new Date();
-
-      getUserDuties({
-        branch,
-        userId,
-        startDate: format(subDays(today, prevDays), 'yyyy-MM-dd'),
-        endDate: format(addDays(today, nextDays), 'yyyy-MM-dd')
-      })
-        .then(({ data }) => {setNextDuties(data)})
-        .catch(() => {});
-    };
-    // Prevent passing empty branch before auth is complete
-    if (branch && userId){
-      fetchNextDuty();
-    }
-  }, [branch, userId, prevDays, nextDays]);
-
+  const { duties, loading, error } = useUserDuties({
+    branch,
+    userId,
+    prevDays,
+    nextDays
+  });
 
   return (
     <div className="w-full mb-3 rounded-xl shadow-lg overflow-hidden bg-linear-to-br from-purple-400 to-purple-600 dark:from-[#7941b2] dark:to-[#3d0273]">
       <div className="px-2 py-3">
         <h2 className="text-lg font-bold text-white mb-2">Мои смены</h2>
-        {!nextDuties 
-          ? <SkeletonLoader />
-          :
-            <div className="space-y-1">
-              {nextDuties.length > 0
-              ? 
-              nextDuties.map((duty, index) => (
-                <p key={index} className="text-sm text-white">
-                  <span className="font-semibold">{format(duty.date, 'dd.MM (EEEE)', { locale: ru })}:</span> {convertToDutyString(duty.hours)}
-                </p>
-              ))
-              : <p className='text-sm text-white'>Смен нет :(</p>
-              }
-            </div>
-        }
+        {loading ? (
+          <SkeletonLoader />
+        ) : error ? (
+          <p className='text-sm text-white'>Ошибка загрузки №{error.status}</p>
+        ) : (
+          <div className="space-y-1">
+            {duties.length > 0
+            ? 
+            duties.map((duty, index) => (
+              <p key={index} className="text-sm text-white">
+                <span className="font-semibold">{format(duty.date, 'dd.MM (EEEE)', { locale: ru })}:</span> {convertToDutyString(duty.hours)}
+              </p>
+            ))
+            : <p className='text-sm text-white'>Смен нет :(</p>
+            }
+          </div>
+        )}
       </div>
     </div>
   )
 }
-
 
 function SkeletonLoader() {
   return (
