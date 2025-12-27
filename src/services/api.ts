@@ -1,9 +1,18 @@
 import axios from 'axios';
+import catchResponseError from '@/utils/responseError';
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 const api = axios.create({
   baseURL: apiUrl
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    catchResponseError(error);
+    return Promise.reject(error);
+  }
+);
 
 type Branch = 'lns' | 'gp' | 'di' | 'ryaz' | 'orel';
 type UserId = number;
