@@ -2,16 +2,16 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
+import { userColors } from '@/utils/userColors.js';
 
-import api from '../../services/api.js';
-import fetchAllUsers from '../../services/fetchAllUsers';
-import catchResponseError from '../../utils/responseError';
-import { userColors } from '../../utils/userColors.js';
+// API
+import { getUsers, getStats } from '@/services/api.ts';
+import catchResponseError from '@/utils/responseError';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '../../styles/gridTheme';
-import localeText from '../../utils/gridLocale';
+import gridTheme from '@/styles/gridTheme';
+import localeText from '@/utils/gridLocale';
 import {
   ModuleRegistry,
   ValidationModule,
@@ -35,7 +35,7 @@ ModuleRegistry.registerModules([
 
 
 
-export default function BranchStats() {
+export default function StatsOverview() {
   const location = useLocation();
   const navigate = useNavigate();
   const gridRef = useRef(null);
@@ -162,7 +162,7 @@ export default function BranchStats() {
     const generateTable = async () => {
       try {
         const year = new Date().getFullYear();
-        const allUsers = await fetchAllUsers(branch, initDataUnsafe);
+        const { data: allUsers } = await getUsers({ branch, initDataUnsafe });
         const allUserIds = allUsers.map(userObj => userObj.id);
         const yearlyColumnDefs = generateColumnDefs(year);
         const intervalsToFetch = calculateIntervals(year);
@@ -194,11 +194,11 @@ export default function BranchStats() {
 
 
   return (
-    <div className={`w-full h-full flex flex-col fixed inset-0 bg-gray-white dark:bg-[#1f2836] ${sessionStorage.getItem('theme') || 'light'}`}>
+    <div className={`w-full h-full flex flex-col fixed inset-0 bg-background ${sessionStorage.getItem('theme') || 'light'}`}>
         <div className='ml-1 text-black dark:text-[#D9D6D6] text-sm'>
           <label htmlFor='colorFilter'>Цвет: </label>
           <select
-            name='coloFilter'
+            name='colorFilter'
             id='colorFilter'
             onChange={(e) => externalFilterChanged(e.target.value)}
           >
@@ -240,10 +240,10 @@ export default function BranchStats() {
 
 async function fetchBranchStats (branch, userIds, dateRanges) {
   try {
-    const response = await api.post('/api/stats', {
-      branch: branch,
-      userIds: userIds,
-      dateRanges: dateRanges
+    const response = await getStats({
+      branch,
+      userIds,
+      dateRanges
     });
 
     return response.data;

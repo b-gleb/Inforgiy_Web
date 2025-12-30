@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from "@/components/ui/input";
 
 // APIs
-import fetchAllUsers from '../../services/fetchAllUsers';
-import updateRota from '../../services/updateRota';
-
+import { getUsers, updateRota } from '@/services/api';
 
 export default function UserSearchPopUp({ 
   mode,
@@ -38,10 +38,10 @@ export default function UserSearchPopUp({
 
   // Fetch all users
   useEffect(() => {
-    fetchAllUsers(branch, initDataUnsafe)
-      .then((result) => {
-        setAllUsers(result);
-        setFilteredUsers(result)
+    getUsers({branch, initDataUnsafe})
+      .then(({ data }) => {
+        setAllUsers(data);
+        setFilteredUsers(data)
       })
       .catch(() => {});
 
@@ -59,13 +59,13 @@ export default function UserSearchPopUp({
 
   return (
     <div className="popup">
-      <div className="flex items-center mb-4">
-        <input
+      <div className="flex items-center mb-2">
+        <Input
           type="text"
           placeholder="Поиск..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="input-field mr-2"
+          className="mr-2"
         />
         <button 
           onClick={() => onClose()}
@@ -76,8 +76,9 @@ export default function UserSearchPopUp({
       </div>
 
       {mode === 'user_management' && (
-        <button
-          className='button-primary'
+        <Button
+          size="lg"
+          className="w-full font-semibold mb-2"
           onClick={() => {
             window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
             navigate('./profile', {
@@ -90,56 +91,60 @@ export default function UserSearchPopUp({
           }}
         >
           + Добавить пользователя
-        </button>
+        </Button>
       )}
 
       <div className="search_results_container">
         {filteredUsers.map((userObj) => (
-          <motion.button
-            initial={{ opacity: 0.5, scale: 0.9 }}
+          <motion.div
+            initial={{ opacity: 0.5, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1, transition: { ease: 'easeOut', duration: 0.2}}}
             key={userObj.id}
-            onClick={() => {
-              if (mode === 'rota'){
-                updateRota({
+          >
+            <Button
+              variant="outline"
+              className="w-full dark:text-white"
+              onClick={() => {
+                if (mode === 'rota'){
+                  updateRota({
+                      type: 'add',
+                      branch: branch,
+                      date: date,
+                      timeRange: timeRange,
+                      userId: userObj.id,
+                      initDataUnsafe: initDataUnsafe
+                    })
+                    .then(({ data }) => {setRotaData(data)})
+                    .catch(() => {});
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                  onClose();
+                } else if (mode === 'user_management'){
+                  window.Telegram.WebApp.BackButton.offClick(onClose);
+                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                  navigate('./profile', {
+                    state: {
+                      branch,
+                      editingUser: userObj,
+                      initDataUnsafe
+                    }});
+                } else if (mode === 'rota_weekly'){
+                  handleUpdateCell({
                     type: 'add',
                     branch: branch,
-                    date: date,
-                    timeRange: timeRange,
                     userId: userObj.id,
                     initDataUnsafe: initDataUnsafe
                   })
-                  .then((result) => {setRotaData(result)})
+                  .then(() => {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    onClose();
+                  })
                   .catch(() => {});
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                onClose();
-              } else if (mode === 'user_management'){
-                window.Telegram.WebApp.BackButton.offClick(onClose);
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                navigate('./profile', {
-                  state: {
-                    branch,
-                    editingUser: userObj,
-                    initDataUnsafe
-                  }});
-              } else if (mode === 'rota_weekly'){
-                handleUpdateCell({
-                  type: 'add',
-                  branch: branch,
-                  userId: userObj.id,
-                  initDataUnsafe: initDataUnsafe
-                })
-                .then(() => {
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                  onClose();
-                })
-                .catch(() => {});
-              }
-            }}
-            className="search_results_button"
-          >
-            {userObj.nick}
-          </motion.button>
+                }
+              }}
+            >
+              {userObj.nick}
+            </Button>
+          </motion.div>
         ))}
       </div>
     </div>

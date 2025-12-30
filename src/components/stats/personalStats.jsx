@@ -3,14 +3,13 @@ import Chart from "react-apexcharts";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
-// Skeletons
-import BarChartSkeleton from '../skeletons/barChartSkeleton';
-import LineChartSkeleton from '../skeletons/lineChartSkeleton';
+// Components
+import StatCard from '@/components/stats/StatCard.jsx';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // API
-import api from '../../services/api.js';
-import catchResponseError from '../../utils/responseError';
-
+import { getStats, getStatsCumulative } from '@/services/api.ts';
+import catchResponseError from '../../utils/responseError.jsx';
 
 function getWeekRange (date) {
   const weekStart = startOfWeek(date, {weekStartsOn: 1});
@@ -40,8 +39,8 @@ export default function PersonalStats({ branch, userId }) {
 
     const fetchPersonalStats = async () => {
       try {
-        const response = await api.post('/api/stats', {
-          branch: branch,
+        const response = await getStats({
+          branch,
           userIds: [userId],
           dateRanges: [
             getWeekRange(now),
@@ -113,7 +112,7 @@ export default function PersonalStats({ branch, userId }) {
       try {
         const weekRanges = XWeekRanges(11);
         
-        const response = await api.post('/api/stats', {
+        const response = await getStats({
           branch: branch,
           userIds: [userId],
           dateRanges: weekRanges
@@ -212,9 +211,9 @@ export default function PersonalStats({ branch, userId }) {
     const fetchDayByDayStats = async () => {
       try {
         const today = new Date();
-        const response = await api.post('/api/stats/cumulative', {
-          branch: branch,
-          userId: userId,
+        const response = await getStatsCumulative({
+          branch,
+          userId,
           dateRanges: [
             [
               format(startOfMonth(today), 'yyyy-MM-dd'),
@@ -268,55 +267,24 @@ export default function PersonalStats({ branch, userId }) {
       />
     </div>
 
-    <h2 className='text-xs mt-6 text-gray-500 dark:text-[#808080]'>Количество смен за последние 12 недель</h2>
+    <h3 className='text-xs mt-6 text-muted-foreground'>Количество смен за последние 12 недель</h3>
     <div className="w-full max-w-md mx-auto px-2">
       {weeklyChartSeries ?
         <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
         :
-        <BarChartSkeleton/>
+        <Skeleton className="w-full h-[230px] my-2"/>
       }
     </div>
 
-    <h2 className='text-xs text-gray-500 dark:text-[#808080]'>Количество смен относительно прошлого месяца</h2>
+    <h3 className='text-xs text-muted-foreground'>Количество смен относительно прошлого месяца</h3>
     <div className="w-full max-w-md mx-auto px-2">
       {dayByDaySeries ?
         <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
         :
-        <LineChartSkeleton/>
+        <Skeleton className="w-full h-[230px] my-2"/>
       }
     </div>
 
     </>
-  );
-};
-
-
-const StatCard = ({ label, sublabel, current, previous }) => {
-  const showComparison = previous !== undefined && previous !== null;
-  const isPositive = showComparison && current > previous;
-  const change = showComparison ? current - previous : 0;
-
-  return (
-    <div className="flex-1 p-2 rounded-2xl shadow-md bg-white dark:bg-neutral-800">
-      <h3 className="text-base font-semibold mb-2 text-gray-500 dark:text-gray-400">{label}</h3>
-      {current === null ? (
-        <div className="animate-pulse">
-          <div className="h-10 rounded-sm w-3/4 mb-2 bg-gray-200 dark:bg-neutral-700"></div>
-          <div className="h-4 rounded-sm w-1/2 bg-gray-200 dark:bg-neutral-700"></div>
-        </div>
-      ) : (
-        <>
-          <div className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{current}</div>
-          {showComparison && (
-            <div className="flex items-center">
-              <span className={`text-[0.6rem] ${isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-                {isPositive ? '↑' : '↓'} {Math.abs(change)}
-              </span>
-              <span className="text-[0.6rem] ml-1 text-gray-500 dark:text-gray-400">{sublabel}</span>
-            </div>
-          )}
-        </>
-      )}
-    </div>
   );
 };

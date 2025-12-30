@@ -1,32 +1,27 @@
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
-import api from './services/api.js';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, CalendarDays, ChartNoAxesCombined } from 'lucide-react';
-import { toast, ToastContainer } from 'react-toastify';
 
 // Custom components
-import RotaHour from './components/rota/rota.jsx';
-import MyDutiesCard from './components/rota/myDuties.jsx';
-import Loading from './components/loading.jsx';
-import catchResponseError from './utils/responseError.jsx';
+import BranchSelector from '@/components/BranchSelector';
+import PageSelector from '@/components/PageSelector';
+import RotaHour from '@/components/rota/rota.jsx';
+import MyDutiesCard from '@/components/rota/myDuties.jsx';
+import Loading from '@/components/loading.jsx';
+import catchResponseError from '@/utils/responseError.jsx';
+
+// API
+import { getAuth, getRota } from '@/services/api.ts';
 
 // CSS
-import './styles/App.css';
-import 'react-toastify/dist/ReactToastify.css';
-
-// Animations
-import shrugAnimationData from "./assets/shrug.json";
-import deniedAnimationData from "./assets/denied.json";
+import '@/styles/App.css';
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp.jsx'));
-const PersonalStats = lazy(() => import('./components/statistics/personalStats.jsx'));
-const Animation = lazy(() => import('./components/animation.jsx'));
-
-const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
+const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp.jsx'));
+const PersonalStats = lazy(() => import('@/components/stats/personalStats.jsx'));
+const Lottie = lazy(() => import("lottie-react"));
 
 
 function Main() {
@@ -49,20 +44,48 @@ function Main() {
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
 
+  // Animations
+  const [animationDataForbidden, setAnimationDataForbidden] = useState(null);
+  const [animationDataShrug, setAnimationDataShrug] = useState(null);
+  useEffect(() => {
+    if (!showForbidden) return;
+
+    const controller = new AbortController();
+
+    import("@/assets/denied.json").then(module => {
+      if (!controller.signal.aborted) {
+        setAnimationDataForbidden(module.default);
+      }
+    });
+
+    return () => controller.abort();
+  }, [showForbidden]);
+
+  useEffect(() => {
+    if (rotaData !== null) return;
+
+    const controller = new AbortController();
+
+    import("@/assets/shrug.json").then(module => {
+      if (!controller.signal.aborted) {
+        setAnimationDataShrug(module.default);
+      }
+    });
+
+    return () => controller.abort();
+  }, [rotaData]);
+
+
 
   // Prevent page refresh to trigger main page opening with the wrong state
   useEffect(() => {
-    const { showUserManagement, toastMessage, ...rest } = location.state || {};    
+    const { showUserManagement, ...rest } = location.state || {};    
 
     if (showUserManagement) {
       setShowUserManagement(showUserManagement);
     }
 
-    if (toastMessage){
-      toast.success(toastMessage);
-    }
-
-    if (showUserManagement || toastMessage) {
+    if (showUserManagement) {
       navigate(location.pathname, {
         replace: true,
         state: rest,
@@ -155,7 +178,7 @@ function Main() {
   useEffect(() => {
     const fetchAuthData = async () => {
       try {
-        const response = await api.post('/api/auth', {initDataUnsafe});
+        const response = await getAuth({initDataUnsafe});
 
         setRotaAdmin(response.data.rotaAdmin);
         setUserBranches(response.data.branches);
@@ -188,21 +211,11 @@ function Main() {
       }
 
       try {
-        const response = await api.get('/api/rota', {
-          params: {
-            branch: branch,
-            date: date,
-          },
-        });
+        const response = await getRota({branch, date});
         setRotaData(response.data);
 
         if (branch === 'di') {
-          const responseSecondary = await api.get('/api/rota', {
-            params: {
-              branch: 'gp',
-              date: date,
-            },
-          });
+          const responseSecondary = await getRota({branch: 'gp', date})
           setSecondaryRotaData(responseSecondary.data);
         } else {
           setSecondaryRotaData([])
@@ -279,116 +292,36 @@ function Main() {
       {!isLoading && userBranches && (
         <>
           {Object.keys(userBranches).length >= 2 && (
-            <div className="branches-container">
-              <div className="branches-flexbox">
-                {Object.entries(userBranches).map(([dept_key, dept_value]) => (
-                  <button
-                    key={dept_key}
-                    onClick={() => {
-                      setBranch(dept_key);
-                      sessionStorage.setItem('branch', dept_key);
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                    }}
-                    className={`branch-button ${branch === dept_key ? 'selected' : ''}`}
-                    style={{WebkitTapHighlightColor: 'transparent'}}
-                  >
-                    {departments[dept_key]}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <BranchSelector 
+              userBranches={userBranches}
+              branch={branch}
+              onClick={(key) => {
+                setBranch(key);
+                sessionStorage.setItem('branch', key);
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              }}
+            />
           )}
 
-          <div className='flex justify-between items-center space-x-2 mb-3'>
-            <div className="button-icon p-2! flex-1">
-              <input
-                type="date"
-                value={date}
-                min="2024-12-23"
-                max={format(addDays(new Date(), 365), 'yyyy-MM-dd')}
-                onChange={(e) => {
-                  setDate(e.target.value);
-                  sessionStorage.setItem('date', e.target.value);
-                  window.Telegram.WebApp.HapticFeedback.selectionChanged();
-                }}
-                className='input-field '
-              />
-            </div>
-              
-
-            <button
-              className='button-icon'
-              onClick={() => {
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                navigate('./weekly', { state: {
-                  branch: branch,
-                  rotaAdmin: rotaAdmin.includes(branch),
-                  maxDuties: userBranches[branch].maxDuties,
-                  initDataUnsafe: initDataUnsafe
-                }});
-              }}
-            >
-              <CalendarDays size={25} className="icon-text"/>
-            </button>
-
-            <div className='relative inline-block'>
-              <button
-                className='button-icon'
-                onClick={() => {
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                  if (rotaAdmin.includes(branch)) {
-                    setShowStatDropdown(prev => !prev);
-                  }
-                  else {
-                    setShowPersonalStats(true);
-                  };
-                }}
-              >
-                <ChartNoAxesCombined size={25} className='icon-text'/>
-              </button>
-
-              {showStatDropdown && (
-                <div className='dropdown-container'>
-                  <button
-                    className='dropdown-button'
-                    onClick={() => {
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                      setShowPersonalStats(true);
-                    }}
-                  >
-                    Личная
-                  </button>
-
-                  <div className='border-t border-neutral-300 dark:border-neutral-500'/>
-
-                  <button
-                    className='dropdown-button'
-                    onClick={() => {
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                      navigate('./branchStats', { state: {
-                        branch: branch,
-                        initDataUnsafe: initDataUnsafe
-                      }});
-                    }}
-                  >
-                    Сводная
-                  </button>
-                </div>
-              )}
-            </div>
-                
-            {rotaAdmin.includes(branch) && (
-              <button
-                className='button-icon'
-                onClick={() => {
-                  setShowUserManagement(true);
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                }}
-              >
-                <Settings size={25} className="icon-text"/>
-              </button>
-            )}
-          </div>
+          <PageSelector 
+            date={date}
+            onDateChange={(newDate) => {
+              setDate(newDate);
+              sessionStorage.setItem('date', newDate);
+            }}
+            branch={branch}
+            isRotaAdmin={rotaAdmin.includes(branch)}
+            userBranches={userBranches}
+            initDataUnsafe={initDataUnsafe}
+            navigate={navigate}
+            showStatDropdown={showStatDropdown}
+            setShowStatDropdown={setShowStatDropdown}
+            onShowPersonalStats={() => setShowPersonalStats(true)}
+            onShowUserManagement={() => {
+              setShowUserManagement(true);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }}
+          />
         </>
       )}
 
@@ -431,7 +364,7 @@ function Main() {
           (
             <Suspense fallback={null}>
               <div className='size-7/12  mx-auto'>
-                <Animation animationData={shrugAnimationData} />
+                <Lottie animationData={animationDataShrug} />
                 <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
               </div>
             </Suspense>
@@ -444,7 +377,7 @@ function Main() {
         <Suspense fallback={null}>
           <div className='popup flex justify-center items-center'>
             <div className='w-[50%]'>
-              <Animation animationData={deniedAnimationData} />
+              <Lottie animationData={animationDataForbidden} />
               <p className='text-center dark:text-white'>Недостаточно прав!</p>
             </div>
           </div>
@@ -472,16 +405,6 @@ function Main() {
           </div>
         </Suspense>
       )}
-
-      <ToastContainer
-        position='bottom-center'
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss={false}
-        draggable={false}
-        theme={window.Telegram.WebApp.colorScheme}
-        limit={4}
-      />
 
   </div>
   );

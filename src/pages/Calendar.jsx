@@ -3,22 +3,22 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
-import api from '../services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
-import Loading from './loading';
-import catchResponseError from '../utils/responseError';
+import { Button } from '@/components/ui/button.jsx';
+import Loading from '@/components/loading.jsx';
+import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import updateRota from '../services/updateRota';
+import { getRota, updateRota } from '@/services/api.ts';
 
 // CSS
-import '../styles/WeeklyView.css';
+import '@/styles/WeeklyView.css';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '../styles/gridTheme';
+import gridTheme from '@/styles/gridTheme.js';
 import {
   ModuleRegistry,
   ValidationModule,
@@ -37,7 +37,7 @@ ModuleRegistry.registerModules([
 ]);
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'))
+const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp'))
 
 const today = startOfToday();
 
@@ -48,7 +48,7 @@ function rowIndexToTime(rowIndex) {
 }
 
 
-export default function WeeklyView() {
+export default function Calendar() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -106,7 +106,7 @@ export default function WeeklyView() {
     }
 
     if (value.some(user => user.id === initDataUnsafe.user.id)) {
-      return 'my-duty'
+      return 'bg-input'
     }
   }
 
@@ -203,11 +203,9 @@ export default function WeeklyView() {
 
       for (const day of days) {
         try {
-          const response = await api.get('/api/rota', {
-            params: {
-              branch: branch,
-              date: format(day, 'yyyy-MM-dd')
-            }
+          const response = await getRota({
+            branch,
+            date: format(day, 'yyyy-MM-dd')
           });
           fetchedRotaData.push(response.data);
         } catch (error) {
@@ -305,14 +303,14 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
     updateRota(updateParams)
-      .then((result) => {
+      .then(({ data }) => {
         selectedCellData.rowNode.setDataValue(
           selectedCellData.column,
-          result[rowIndex].users
+          data[rowIndex].users
         );
         setSelectedCellData(prevState => ({
           ...prevState,
-          users: result[rowIndex].users
+          users: data[rowIndex].users
         }));
       })
       .catch(() => {});
@@ -382,9 +380,11 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
               )}
 
               {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
-                <div className='flex justify-between gap-6'>
-                  <button
-                    className='button-primary'
+                <div className='flex justify-between'>
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-4/5 font-semibold"
                     onClick={() => {
                       handleUpdateCell({
                         type: 'add',
@@ -397,18 +397,19 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                     }}
                   >
                     Взять смену
-                  </button>
+                  </Button>
 
                   {rotaAdmin && (
-                    <button
-                      className='button-secondary'
+                    <Button
+                      variant="outline"
+                      size="icon-lg"
                       onClick={() => {
                         setShowSearch(true);
                         window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                       }}
                     >
-                      <UserPlus />
-                    </button>
+                      <UserPlus className='size-6'/>
+                    </Button>
                   )}
                 </div>
               )}

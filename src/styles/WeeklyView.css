@@ -20,15 +20,11 @@
 }
 
 .empty { @apply
-    bg-red-100 dark:bg-[#421212]
+    bg-red-100 dark:bg-[#3a0808]
 }
 
 .empty.gp { @apply
     bg-[#fbe4a2] dark:bg-[#62501d]
-}
-
-.my-duty { @apply
-    bg-[#babec4] dark:bg-[#737387]
 }
 
 .pop-up { @apply
