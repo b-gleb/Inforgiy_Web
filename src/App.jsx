@@ -1,10 +1,13 @@
+import React, { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Main from './pages/Main.jsx';
-import Profile from './pages/Profile.jsx';
-import Calendar from './pages/Calendar.jsx';
-import StatsOverview from './pages/StatsOverview.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// ROUTES
+import Main from './pages/Main.jsx';
+const Profile = lazy(() => import('./pages/Profile.jsx'));
+const Calendar = lazy(() => import('./pages/Calendar.jsx'));
+const StatsOverview = lazy(() => import('./pages/StatsOverview.jsx'));
 
 function App() {
   return (
