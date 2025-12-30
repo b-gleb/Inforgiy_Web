@@ -21,7 +21,7 @@ import '@/styles/App.css';
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp.jsx'));
 const PersonalStats = lazy(() => import('@/components/stats/personalStats.jsx'));
-const Animation = lazy(() => import('@/components/animation.jsx'));
+const Lottie = lazy(() => import("lottie-react"));
 
 
 function Main() {
@@ -364,7 +364,7 @@ function Main() {
           (
             <Suspense fallback={null}>
               <div className='size-7/12  mx-auto'>
-                <Animation animationData={animationDataShrug} />
+                <Lottie animationData={animationDataShrug} />
                 <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
               </div>
             </Suspense>
@@ -377,7 +377,7 @@ function Main() {
         <Suspense fallback={null}>
           <div className='popup flex justify-center items-center'>
             <div className='w-[50%]'>
-              <Animation animationData={animationDataForbidden} />
+              <Lottie animationData={animationDataForbidden} />
               <p className='text-center dark:text-white'>Недостаточно прав!</p>
             </div>
           </div>
