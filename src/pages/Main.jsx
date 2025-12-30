@@ -18,10 +18,6 @@ import { getAuth, getRota } from '@/services/api.ts';
 // CSS
 import '@/styles/App.css';
 
-// Animations
-import shrugAnimationData from "@/assets/shrug.json";
-import deniedAnimationData from "@/assets/denied.json";
-
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp.jsx'));
 const PersonalStats = lazy(() => import('@/components/stats/personalStats.jsx'));
@@ -47,6 +43,38 @@ function Main() {
   const [showPersonalStats, setShowPersonalStats] = useState(false);
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
+
+  // Animations
+  const [animationDataForbidden, setAnimationDataForbidden] = useState(null);
+  const [animationDataShrug, setAnimationDataShrug] = useState(null);
+  useEffect(() => {
+    if (!showForbidden) return;
+
+    const controller = new AbortController();
+
+    import("@/assets/denied.json").then(module => {
+      if (!controller.signal.aborted) {
+        setAnimationDataForbidden(module.default);
+      }
+    });
+
+    return () => controller.abort();
+  }, [showForbidden]);
+
+  useEffect(() => {
+    if (rotaData !== null) return;
+
+    const controller = new AbortController();
+
+    import("@/assets/shrug.json").then(module => {
+      if (!controller.signal.aborted) {
+        setAnimationDataShrug(module.default);
+      }
+    });
+
+    return () => controller.abort();
+  }, [rotaData]);
+
 
 
   // Prevent page refresh to trigger main page opening with the wrong state
@@ -336,7 +364,7 @@ function Main() {
           (
             <Suspense fallback={null}>
               <div className='size-7/12  mx-auto'>
-                <Animation animationData={shrugAnimationData} />
+                <Animation animationData={animationDataShrug} />
                 <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
               </div>
             </Suspense>
@@ -349,7 +377,7 @@ function Main() {
         <Suspense fallback={null}>
           <div className='popup flex justify-center items-center'>
             <div className='w-[50%]'>
-              <Animation animationData={deniedAnimationData} />
+              <Animation animationData={animationDataForbidden} />
               <p className='text-center dark:text-white'>Недостаточно прав!</p>
             </div>
           </div>
