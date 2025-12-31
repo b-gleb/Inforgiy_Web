@@ -3,7 +3,8 @@ import { themeQuartz } from 'ag-grid-community';
 const gridTheme = themeQuartz
     .withParams({
     browserColorScheme: "dark",
-    backgroundColor: "#1f2836",
+    accentColor: "#434343",
+    backgroundColor: "#171717",
     columnBorder: true,
     fontFamily: "inherit",
     fontSize: 10,
@@ -11,7 +12,7 @@ const gridTheme = themeQuartz
     headerFontSize: 10,
     headerFontWeight: 700,
     iconSize: 12,
-    oddRowBackgroundColor: "#1F2836",
+    oddRowBackgroundColor: "#171717",
     spacing: 5,
     wrapperBorderRadius: 0
    }, 'dark')

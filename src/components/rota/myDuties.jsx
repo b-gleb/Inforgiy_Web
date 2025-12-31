@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
 import { format, addDays, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
-
+import { Skeleton } from '@/components/ui/skeleton.jsx';
 import userDuties from '../../services/userDuties.jsx';
 
 function convertToDutyString(hours) {
@@ -81,10 +81,9 @@ export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 
 
 function SkeletonLoader() {
   return (
-    <div className="animate-pulse space-y-2">
-      <div className="h-4 rounded-sm bg-gray-200 dark:bg-gray-400"></div>
-      <div className="h-4 rounded-sm w-5/6 bg-gray-200 dark:bg-gray-400"></div>
-      <div className="h-4 rounded-sm w-4/6 bg-gray-200 dark:bg-gray-400"></div>
+    <div className="space-y-2">
+      <Skeleton className="h-4"/>
+      <Skeleton className="h-4 w-5/6"/>
     </div>
   );
 }
