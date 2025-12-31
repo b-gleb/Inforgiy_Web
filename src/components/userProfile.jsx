@@ -89,7 +89,7 @@ export default function UserProfile(){
                 <Suspense fallback={null}>
                   <MyDutiesCard
                     branch={branch}
-                    user_id={editingUser.id}
+                    userId={editingUser.id}
                     prevDays={14}
                     nextDays={30}
                   />
@@ -126,7 +126,7 @@ export default function UserProfile(){
                 <Suspense fallback={null}>
                   <PersonalStats
                     branch={branch}
-                    user_id={editingUser.id}
+                    userId={editingUser.id}
                   />
                 </Suspense>
               </AccordionContent>
