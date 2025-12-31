@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion"
 
 // Sections
-import UserEditForm from "@/components/rota/userEditForm";
+import UserEditForm from "@/components/profile/userEditForm";
 const PersonalStats = lazy(() => import('@/components/stats/personalStats'));
 const MyDutiesCard = lazy(() => import('@/components/rota/myDuties'));
 const ModifyRotaMulti = lazy(() => import('@/components/rota/modifyRotaMulti'));
