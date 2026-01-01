@@ -71,7 +71,7 @@ export const getUsers = async (params: {
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/users', params);
-  return response;
+  return response.data;
 };
 
 export const updateUser = async (params: {

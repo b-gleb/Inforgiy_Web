@@ -5,7 +5,8 @@ import { ru } from "date-fns/locale";
 import { userColors } from '@/utils/userColors.js';
 
 // API
-import { getUsers, getStats } from '@/services/api.ts';
+import { useGetUsers } from '@/hooks/userHooks';
+import { getStats } from '@/services/api.ts';
 import catchResponseError from '@/utils/responseError';
 
 // AG Grid
@@ -36,12 +37,15 @@ ModuleRegistry.registerModules([
 
 
 export default function StatsOverview() {
+  // TODO: restructure use states
   const location = useLocation();
+  const { branch, initDataUnsafe } = location.state || {};
   const navigate = useNavigate();
   const gridRef = useRef(null);
   let colorFilter = 'all';
   const [colorMap, setColorMap] = useState({'all': 'Все цвета'});
-  const [allUsers, setAllUsers] = useState(null);
+  // TODO: Think of invalidation strategy
+  const {data: allUsers = [], isLoading, isError, error} = useGetUsers({ branch, initDataUnsafe });
   const [columnDefs, setColumnDefs] = useState(null);
   const [rowData, setRowData] = useState(null);
   const [defaultColDef] = useState({
@@ -60,7 +64,6 @@ export default function StatsOverview() {
   });
 
   // Checking if all the neccessary location states exist, otherwise redirect
-  const { branch, initDataUnsafe } = location.state || {};
   const requiredParams = [branch, initDataUnsafe];
   useEffect(() => {
     if (requiredParams.some(param => param === undefined)){
@@ -93,6 +96,10 @@ export default function StatsOverview() {
   useEffect(() => {
     document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
   }, []);
+
+  const allUserIds = useMemo(() => {
+    return allUsers.map(userObj => userObj.id);
+  }, [allUsers]);
 
 
   const autoSizeStrategy = useMemo(() => {
@@ -162,8 +169,6 @@ export default function StatsOverview() {
     const generateTable = async () => {
       try {
         const year = new Date().getFullYear();
-        const { data: allUsers } = await getUsers({ branch, initDataUnsafe });
-        const allUserIds = allUsers.map(userObj => userObj.id);
         const yearlyColumnDefs = generateColumnDefs(year);
         const intervalsToFetch = calculateIntervals(year);
         const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
@@ -171,7 +176,6 @@ export default function StatsOverview() {
         const colors = getColorMap(rows);
 
         setColorMap(colors);
-        setAllUsers(allUserIds);
         setRowData(rows);
         setColumnDefs([
           {
@@ -189,8 +193,10 @@ export default function StatsOverview() {
       };
     };
 
-    generateTable();
-  }, [branch, initDataUnsafe])
+    if (allUserIds.length >= 1) {
+      generateTable();
+    }
+  }, [branch, initDataUnsafe, allUserIds])
 
 
   return (

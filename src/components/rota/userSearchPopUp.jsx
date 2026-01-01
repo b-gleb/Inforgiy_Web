@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 
 // APIs
-import { getUsers, updateRota } from '@/services/api';
+import { useGetUsers } from '@/hooks/userHooks';
+import { updateRota } from '@/services/api';
 
 export default function UserSearchPopUp({ 
   mode,
@@ -18,11 +19,18 @@ export default function UserSearchPopUp({
   handleUpdateCell
 }) {
   const navigate = useNavigate();
-
-  // States for fetching users and managing fuzzy search
-  const [allUsers, setAllUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  // TODO: Should be invalidated by adding/removing a user
+  const {data: allUsers = [], isLoading, isError, error} = useGetUsers({branch, initDataUnsafe});
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Partial search
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return allUsers
+
+    return allUsers.filter(userObj =>
+      userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [allUsers, searchQuery]);
 
   // Telegram UI Back Button
   useEffect(() => {
@@ -33,29 +41,7 @@ export default function UserSearchPopUp({
       window.Telegram.WebApp.BackButton.offClick(onClose);
       window.Telegram.WebApp.BackButton.hide();
     };
-  
   }, [onClose]);
-
-  // Fetch all users
-  useEffect(() => {
-    getUsers({branch, initDataUnsafe})
-      .then(({ data }) => {
-        setAllUsers(data);
-        setFilteredUsers(data)
-      })
-      .catch(() => {});
-
-  }, [branch, initDataUnsafe]);
-
-
-  // Fuzzy search
-  useEffect(() => {
-    const results = allUsers.filter((userObj) =>
-      userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredUsers(results);
-  }, [searchQuery, allUsers]);
-
 
   return (
     <div className="popup">

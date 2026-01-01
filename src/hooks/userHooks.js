@@ -1,7 +1,19 @@
 import { useCallback } from "react";
-import { updateUser, removeUser } from "@/services/api.ts";
+import { useQuery } from '@tanstack/react-query';
+import { getUsers, updateUser, removeUser } from "@/services/api.ts";
 import catchResponseError from '@/utils/responseError';
 import { toast } from "react-toastify";
+
+export function useGetUsers({
+  branch,
+  initDataUnsafe
+}) {
+  return useQuery({
+    queryKey: ['users', branch],
+    queryFn: () => getUsers({ branch, initDataUnsafe }),
+    staleTime: 5 * 60 * 1000
+  })
+};
 
 export const useUpdateUser = () => {
   return useCallback(async (branch, userObj, initDataUnsafe) => {
