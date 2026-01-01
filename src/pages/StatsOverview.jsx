@@ -9,7 +9,7 @@ import { getStats } from '@/services/api.ts';
 import catchResponseError from '@/utils/responseError';
 
 // Utils
-import { calcYearIntervals } from '@/utils/statUtils';
+import { calcYearIntervals, transformStatsOverviewData } from '@/utils/statUtils';
 import { userColors } from '@/utils/userColors.js';
 
 // AG Grid
@@ -122,7 +122,7 @@ export default function StatsOverview() {
       };
 
       const branchStats = await fetchBranchStats(branch, allUsers, intervals);
-      const { rows } = transformData(branchStats);
+      const { rows } = transformStatsOverviewData(branchStats);
 
       // Add new data to already existing columns
       setRowData((prevData) => {
@@ -175,7 +175,7 @@ export default function StatsOverview() {
         const yearlyColumnDefs = generateColumnDefs(year);
         const intervalsToFetch = calcYearIntervals(year);
         const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
-        const { rows } = transformData(branchStats);
+        const { rows } = transformStatsOverviewData(branchStats);
         const colors = getColorMap(rows);
 
         setColorMap(colors);
@@ -321,25 +321,6 @@ function generateColumnDefs(year) {
 
   columnDefs.push(yearColumnDefs);
   return columnDefs;
-};
-
-
-function transformData(data) {
-  const rows = [];
-
-  data.forEach(entry => {
-    const {user, data} = entry;
-    const row = {user};
-    
-    for (const entry of data) {
-      const range = `${entry.dateRange[0].split("T")[0]}_${entry.dateRange[1].split("T")[0]}`;
-      row[range] = entry.count;
-    };
-      
-    rows.push(row);
-  });
-
-  return { rows };
 };
 
 

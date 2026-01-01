@@ -14,3 +14,21 @@ export function calcYearIntervals (year) {
   };
   return intervals;
 };
+
+export function transformStatsOverviewData(data) {
+  const rows = [];
+
+  data.forEach(entry => {
+    const {user, data} = entry;
+    const row = {user};
+    
+    for (const entry of data) {
+      const range = `${entry.dateRange[0].split("T")[0]}_${entry.dateRange[1].split("T")[0]}`;
+      row[range] = entry.count;
+    };
+      
+    rows.push(row);
+  });
+
+  return { rows };
+};
