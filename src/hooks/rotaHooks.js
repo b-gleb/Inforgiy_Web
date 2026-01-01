@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { addDays, subDays, format } from "date-fns";
 import { getUserDuties } from "@/services/api.ts";
 
-
 // TODO: Needs to be invalidated if changed via main or calendar
 // TODO: Understand refetchActive & refetchInactive (see below)
 // queryClient.invalidateQueries({
@@ -16,6 +15,10 @@ export function useUserDuties({
   prevDays = 0,
   nextDays = 14,
 }) {
+  const today = new Date();
+  const startDate = format(subDays(today, prevDays), 'yyyy-MM-dd');
+  const endDate = format(addDays(today, nextDays), 'yyyy-MM-dd');
+
   return useQuery({
     queryKey: [
       'userDuties',
@@ -24,18 +27,12 @@ export function useUserDuties({
       prevDays,
       nextDays,
     ],
-    queryFn: async () => {
-      const today = new Date()
-      const startDate = format(subDays(today, prevDays), 'yyyy-MM-dd')
-      const endDate = format(addDays(today, nextDays), 'yyyy-MM-dd')
-
-      return getUserDuties({
-        branch,
-        userId,
-        startDate,
-        endDate,
-      })
-    },
+    queryFn: () => getUserDuties({
+      branch,
+      userId,
+      startDate,
+      endDate,
+    }),
     enabled: !!branch && !!userId,
     staleTime: 2 * 60 * 1000
   })
