@@ -27,6 +27,7 @@ import deniedAnimationData from "./assets/denied.json";
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('./components/rota/userSearchPopUp.jsx'));
 const PersonalStats = lazy(() => import('./components/statistics/personalStats.jsx'));
+const BranchSummaryStats = lazy(() => import('./components/statistics/branchSummaryStats.jsx'))
 const Animation = lazy(() => import('./components/animation.jsx'));
 
 const departments = {'lns': 'ЛНС', 'gp': 'ГП', 'di': 'ДИ', 'orel': 'Орёл', 'ryaz': 'Рязань'};
@@ -49,6 +50,7 @@ function Main() {
   const [showRota, setShowRota] = useState(true);
   const [showStatDropdown, setShowStatDropdown] = useState(false);
   const [showPersonalStats, setShowPersonalStats] = useState(false);
+  const [showBranchSummaryStats, setShowBranchSummaryStats] = useState(false);
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
 
@@ -371,6 +373,18 @@ function Main() {
                     className='dropdown-button'
                     onClick={() => {
                       window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                      setShowBranchSummaryStats(true);
+                    }}
+                  >
+                    Направление
+                  </button>
+
+                  <div className='border-t border-neutral-300 dark:border-neutral-500'/>
+
+                  <button
+                    className='dropdown-button'
+                    onClick={() => {
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                       navigate('./branchStats', { state: {
                         branch: branch,
                         initDataUnsafe: initDataUnsafe
@@ -476,6 +490,16 @@ function Main() {
             <PersonalStats
               branch={branch}
               userId={initDataUnsafe.user.id}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {showBranchSummaryStats && (
+        <Suspense fallback={null}>
+          <div className='popup'>
+            <BranchSummaryStats
+              branch={branch}
             />
           </div>
         </Suspense>
