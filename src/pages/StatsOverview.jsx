@@ -2,12 +2,15 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
-import { userColors } from '@/utils/userColors.js';
 
 // API
 import { useGetUsers } from '@/hooks/userHooks';
 import { getStats } from '@/services/api.ts';
 import catchResponseError from '@/utils/responseError';
+
+// Utils
+import { calcYearIntervals } from '@/utils/statUtils';
+import { userColors } from '@/utils/userColors.js';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
@@ -170,7 +173,7 @@ export default function StatsOverview() {
       try {
         const year = new Date().getFullYear();
         const yearlyColumnDefs = generateColumnDefs(year);
-        const intervalsToFetch = calculateIntervals(year);
+        const intervalsToFetch = calcYearIntervals(year);
         const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
         const { rows } = transformData(branchStats);
         const colors = getColorMap(rows);
@@ -258,21 +261,6 @@ async function fetchBranchStats (branch, userIds, dateRanges) {
   }
 };
 
-
-function calculateIntervals (year) {
-  const intervals = [];
-  
-  intervals.push([format(new Date(year, 0, 1), 'yyyy-MM-dd'), format(new Date(year, 11, 31), 'yyyy-MM-dd')]);
-
-  const months = Array.from({ length: 12 }, (_, i) => i);
-  for (const month of months) {
-    const monthStart = startOfMonth(new Date(year, month));
-    const monthEnd = endOfMonth(new Date(year, month));
-
-    intervals.push([format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')]);
-  };
-  return intervals;
-}
 
 
 function generateColumnDefs(year) {
