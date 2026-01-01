@@ -30,24 +30,24 @@ function convertToDutyString(hours) {
 }
 
 export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 14 }) {
-  const { duties, loading, error } = useUserDuties({
+  const { data: duties, isLoading, isError, error } = useUserDuties({
     branch,
     userId,
     prevDays,
     nextDays
-  });
+  })
 
   return (
     <div className="w-full mb-3 rounded-xl shadow-lg overflow-hidden bg-linear-to-br from-purple-400 to-purple-600 dark:from-[#7941b2] dark:to-[#3d0273]">
       <div className="px-2 py-3">
         <h2 className="text-lg font-bold text-white mb-2">Мои смены</h2>
-        {loading ? (
+        {isLoading ? (
           <SkeletonLoader />
-        ) : error ? (
+        ) : isError ? (
           <p className='text-sm text-white'>Ошибка загрузки №{error.status}</p>
         ) : (
           <div className="space-y-1">
-            {duties.length > 0
+            {duties && duties.length > 0
             ? 
             duties.map((duty, index) => (
               <p key={index} className="text-sm text-white">

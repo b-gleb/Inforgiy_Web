@@ -47,7 +47,7 @@ export const getUserDuties = async (params: {
   endDate: ISODate;
 }) => {
   const response = await api.get('/api/userDuties', { params });
-  return response;
+  return response.data;
 };
 
 export const updateRota = async (params: {
