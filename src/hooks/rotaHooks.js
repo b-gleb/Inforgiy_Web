@@ -9,12 +9,15 @@ import { getUserDuties } from "@/services/api.ts";
 //   refetchActive: true,  // immediately refetch if component is mounted
 //   refetchInactive: false, // only refetch mounted queries (default: true)
 // });
-export function useUserDuties({
-  branch,
-  userId,
-  prevDays = 0,
-  nextDays = 14,
-}) {
+export function useUserDuties(
+  {
+    branch,
+    userId,
+    prevDays = 0,
+    nextDays = 14,
+  },
+  options = {}
+) {
   const today = new Date();
   const startDate = format(subDays(today, prevDays), 'yyyy-MM-dd');
   const endDate = format(addDays(today, nextDays), 'yyyy-MM-dd');
@@ -34,6 +37,7 @@ export function useUserDuties({
       endDate,
     }),
     enabled: !!branch && !!userId,
-    staleTime: 2 * 60 * 1000
+    staleTime: 2 * 60 * 1000,
+    ...options
   })
 };

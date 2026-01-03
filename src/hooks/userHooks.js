@@ -4,14 +4,15 @@ import { getUsers, updateUser, removeUser } from "@/services/api.ts";
 import catchResponseError from '@/utils/responseError';
 import { toast } from "react-toastify";
 
-export function useGetUsers({
-  branch,
-  initDataUnsafe
-}) {
+export function useGetUsers(
+  { branch, initDataUnsafe },
+  options = {}
+) {
   return useQuery({
     queryKey: ['users', branch],
     queryFn: () => getUsers({ branch, initDataUnsafe }),
-    staleTime: 5 * 60 * 1000
+    staleTime: 5 * 60 * 1000,
+    ...options
   })
 };
 
