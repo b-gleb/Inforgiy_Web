@@ -62,6 +62,33 @@ export const updateRota = async (params: {
   return response;
 };
 
+export const addRotaMulti = async (params: {
+  branch: Branch;
+  startDate: ISODate;
+  endDate: ISODate;
+  timeRanges: string[];
+  daysOfWeek: number[];
+  userId: UserId;
+  allowOccupiedSlots?: Boolean;
+  initDataUnsafe: InitDataUnsafe;
+}) => {
+  const response = await api.post('/api/addRotaMulti', params);
+  return response.data;
+};
+
+export const removeRotaMulti = async (params: {
+  branch: Branch;
+  startDate: ISODate;
+  endDate: ISODate;
+  timeRanges: string[];
+  daysOfWeek: number[];
+  userId: UserId;
+  initDataUnsafe: InitDataUnsafe;
+}) => {
+  const response = await api.post('/api/removeRotaMulti', params);
+  return response.data;
+};
+
 // ///// //
 // USERS //
 // ///// //
