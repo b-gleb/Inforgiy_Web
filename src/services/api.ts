@@ -102,7 +102,7 @@ export const getStats = async (params: {
   dateRanges: DateRange[];
 }) => {
   const response = await api.post('/api/stats', params);
-  return response;
+  return response.data;
 };
 
 export const getStatsCumulative = async (params: {

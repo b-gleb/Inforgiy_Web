@@ -5,6 +5,7 @@ import { ru } from "date-fns/locale";
 
 // API
 import { useGetUsers } from '@/hooks/userHooks';
+import { useGetStats } from '@/hooks/statHooks';
 import { getStats } from '@/services/api.ts';
 import catchResponseError from '@/utils/responseError';
 
@@ -38,17 +39,41 @@ ModuleRegistry.registerModules([
 ]);
 
 
-
+// TODO: restructure use states
+// TODO: Think of invalidation strategy
 export default function StatsOverview() {
-  // TODO: restructure use states
   const location = useLocation();
   const { branch, initDataUnsafe } = location.state || {};
   const navigate = useNavigate();
   const gridRef = useRef(null);
+
+  const year = new Date().getFullYear();
+  const yearlyColumnDefs = useMemo(() => generateColumnDefs(year), [year]);
+  const dateRanges = useMemo(() => calcYearIntervals(year), [year]);
+
   let colorFilter = 'all';
   const [colorMap, setColorMap] = useState({'all': 'Все цвета'});
-  // TODO: Think of invalidation strategy
-  const {data: allUsers = [], isLoading, isError, error} = useGetUsers({ branch, initDataUnsafe });
+  const { data: userIds = [] } = useGetUsers(
+    { branch, initDataUnsafe },
+    { select: users => users.map(user => user.id) }
+  );
+
+  const { data } = useGetStats(
+    { branch, userIds, dateRanges },
+    {
+      select: stats => {
+      const transformed = transformStatsOverviewData(stats);
+
+      return {
+        stats: transformed,
+        colors: getColorMap(transformed),
+      };
+    },
+      enabled: userIds.length >= 1
+    }
+  );
+
+
   const [columnDefs, setColumnDefs] = useState(null);
   const [rowData, setRowData] = useState(null);
   const [defaultColDef] = useState({
@@ -100,11 +125,6 @@ export default function StatsOverview() {
     document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
   }, []);
 
-  const allUserIds = useMemo(() => {
-    return allUsers.map(userObj => userObj.id);
-  }, [allUsers]);
-
-
   const autoSizeStrategy = useMemo(() => {
     return {
       type: 'fitCellContents'
@@ -121,7 +141,7 @@ export default function StatsOverview() {
         intervals.push([colIdSplit[0], colIdSplit[1]]);
       };
 
-      const branchStats = await fetchBranchStats(branch, allUsers, intervals);
+      const branchStats = await fetchBranchStats(branch, userIds, intervals);
       const { rows } = transformStatsOverviewData(branchStats);
 
       // Add new data to already existing columns
@@ -138,7 +158,7 @@ export default function StatsOverview() {
       const colArray = params.columnGroup.children.map(col => col.getId());
       params.api.autoSizeColumns(colArray)
     }
-  }, [branch, allUsers]);
+  }, [branch, userIds]);
 
 
   const isExternalFilterPresent = useCallback(() => {
@@ -169,37 +189,22 @@ export default function StatsOverview() {
 
 
   useEffect(() => {
-    const generateTable = async () => {
-      try {
-        const year = new Date().getFullYear();
-        const yearlyColumnDefs = generateColumnDefs(year);
-        const intervalsToFetch = calcYearIntervals(year);
-        const branchStats = await fetchBranchStats(branch, allUserIds, intervalsToFetch);
-        const { rows } = transformStatsOverviewData(branchStats);
-        const colors = getColorMap(rows);
+    if (!data) return;
 
-        setColorMap(colors);
-        setRowData(rows);
-        setColumnDefs([
-          {
-            field: "user",
-            headerName: "Позывной",
-            pinned: 'left',
-            filter: null,
-            valueGetter: (params) => params.data.user?.nick || '???',
-            cellClass: null
-          },
-          ...yearlyColumnDefs
-        ]);
-      } catch (error) {
-        
-      };
-    };
-
-    if (allUserIds.length >= 1) {
-      generateTable();
-    }
-  }, [branch, initDataUnsafe, allUserIds])
+    setRowData(data.stats);
+    setColumnDefs([
+      {
+        field: "user",
+        headerName: "Позывной",
+        pinned: 'left',
+        filter: null,
+        valueGetter: (params) => params.data.user?.nick || '???',
+        cellClass: null
+      },
+      ...yearlyColumnDefs
+    ]);
+    setColorMap(data.colors);
+  }, [data, yearlyColumnDefs])
 
 
   return (

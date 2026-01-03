@@ -30,5 +30,5 @@ export function transformStatsOverviewData(data) {
     rows.push(row);
   });
 
-  return { rows };
+  return rows;
 };
