@@ -18,7 +18,7 @@ import { useRemoveUser, useUpdateUser } from '@/hooks/userHooks.js';
 export default function UserEditForm({ branch, User, initDataUnsafe }){
   const navigate = useNavigate();
   const [editingUser, setEditingUser] = useState(User);
-  const updateUser = useUpdateUser();
+  const { mutate: updateUser} = useUpdateUser();
   const removeUser = useRemoveUser();
 
   const handleChange = (e) => {
@@ -36,21 +36,16 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const result = await updateUser(
-        branch,
-        editingUser,
-        initDataUnsafe
-      );
-
-      navigate('/Inforgiy_Web/', { state: {
-        showUserManagement: true
-      } });
-    }
-    catch {
-      // error handled by hook
-    }
+    updateUser(
+      {branch, userObj: editingUser, initDataUnsafe},
+      {
+        onSuccess: (data) => {
+          navigate('/Inforgiy_Web/', { state: {
+            showUserManagement: true
+          } });
+        }
+      }
+    )
   };
 
   return(

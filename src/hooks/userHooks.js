@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUsers, updateUser, removeUser } from "@/services/api.ts";
 import catchResponseError from '@/utils/responseError';
 import { toast } from "react-toastify";
@@ -16,32 +16,30 @@ export function useGetUsers(
   })
 };
 
-export const useUpdateUser = () => {
-  return useCallback(async (branch, userObj, initDataUnsafe) => {
-    try {
-      const response = await updateUser({
-        branch , userObj, initDataUnsafe
-      });
+export const useUpdateUser = (options = {}) => {
+  const queryClient = useQueryClient();
 
+  return useMutation({
+    mutationFn: updateUser,
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries(['users', variables.branch]);
       toast.success('Пользователь обновлен!');
       window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 
-      return response;
-
-    } catch (error) {
+      if (options.onSuccess) {
+        options.onSuccess(data, variables, context);
+      }
+    },
+    onError: (error) => {
       if (error.response.status === 404) {
         toast.warn('Пользователь не найден!');
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-        return null;
+      } else {
+        catchResponseError(error);
       }
-
-      // show general toast for all other error types
-      catchResponseError(error);
-      throw error;
-    }
-
-
-  }, []);
+    },
+    ...options
+  })
 };
 
 export const useRemoveUser = () => {

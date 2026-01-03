@@ -80,7 +80,7 @@ export const updateUser = async (params: {
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/updateUser', params);
-  return response;
+  return response.data;
 };
 
 export const removeUser = async (params: {
