@@ -1,7 +1,6 @@
 import { useState} from 'react';
 import api from '@/services/api.ts';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { eachDayOfInterval } from 'date-fns';
 import { ru } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
