@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUsers, updateUser, removeUser } from "@/services/api.ts";
 import catchResponseError from '@/utils/responseError';
@@ -42,22 +41,22 @@ export const useUpdateUser = (options = {}) => {
   })
 };
 
-export const useRemoveUser = () => {
-  return useCallback(async (branch, userId, initDataUnsafe) => {
-    try {
-      const response = await removeUser({
-        branch, userId, initDataUnsafe
-      });
+export const useRemoveUser = (options = {}) => {
+  const queryClient = useQueryClient();
 
-      if (response.status === 204) {
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-        toast.success("Пользователь удален!");
+  return useMutation({
+    mutationFn: removeUser,
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries(['users', variables.branch]);
+      toast.success("Пользователь удален!");
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+
+      if (options.onSuccess) {
+        options.onSuccess(data, variables, context);
       }
-
-      return response;
-    } catch (error) {
+    },
+    onError: (error) => {
       catchResponseError(error);
-      throw error;
     }
-  }, []);
+  });
 };

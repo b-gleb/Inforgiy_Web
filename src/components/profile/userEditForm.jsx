@@ -19,7 +19,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
   const navigate = useNavigate();
   const [editingUser, setEditingUser] = useState(User);
   const { mutate: updateUser} = useUpdateUser();
-  const removeUser = useRemoveUser();
+  const { mutate: removeUser } = useRemoveUser();
 
   const handleChange = (e) => {
     const {name, value} = e.target;
@@ -110,14 +110,14 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
             variant="outline"
             size="icon-lg"
             className="flex-none"
-            onClick={async () => {
-              try {
-                await removeUser(branch, editingUser.id, initDataUnsafe);
-                navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
-              } catch {
-                // error handled by hook
-              }   
-            }}
+            onClick={() => removeUser(
+              { branch, userId: editingUser.id, initDataUnsafe },
+              {
+                onSuccess: (data) => {
+                  navigate('/Inforgiy_Web/', { state: { showUserManagement: true } })
+                }
+              }
+            )}
           >
             <Trash2 color='red' className="size-6"/>
           </Button>

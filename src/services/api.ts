@@ -89,7 +89,7 @@ export const removeUser = async (params: {
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/removeUser', params);
-  return response;
+  return response.data;
 };
 
 // ///// //
