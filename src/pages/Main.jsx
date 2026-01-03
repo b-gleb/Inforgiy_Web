@@ -19,7 +19,7 @@ import { getAuth, getRota } from '@/services/api.ts';
 import '@/styles/App.css';
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp.jsx'));
+const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp.jsx'));
 const PersonalStats = lazy(() => import('@/components/stats/personalStats.jsx'));
 const Lottie = lazy(() => import("lottie-react"));
 

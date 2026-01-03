@@ -7,7 +7,7 @@ import { User, Plus } from 'lucide-react';
 import { updateRota } from '@/services/api.ts';
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('./userSearchPopUp'))
+const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp'))
 
 export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
   const today = format(new Date(), 'yyyy-MM-dd')

@@ -37,7 +37,7 @@ ModuleRegistry.registerModules([
 ]);
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('@/components/rota/userSearchPopUp'))
+const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp'))
 
 const today = startOfToday();
 
