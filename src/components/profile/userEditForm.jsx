@@ -34,7 +34,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }){
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     updateUser(
       {branch, userObj: editingUser, initDataUnsafe},
