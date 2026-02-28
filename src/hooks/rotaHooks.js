@@ -48,7 +48,7 @@ export const useAddRotaMulti = (options = {}) => {
   return useMutation({
     mutationFn: addRotaMulti,
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries(['rota', variables.branch]);
+      queryClient.invalidateQueries({queryKey: ['rota', variables.branch]});
 
       if (options.onSuccess) {
         options.onSuccess(data, variables, context);
@@ -67,7 +67,7 @@ export const useRemoveRotaMulti = (options = {}) => {
   return useMutation({
     mutationFn: removeRotaMulti,
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries(['rota', variables.branch]);
+      queryClient.invalidateQueries({queryKey: ['rota', variables.branch]});
 
       if (options.onSuccess) {
         options.onSuccess(data, variables, context);

@@ -21,7 +21,7 @@ export const useUpdateUser = (options = {}) => {
   return useMutation({
     mutationFn: updateUser,
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries(['users', variables.branch]);
+      queryClient.invalidateQueries({queryKey: ['users', variables.branch]});
       toast.success('Пользователь обновлен!');
       window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
 
@@ -47,7 +47,7 @@ export const useRemoveUser = (options = {}) => {
   return useMutation({
     mutationFn: removeUser,
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries(['users', variables.branch]);
+      queryClient.invalidateQueries({queryKey: ['users', variables.branch]});
       toast.success("Пользователь удален!");
       window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
 
