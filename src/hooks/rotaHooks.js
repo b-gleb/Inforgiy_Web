@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { addDays, subDays, format } from "date-fns";
-import { getUserDuties, addRotaMulti, removeRotaMulti } from "@/services/api.ts";
+import { getUserDuties, updateRota, addRotaMulti, removeRotaMulti } from "@/services/api.ts";
+import catchResponseError from '@/utils/responseError';
 
-// TODO: Needs to be invalidated if changed via main or calendar
 // TODO: Understand refetchActive & refetchInactive (see below)
 // queryClient.invalidateQueries({
 //   queryKey: ['userDuties'],
@@ -40,6 +40,25 @@ export function useUserDuties(
     staleTime: 2 * 60 * 1000,
     ...options
   })
+};
+
+export const useUpdateRota = (options = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateRota,
+    onSuccess: (data, variables, context) => {
+      // TODO: check invalidation is ok after GET rota is added to react-query
+      queryClient.invalidateQueries({queryKey: ['rota', variables.branch, variables.date]});
+      queryClient.invalidateQueries({queryKey: ['userDuties', variables.branch, variables.userId]})
+
+      if (options.onSuccess) {
+        options.onSuccess(data, variables, context);
+      }
+    },
+    onError: (error) => catchResponseError(error),
+    ...options
+  });
 };
 
 export const useAddRotaMulti = (options = {}) => {

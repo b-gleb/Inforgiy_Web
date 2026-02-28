@@ -4,13 +4,15 @@ import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
 
 // API
-import { updateRota } from '@/services/api.ts';
+import { useUpdateRota } from '@/hooks/rotaHooks';
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp'))
 
 export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
-  const today = format(new Date(), 'yyyy-MM-dd')
+  const {mutate: updateRota} = useUpdateRota();
+  // TODO: today and display logic it trigers needs to be moved out of the component
+  const today = format(new Date(), 'yyyy-MM-dd');
   const [showSearch, setShowSearch] = useState(false);
 
   let hourContainerClass = "hour-container";
@@ -64,19 +66,22 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
                 <button
                   className="ml-2"
                     onClick={() => {
-                      updateRota({
-                        type: 'remove',
-                        branch,
-                        date,
-                        timeRange: dutyHour.label,
-                        userId: userObj.id,
-                        initDataUnsafe
-                      })
-                        .then(({ data }) => {
-                          setRotaData(data);
-                          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                        })
-                        .catch(() => {});
+                      updateRota(
+                        {
+                          type: 'remove',
+                          branch,
+                          date,
+                          timeRange: dutyHour.label,
+                          userId: userObj.id,
+                          initDataUnsafe
+                        },
+                        {
+                          onSuccess: (data, variable, context) => {
+                            setRotaData(data);
+                            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                          }
+                        }
+                      )
                     }}
                 >
                   ✕
@@ -105,17 +110,22 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
           <button
             className='p-1'
             onClick={() => {
-              updateRota({
+              updateRota(
+                {
                   type: 'add',
                   branch,
                   date,
                   timeRange: dutyHour.label,
                   userId: initDataUnsafe.user.id,
                   initDataUnsafe
-                })
-                .then(({data}) => {setRotaData(data)})
-                .catch(() => {});
-              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                },
+                {
+                  onSuccess: (data, variables, context) => {
+                    setRotaData(data);
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                  }
+                }
+              )
             }}
           >
               <Plus size={15} className="icon-text"/>

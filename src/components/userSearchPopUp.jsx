@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 // APIs
 import { useGetUsers } from '@/hooks/userHooks';
-import { updateRota } from '@/services/api';
+import { useUpdateRota } from '@/hooks/rotaHooks';
 
 export default function UserSearchPopUp({ 
   mode,
@@ -21,6 +21,7 @@ export default function UserSearchPopUp({
   const navigate = useNavigate();
   // TODO: Should be invalidated by adding/removing a user
   const {data: allUsers = [], isLoading, isError, error} = useGetUsers({branch, initDataUnsafe});
+  const { mutate: updateRota } = useUpdateRota();
   const [searchQuery, setSearchQuery] = useState("");
 
   // Partial search
@@ -92,18 +93,23 @@ export default function UserSearchPopUp({
               className="w-full dark:text-white"
               onClick={() => {
                 if (mode === 'rota'){
-                  updateRota({
+                  updateRota(
+                    {
                       type: 'add',
-                      branch: branch,
-                      date: date,
-                      timeRange: timeRange,
+                      branch,
+                      date,
+                      timeRange,
                       userId: userObj.id,
-                      initDataUnsafe: initDataUnsafe
-                    })
-                    .then(({ data }) => {setRotaData(data)})
-                    .catch(() => {});
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                  onClose();
+                      initDataUnsafe
+                    },
+                    {
+                      onSuccess: (data, variable, context) => {
+                        setRotaData(data);
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                        onClose();
+                      }
+                    }
+                  )
                 } else if (mode === 'user_management'){
                   window.Telegram.WebApp.BackButton.offClick(onClose);
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('light');

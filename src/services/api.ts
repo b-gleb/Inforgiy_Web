@@ -59,7 +59,7 @@ export const updateRota = async (params: {
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/updateRota', params);
-  return response;
+  return response.data;
 };
 
 export const addRotaMulti = async (params: {

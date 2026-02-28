@@ -11,7 +11,8 @@ import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import { getRota, updateRota } from '@/services/api.ts';
+import { useUpdateRota } from '@/hooks/rotaHooks';
+import { getRota } from '@/services/api.ts';
 
 // CSS
 import '@/styles/WeeklyView.css';
@@ -289,6 +290,7 @@ export default function Calendar() {
 
 function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
   const [showSearch, setShowSearch] = useState(false);
+  const { mutate: updateRota } = useUpdateRota();
 
   let date;
   let rowIndex;
@@ -302,9 +304,11 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
     updateParams.date = selectedCellData.column.colDef.field;
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
-    updateRota(updateParams)
-      .then(({ data }) => {
-        selectedCellData.rowNode.setDataValue(
+    updateRota(
+      updateParams,
+      {
+        onSuccess: (data, variable, context) => {
+          selectedCellData.rowNode.setDataValue(
           selectedCellData.column,
           data[rowIndex].users
         );
@@ -312,8 +316,9 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
           ...prevState,
           users: data[rowIndex].users
         }));
-      })
-      .catch(() => {});
+        }
+      }
+    )
   };
 
   return (
