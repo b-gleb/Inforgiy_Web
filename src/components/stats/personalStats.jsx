@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Chart from "react-apexcharts";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -8,7 +8,8 @@ import StatCard from '@/components/stats/StatCard.jsx';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // API
-import { getStats, getStatsCumulative } from '@/services/api.ts';
+import { useGetStats } from '@/hooks/statHooks.js';
+import { getStatsCumulative } from '@/services/api.ts';
 import catchResponseError from '../../utils/responseError.jsx';
 
 function getWeekRange (date) {
@@ -32,45 +33,35 @@ function getYearRange (date) {
 
 export default function PersonalStats({ branch, userId }) {
   // CARDS
-  const [personalStatsData, setPersonalStatsData] = useState(null);
+  const now = new Date();
 
-  useEffect(() => {
-    const now = new Date();
+  const { data: personalStatsResponse } = useGetStats({
+    branch,
+    userIds: [userId],
+    dateRanges: [
+      getWeekRange(now),
+      getWeekRange(subWeeks(now, 1)),
+      getMonthRange(now),
+      getMonthRange(subMonths(now, 1)),
+      getYearRange(now)
+    ]
+  })
 
-    const fetchPersonalStats = async () => {
-      try {
-        const response = await getStats({
-          branch,
-          userIds: [userId],
-          dateRanges: [
-            getWeekRange(now),
-            getWeekRange(subWeeks(now, 1)),
-            getMonthRange(now),
-            getMonthRange(subMonths(now, 1)),
-            getYearRange(now)
-          ]
-        });
+  const personalStatsData = useMemo(() => {
+    if (!personalStatsResponse) return null;
 
-        const stats  = response.data[0].data;
-        setPersonalStatsData({
-          currentWeek: stats[0].count,
-          previousWeek: stats[1].count,
-          currentMonth: stats[2].count,
-          previousMonth: stats[3].count,
-          currentYear: stats[4].count
-        });
+    const stats = personalStatsResponse[0].data;
 
-      } catch (error) {
-        catchResponseError(error);
-      }
+    return {
+      currentWeek: stats[0]?.count,
+      previousWeek: stats[1]?.count,
+      currentMonth: stats[2]?.count,
+      previousMonth: stats[3]?.count,
+      currentYear: stats[4]?.count
     };
-
-    fetchPersonalStats();
-  }, [branch, userId])
-
+  }, [personalStatsResponse]);
 
   // Weekly Bars
-  const [weeklyChartSeries, setWeeklyChartSeries] = useState(null);
   const [weeklyChartOptions, setWeeklyChartOptions] = useState({
     chart: {
       id: "weekly-chart",
@@ -96,53 +87,44 @@ export default function PersonalStats({ branch, userId }) {
     colors: ["#F69200"],
   });
 
+  const weekRanges = useMemo(() => {
+    const date = subWeeks(new Date(), 11);
+    const ranges = [];
 
-  useEffect(() => {
-    const XWeekRanges = (weeks) => {
-      const date = subWeeks(new Date(), weeks);
-      const ranges = [];
+    for (let i = 0; i <= 11; i++) {
+      ranges.push(getWeekRange(addWeeks(date, i)));
+    }
 
-      for (let i = 0; i <= weeks; i++) {
-        ranges.push(getWeekRange(addWeeks(date, i)))
-      };
-      return ranges;
-    };
+    return ranges;
+  }, []);
 
-    const fetchWeeklyStats = async () => {
-      try {
-        const weekRanges = XWeekRanges(11);
-        
-        const response = await getStats({
-          branch: branch,
-          userIds: [userId],
-          dateRanges: weekRanges
-        });
+  const { data: weeklyStatsResponse } = useGetStats({
+    branch,
+    userIds: [userId],
+    dateRanges: weekRanges
+  });
 
-        setWeeklyChartSeries([{
-          name: response.data[0].user.nick,
-          data: response.data[0].data.map(item => item.count)
-        }]);
+  const weeklyChartSeries = useMemo(() => {
+    if (!weeklyStatsResponse) return null;
 
-        setWeeklyChartOptions(prevOptions => ({
-          ...prevOptions,
-          xaxis: {
-            categories: weekRanges.map(range => format(parseISO(range[0]), 'dd LLL', { locale: ru })),
-            labels: {
-              style: {
-                colors: '#808080',
-                fontSize: '12px',
-              }
-            }
+    setWeeklyChartOptions(prevOptions => ({
+      ...prevOptions,
+      xaxis: {
+        categories: weekRanges.map(range => format(parseISO(range[0]), 'dd LLL', { locale: ru })),
+        labels: {
+          style: {
+            colors: '#808080',
+            fontSize: '12px',
           }
-        }));
-      
-      } catch (error) {
-        catchResponseError(error);
-      };
-    };
+        }
+      }
+    }));
 
-    fetchWeeklyStats();  
-  }, [branch, userId])
+    return [{
+      name: weeklyStatsResponse[0]?.user?.nick,
+      data: weeklyStatsResponse[0]?.data?.map(item => item.count)
+    }];
+  }, [weeklyStatsResponse]);
 
 
   // Cumulative month stats
