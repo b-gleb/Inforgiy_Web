@@ -13,7 +13,8 @@ import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import { getAuth, getRota } from '@/services/api.ts';
+import { useRota } from '@/hooks/rotaHooks';
+import { getAuth } from '@/services/api.ts';
 
 // CSS
 import '@/styles/App.css';
@@ -29,8 +30,6 @@ function Main() {
   const location = useLocation();
 
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
-  const [rotaData, setRotaData] = useState([]);
-  const [secondaryRotaData, setSecondaryRotaData] = useState([]);
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(sessionStorage.getItem('date') || format(new Date(), 'yyyy-MM-dd'));
   const [userBranches, setUserBranches] = useState(null);
@@ -47,6 +46,7 @@ function Main() {
   // Animations
   const [animationDataForbidden, setAnimationDataForbidden] = useState(null);
   const [animationDataShrug, setAnimationDataShrug] = useState(null);
+  // TODO: rework
   useEffect(() => {
     if (!showForbidden) return;
 
@@ -61,8 +61,25 @@ function Main() {
     return () => controller.abort();
   }, [showForbidden]);
 
+  const { 
+    data: rotaData,
+    isLoading: isRotaLoading,
+    isError: isRotaError,
+    error: rotaError,
+  } = useRota({ branch, date });
+
+  const { data: secondaryRotaResponse } = useRota(
+    { branch: 'gp', date },
+    { enabled: branch === 'di'}
+  );
+
+  const secondaryRotaData =
+  branch === 'di'
+    ? secondaryRotaResponse?.data ?? []
+    : [];
+
   useEffect(() => {
-    if (rotaData !== null) return;
+    if (rotaError?.status !== 404) return;
 
     const controller = new AbortController();
 
@@ -73,7 +90,7 @@ function Main() {
     });
 
     return () => controller.abort();
-  }, [rotaData]);
+  }, [rotaError]);
 
 
 
@@ -202,40 +219,6 @@ function Main() {
     };
   }, [initDataUnsafe]);
 
-  
-  useEffect(() => {
-    const fetchRotaData = async () => {
-      // Prevent fetching data on mount when branch is not defined
-      if (branch === null) {
-        return
-      }
-
-      try {
-        const response = await getRota({branch, date});
-        setRotaData(response.data);
-
-        if (branch === 'di') {
-          const responseSecondary = await getRota({branch: 'gp', date})
-          setSecondaryRotaData(responseSecondary.data);
-        } else {
-          setSecondaryRotaData([])
-        };
-
-      } catch (error) {
-
-        if (error.response.status === 404){
-          setRotaData(null);
-        } else {
-        catchResponseError(error);
-        }
-
-      }
-    };
-  
-    fetchRotaData();
-    setShowStatDropdown(false);
-  }, [branch, date]);
-
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       const newDate = format(addDays(new Date(date), 1), 'yyyy-MM-dd');
@@ -280,7 +263,6 @@ function Main() {
       transition: { duration: 0.4, ease: 'easeOut' },
     }),
   };
-
 
 
   return (
@@ -330,48 +312,51 @@ function Main() {
         userId={initDataUnsafe?.user?.id ?? null}
       />
 
-      {userBranches !== null
-      ? rotaData !== null
-        ? <AnimatePresence custom={swipeDirection}>
-          {showRota && (
-            <motion.div 
-              {...swipeHandlers}
-              className='hours-grid'
-              key={date}
-              custom={swipeDirection}
-              variants={animationVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
-              {rotaData.map((dutyHour, index) => (
-                <RotaHour
-                  key={index}
-                  branch={branch}
-                  date={date}
-                  dutyHour={dutyHour}
-                  secondaryDutyHour={secondaryRotaData[index]}
-                  rotaAdmin={rotaAdmin.includes(branch)}
-                  maxDuties={userBranches[branch].maxDuties}
-                  initDataUnsafe={initDataUnsafe}
-                  setRotaData={setRotaData}
-                />
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-        :
-          (
-            <Suspense fallback={null}>
-              <div className='size-7/12  mx-auto'>
-                <Lottie animationData={animationDataShrug} />
-                <p className='text-center dark:text-white'>График за этот день недоступен :(</p>
-              </div>
-            </Suspense>
-          )
-      :
-      <></>
-      }
+      {userBranches !== null && (
+        // TODO: Add loading screen
+        isRotaLoading ? (
+          <div className="flex justify-center items-center h-full">
+            <p className="dark:text-white">Загрузка...</p>
+          </div>
+        ) : isRotaError ? (
+          <Suspense fallback={null}>
+            <div className='size-7/12 mx-auto'>
+              <Lottie animationData={animationDataShrug} />
+              <p className='text-center dark:text-white'>
+                График за этот день недоступен :(
+              </p>
+            </div>
+          </Suspense>
+        ) : (
+          <AnimatePresence custom={swipeDirection}>
+            {showRota && (
+              <motion.div 
+                {...swipeHandlers}
+                className='hours-grid'
+                key={date}
+                custom={swipeDirection}
+                variants={animationVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+              >
+                {(rotaData ?? []).map((dutyHour, index) => (
+                  <RotaHour
+                    key={index}
+                    branch={branch}
+                    date={date}
+                    dutyHour={dutyHour}
+                    secondaryDutyHour={secondaryRotaData[index]}
+                    rotaAdmin={rotaAdmin.includes(branch)}
+                    maxDuties={userBranches[branch].maxDuties}
+                    initDataUnsafe={initDataUnsafe}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )
+      )}
 
       {showForbidden && (
         <Suspense fallback={null}>
@@ -405,7 +390,6 @@ function Main() {
           </div>
         </Suspense>
       )}
-
   </div>
   );
 }

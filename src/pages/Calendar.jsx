@@ -1,5 +1,6 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueries } from '@tanstack/react-query';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
@@ -8,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Custom components
 import { Button } from '@/components/ui/button.jsx';
 import Loading from '@/components/loading.jsx';
-import catchResponseError from '@/utils/responseError.jsx';
 
 // API
 import { useUpdateRota } from '@/hooks/rotaHooks';
@@ -255,7 +255,7 @@ export default function Calendar() {
 
   return (
     <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
-      {isLoading && <Loading />}
+      {isRotaLoading && <Loading />}
 
       {rowData && (
         <div className='w-full h-full fixed inset-0'>
@@ -290,7 +290,8 @@ export default function Calendar() {
 
 function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
   const [showSearch, setShowSearch] = useState(false);
-  const { mutate: updateRota } = useUpdateRota();
+  // 'inactive' is set to prevent table reload when mutating rota data
+  const { mutate: updateRota } = useUpdateRota({}, 'inactive');
 
   let date;
   let rowIndex;
@@ -309,13 +310,16 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
       {
         onSuccess: (data, variable, context) => {
           selectedCellData.rowNode.setDataValue(
-          selectedCellData.column,
-          data[rowIndex].users
-        );
-        setSelectedCellData(prevState => ({
-          ...prevState,
-          users: data[rowIndex].users
-        }));
+            selectedCellData.column,
+            data[rowIndex].users
+          );
+
+          setSelectedCellData(prevState => ({
+            ...prevState,
+            users: data[rowIndex].users
+          }));
+
+          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
         }
       }
     )
@@ -371,8 +375,6 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                             userId: user.id,
                             initDataUnsafe: initDataUnsafe
                           })
-                          .then(window.Telegram.WebApp.HapticFeedback.impactOccurred('light'))
-                          .catch(() => {});
                         }}
                       >
                         ✕
@@ -397,8 +399,6 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                         userId: initDataUnsafe.user.id,
                         initDataUnsafe: initDataUnsafe
                       })
-                      .then(window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'))
-                      .catch(() => {})
                     }}
                   >
                     Взять смену

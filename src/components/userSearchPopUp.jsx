@@ -15,7 +15,6 @@ export default function UserSearchPopUp({
   date,
   timeRange,
   onClose,
-  setRotaData,
   handleUpdateCell
 }) {
   const navigate = useNavigate();
@@ -104,7 +103,6 @@ export default function UserSearchPopUp({
                     },
                     {
                       onSuccess: (data, variable, context) => {
-                        setRotaData(data);
                         window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                         onClose();
                       }

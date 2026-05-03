@@ -1,14 +1,33 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { addDays, subDays, format } from "date-fns";
-import { getUserDuties, updateRota, addRotaMulti, removeRotaMulti } from "@/services/api.ts";
+import { getRota, getUserDuties, updateRota, addRotaMulti, removeRotaMulti } from "@/services/api.ts";
 import catchResponseError from '@/utils/responseError';
 
-// TODO: Understand refetchActive & refetchInactive (see below)
-// queryClient.invalidateQueries({
-//   queryKey: ['userDuties'],
-//   refetchActive: true,  // immediately refetch if component is mounted
-//   refetchInactive: false, // only refetch mounted queries (default: true)
-// });
+
+export function useRota(
+  {
+    branch,
+    date
+  },
+  options = {}
+) {
+  return useQuery({
+    queryKey: [
+      'rota',
+      branch,
+      date
+    ],
+    queryFn: () => getRota({
+      branch,
+      date
+    }),
+    retry: false,
+    enabled: !!branch,
+    staleTime: 2 * 60 * 1000,
+    ...options
+  })
+};
+
 export function useUserDuties(
   {
     branch,
@@ -42,16 +61,20 @@ export function useUserDuties(
   })
 };
 
-export const useUpdateRota = (options = {}) => {
+export const useUpdateRota = (options = {}, rotaRefetchType = 'active') => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateRota,
     onSuccess: (data, variables, context) => {
-      // TODO: check invalidation is ok after GET rota is added to react-query
-      queryClient.invalidateQueries({queryKey: ['rota', variables.branch, variables.date]});
-      queryClient.invalidateQueries({queryKey: ['userDuties', variables.branch, variables.userId]})
+      if (rotaRefetchType === 'active') {
+        queryClient.setQueryData(['rota', variables.branch, variables.date], data);
+      } else {
+        queryClient.invalidateQueries({queryKey: ['rota', variables.branch, variables.date], refetchType: rotaRefetchType});
+        queryClient.invalidateQueries({queryKey: ['userDuties', variables.branch, variables.userId]});
+      };
 
+      // TODO: Supposdely this oveerides the whole success callback, check across all queries.
       if (options.onSuccess) {
         options.onSuccess(data, variables, context);
       }

@@ -37,7 +37,7 @@ export const getRota = async (params: {
   date: ISODate;
 }) => {
   const response = await api.get('/api/rota', { params });
-  return response;
+  return response.data;
 };
 
 export const getUserDuties = async (params: {

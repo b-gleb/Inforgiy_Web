@@ -9,7 +9,7 @@ import { useUpdateRota } from '@/hooks/rotaHooks';
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp'))
 
-export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, rotaAdmin, maxDuties, initDataUnsafe, setRotaData}) {
+export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, rotaAdmin, maxDuties, initDataUnsafe}) {
   const {mutate: updateRota} = useUpdateRota();
   // TODO: today and display logic it trigers needs to be moved out of the component
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -77,7 +77,6 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
                         },
                         {
                           onSuccess: (data, variable, context) => {
-                            setRotaData(data);
                             window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                           }
                         }
@@ -121,7 +120,6 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
                 },
                 {
                   onSuccess: (data, variables, context) => {
-                    setRotaData(data);
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                   }
                 }
@@ -141,7 +139,6 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
             date={date}
             timeRange={dutyHour.label}
             initDataUnsafe={initDataUnsafe}
-            setRotaData={setRotaData}
             onClose={() => setShowSearch(false)}
           />
         </Suspense>
