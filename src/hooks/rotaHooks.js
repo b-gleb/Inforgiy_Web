@@ -71,8 +71,8 @@ export const useUpdateRota = (options = {}, rotaRefetchType = 'active') => {
         queryClient.setQueryData(['rota', variables.branch, variables.date], data);
       } else {
         queryClient.invalidateQueries({queryKey: ['rota', variables.branch, variables.date], refetchType: rotaRefetchType});
-        queryClient.invalidateQueries({queryKey: ['userDuties', variables.branch, variables.userId]});
-      };
+      }
+      queryClient.invalidateQueries({queryKey: ['userDuties', variables.branch, variables.userId]});
 
       // TODO: Supposdely this oveerides the whole success callback, check across all queries.
       if (options.onSuccess) {
