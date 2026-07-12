@@ -63,9 +63,12 @@ export function useUserDuties(
 
 export const useUpdateRota = (options = {}, rotaRefetchType = 'active') => {
   const queryClient = useQueryClient();
+  const { onSuccess, onError, ...restOptions } = options;
 
   return useMutation({
     mutationFn: updateRota,
+    ...restOptions,
+
     onSuccess: (data, variables, context) => {
       if (rotaRefetchType === 'active') {
         queryClient.setQueryData(['rota', variables.branch, variables.date], data);
@@ -74,50 +77,52 @@ export const useUpdateRota = (options = {}, rotaRefetchType = 'active') => {
       }
       queryClient.invalidateQueries({queryKey: ['userDuties', variables.branch, variables.userId]});
 
-      // TODO: Supposdely this oveerides the whole success callback, check across all queries.
-      if (options.onSuccess) {
-        options.onSuccess(data, variables, context);
-      }
+      onSuccess?.(data, variables, context);
     },
-    onError: (error) => catchResponseError(error),
-    ...options
+
+    onError: (error, variables, context) => {
+      catchResponseError(error);
+      onError?.(error, variables, context);
+    },
   });
 };
 
 export const useAddRotaMulti = (options = {}) => {
   const queryClient = useQueryClient();
+  const { onSuccess, onError, ...restOptions } = options;
 
   return useMutation({
     mutationFn: addRotaMulti,
+    ...restOptions,
+
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({queryKey: ['rota', variables.branch]});
+      onSuccess?.(data, variables, context);
+    },
 
-      if (options.onSuccess) {
-        options.onSuccess(data, variables, context);
-      }
+    onError: (error, variables, context) => {
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
+      onError?.(error, variables, context);
     },
-    onError: (error) => {
-      window.Telegram.WebApp.HapticFeedback.notificationOccurred("error")
-    },
-    ...options
   });
 };
 
 export const useRemoveRotaMulti = (options = {}) => {
   const queryClient = useQueryClient();
+  const { onSuccess, onError, ...restOptions } = options;
 
   return useMutation({
     mutationFn: removeRotaMulti,
+    ...restOptions,
+
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({queryKey: ['rota', variables.branch]});
+      onSuccess?.(data, variables, context);
+    },
 
-      if (options.onSuccess) {
-        options.onSuccess(data, variables, context);
-      }
+    onError: (error, variables, context) => {
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
+      onError?.(error, variables, context);
     },
-    onError: (error) => {
-      window.Telegram.WebApp.HapticFeedback.notificationOccurred("error")
-    },
-    ...options
   });
 };

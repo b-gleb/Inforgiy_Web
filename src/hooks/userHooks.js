@@ -17,46 +17,49 @@ export function useGetUsers(
 
 export const useUpdateUser = (options = {}) => {
   const queryClient = useQueryClient();
+  const { onSuccess, onError, ...restOptions } = options;
 
   return useMutation({
     mutationFn: updateUser,
+    ...restOptions,
+
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({queryKey: ['users', variables.branch]});
       toast.success('Пользователь обновлен!');
       window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-
-      if (options.onSuccess) {
-        options.onSuccess(data, variables, context);
-      }
+      onSuccess?.(data, variables, context);
     },
-    onError: (error) => {
-      if (error.response.status === 404) {
+
+    onError: (error, variables, context) => {
+      if (error.response?.status === 404) {
         toast.warn('Пользователь не найден!');
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
       } else {
         catchResponseError(error);
       }
+      onError?.(error, variables, context);
     },
-    ...options
-  })
+  });
 };
 
 export const useRemoveUser = (options = {}) => {
   const queryClient = useQueryClient();
+  const { onSuccess, onError, ...restOptions } = options;
 
   return useMutation({
     mutationFn: removeUser,
+    ...restOptions,
+
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({queryKey: ['users', variables.branch]});
       toast.success("Пользователь удален!");
       window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-
-      if (options.onSuccess) {
-        options.onSuccess(data, variables, context);
-      }
+      onSuccess?.(data, variables, context);
     },
-    onError: (error) => {
+
+    onError: (error, variables, context) => {
       catchResponseError(error);
-    }
+      onError?.(error, variables, context);
+    },
   });
 };
