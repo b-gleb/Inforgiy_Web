@@ -31,7 +31,6 @@ export const getAuth = async (params: {
 // //// //
 // ROTA //
 // //// //
-
 export const getRota = async (params: {
   branch: Branch;
   date: ISODate;
@@ -92,7 +91,6 @@ export const removeRotaMulti = async (params: {
 // ///// //
 // USERS //
 // ///// //
-
 export const getUsers = async (params: {
   branch: Branch;
   initDataUnsafe: InitDataUnsafe;
@@ -122,7 +120,6 @@ export const removeUser = async (params: {
 // ///// //
 // STATS //
 // ///// //
-
 export const getStats = async (params: {
   branch: Branch;
   userIds: UserId[];
@@ -138,7 +135,7 @@ export const getStatsCumulative = async (params: {
   dateRanges: DateRange[];
 }) => {
   const response = await api.post('/api/stats/cumulative', params);
-  return response;
+  return response.data;
 };
 
 export default api;

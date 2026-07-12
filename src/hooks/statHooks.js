@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getStats } from "@/services/api";
+import { getStats, getStatsCumulative } from "@/services/api";
 
 export function useGetStats(
   {branch, userIds, dateRanges},
@@ -12,3 +12,15 @@ export function useGetStats(
     ...options
   })
 };
+
+export function useGetStatsCumulative(
+  {branch, userId, dateRanges},
+  options = {}
+) {
+  return useQuery({
+    queryKey: ['cumulativeStats', branch, userId, {dateRanges}],
+    queryFn: () => getStatsCumulative({branch, userId, dateRanges}),
+    staleTime: 5 * 60 * 1000,
+    ...options
+  })
+}

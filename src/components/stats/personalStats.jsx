@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import Chart from "react-apexcharts";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -8,9 +8,7 @@ import StatCard from '@/components/stats/StatCard.jsx';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // API
-import { useGetStats } from '@/hooks/statHooks.js';
-import { getStatsCumulative } from '@/services/api.ts';
-import catchResponseError from '../../utils/responseError.jsx';
+import { useGetStats, useGetStatsCumulative } from '@/hooks/statHooks.js';
 
 function getWeekRange (date) {
   const weekStart = startOfWeek(date, {weekStartsOn: 1});
@@ -128,7 +126,6 @@ export default function PersonalStats({ branch, userId }) {
 
 
   // Cumulative month stats
-  const [dayByDaySeries, setDayByDaySeries] = useState(null);
   const [dayByDayOptions] = useState({
     chart: {
       id: "cumulative",
@@ -189,42 +186,33 @@ export default function PersonalStats({ branch, userId }) {
     colors: ["#E6D3B8", "#F69200"],
   });
 
-  useEffect(() => {
-    const fetchDayByDayStats = async () => {
-      try {
-        const today = new Date();
-        const response = await getStatsCumulative({
-          branch,
-          userId,
-          dateRanges: [
-            [
-              format(startOfMonth(today), 'yyyy-MM-dd'),
-              format(today, 'yyyy-MM-dd'),
-            ], 
-            getMonthRange(subMonths(today, 1))
-          ]
-        });
+  const dateRanges = useMemo(() => {
+    const today = new Date();
+    return [
+      [format(startOfMonth(today), 'yyyy-MM-dd'), format(today, 'yyyy-MM-dd')],
+      getMonthRange(subMonths(today, 1)),
+    ];
+  }, []);
 
-        setDayByDaySeries([
-          {
-            name: "Прошлый месяц",
-            data: response.data[1].data.map(item => item.count)
-          },
-          {
-            name: "Текущий месяц",
-            data: response.data[0].data.map(item => item.count)
-          },
-        ]);
+  const { data: cumulativeStatsResponse } = useGetStatsCumulative({
+    branch,
+    userId,
+    dateRanges,
+  });
 
-
-      } catch (error) {
-        catchResponseError(error);
-      };
-    };
-
-    fetchDayByDayStats();
-  }, [branch, userId])
-
+  const dayByDaySeries = useMemo(() => {
+    if (!cumulativeStatsResponse) {console.log(cumulativeStatsResponse); return []};
+    return [
+      {
+        name: 'Прошлый месяц',
+        data: cumulativeStatsResponse[1].data.map(item => item.count),
+      },
+      {
+        name: 'Текущий месяц',
+        data: cumulativeStatsResponse[0].data.map(item => item.count),
+      },
+    ];
+  }, [cumulativeStatsResponse]);
 
   return (
     <>
