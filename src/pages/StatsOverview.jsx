@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
 import { ru } from "date-fns/locale";
 
@@ -7,7 +8,6 @@ import { ru } from "date-fns/locale";
 import { useGetUsers } from '@/hooks/userHooks';
 import { useGetStats } from '@/hooks/statHooks';
 import { getStats } from '@/services/api.ts';
-import catchResponseError from '@/utils/responseError';
 
 // Utils
 import { calcYearIntervals, transformStatsOverviewData } from '@/utils/statUtils';
@@ -39,20 +39,21 @@ ModuleRegistry.registerModules([
 ]);
 
 
-// TODO: restructure use states
-// TODO: Think of invalidation strategy
 export default function StatsOverview() {
   const location = useLocation();
   const { branch, initDataUnsafe } = location.state || {};
   const navigate = useNavigate();
   const gridRef = useRef(null);
+  const queryClient = useQueryClient();
 
   const year = new Date().getFullYear();
   const yearlyColumnDefs = useMemo(() => generateColumnDefs(year), [year]);
   const dateRanges = useMemo(() => calcYearIntervals(year), [year]);
+  const getRowId = useCallback((params) => params.data.user?.nick, []);
 
-  let colorFilter = 'all';
+  const colorFilterRef = useRef('all');
   const [colorMap, setColorMap] = useState({'all': 'Все цвета'});
+
   const { data: userIds = [] } = useGetUsers(
     { branch, initDataUnsafe },
     { select: users => users.map(user => user.id) }
@@ -62,17 +63,15 @@ export default function StatsOverview() {
     { branch, userIds, dateRanges },
     {
       select: stats => {
-      const transformed = transformStatsOverviewData(stats);
-
-      return {
-        stats: transformed,
-        colors: getColorMap(transformed),
-      };
-    },
+        const transformed = transformStatsOverviewData(stats);
+        return {
+          stats: transformed,
+          colors: getColorMap(transformed),
+        };
+      },
       enabled: userIds.length >= 1
     }
   );
-
 
   const [columnDefs, setColumnDefs] = useState(null);
   const [rowData, setRowData] = useState(null);
@@ -91,17 +90,14 @@ export default function StatsOverview() {
     cellClass: cellClass
   });
 
-  // Checking if all the neccessary location states exist, otherwise redirect
-  const requiredParams = [branch, initDataUnsafe];
-  useEffect(() => {
-    if (requiredParams.some(param => param === undefined)){
-      navigate('/Inforgiy_Web/', { replace: true })
-    }
-  }, [navigate, requiredParams])
+// Checking if all the neccessary location states exist, otherwise redirect
+  const missingParams = branch === undefined || initDataUnsafe === undefined;
 
-  if (requiredParams.some(param => param === undefined)){
-    return null;
-  };
+  useEffect(() => {
+    if (missingParams) {
+      navigate('/Inforgiy_Web/', { replace: true });
+    }
+  }, [navigate, missingParams]);
 
   // Telegram UI BackButton
   useEffect(() => {
@@ -119,7 +115,6 @@ export default function StatsOverview() {
     };
   }, []);
 
-
   // Set Table Theme
   useEffect(() => {
     document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
@@ -131,7 +126,6 @@ export default function StatsOverview() {
     };
   }, []);
 
-
   const onColumnGroupOpened = useCallback( async (params) => {
     if (params.columnGroup.level === 1 && params.columnGroup.isExpanded() === true) {
       const intervals = [];
@@ -141,16 +135,20 @@ export default function StatsOverview() {
         intervals.push([colIdSplit[0], colIdSplit[1]]);
       };
 
-      const branchStats = await fetchBranchStats(branch, userIds, intervals);
-      const { rows } = transformStatsOverviewData(branchStats);
-
-      // Add new data to already existing columns
-      setRowData((prevData) => {
-        return prevData.map((row) => {
-          const newColumns = rows.find((item) => item.user.nick === row.user.nick);
-          return newColumns ? { ...row, ...newColumns } : row;
-        });
+      const data = await queryClient.fetchQuery({
+        queryKey: ['overviewStats', branch, {userIds, dateRanges: intervals}],
+        queryFn: () => getStats({branch, userIds, dateRanges: intervals})
       });
+      const newRowData = transformStatsOverviewData(data);
+
+      if (newRowData) {
+        setRowData((prevData) => {
+          return prevData.map((row) => {
+            const newColumns = newRowData.find((item) => item.user.nick === row.user.nick);
+            return newColumns ? { ...row, ...newColumns } : row;
+          });
+        });
+      }
     };
 
     // Adjust the width of opened columns
@@ -158,35 +156,23 @@ export default function StatsOverview() {
       const colArray = params.columnGroup.children.map(col => col.getId());
       params.api.autoSizeColumns(colArray)
     }
-  }, [branch, userIds]);
-
+  }, [branch, userIds, queryClient]);
 
   const isExternalFilterPresent = useCallback(() => {
-    return colorFilter !== "all";
+    return colorFilterRef.current !== "all";
   }, []);
 
-
-
   const externalFilterChanged = useCallback((newValue) => {
-    colorFilter = newValue
+    colorFilterRef.current = newValue;
     gridRef.current.api.onFilterChanged();
   }, []);
 
-
   const doesExternalFilterPass = useCallback((node) => {
     if (node.data) {
-      if (node.data.user.color == colorFilter) {
-        return true;
-      }
-      else {
-        return false;
-      }
+      return node.data.user.color == colorFilterRef.current;
     }
-    else {
-      return true;
-    };
-  }, [colorFilter]);
-
+    return true;
+  }, []);
 
   useEffect(() => {
     if (!data) return;
@@ -206,6 +192,9 @@ export default function StatsOverview() {
     setColorMap(data.colors);
   }, [data, yearlyColumnDefs])
 
+  if (missingParams) {
+    return null;
+  }
 
   return (
     <div className={`w-full h-full flex flex-col fixed inset-0 bg-background ${sessionStorage.getItem('theme') || 'light'}`}>
@@ -232,6 +221,7 @@ export default function StatsOverview() {
       <div className='w-full h-full flex-1 overflow-hidden'>
         <AgGridReact
           ref={gridRef}
+          getRowId={getRowId}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
@@ -250,22 +240,6 @@ export default function StatsOverview() {
     </div>
   );
 };
-
-
-async function fetchBranchStats (branch, userIds, dateRanges) {
-  try {
-    const response = await getStats({
-      branch,
-      userIds,
-      dateRanges
-    });
-
-    return response.data;
-  } catch (error) {
-    catchResponseError(error);
-  }
-};
-
 
 
 function generateColumnDefs(year) {
