@@ -201,7 +201,7 @@ export default function PersonalStats({ branch, userId }) {
   });
 
   const dayByDaySeries = useMemo(() => {
-    if (!cumulativeStatsResponse) {console.log(cumulativeStatsResponse); return []};
+    if (!cumulativeStatsResponse) return [];
     return [
       {
         name: 'Прошлый месяц',
