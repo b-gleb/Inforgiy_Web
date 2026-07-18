@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 
 // APIs
-import fetchAllUsers from '../../services/fetchAllUsers';
-import updateRota from '../../services/updateRota';
-
+import { useGetUsers } from '@/hooks/userHooks';
+import { useUpdateRota } from '@/hooks/rotaHooks';
 
 export default function UserSearchPopUp({ 
   mode,
@@ -16,15 +15,22 @@ export default function UserSearchPopUp({
   date,
   timeRange,
   onClose,
-  setRotaData,
   handleUpdateCell
 }) {
   const navigate = useNavigate();
-
-  // States for fetching users and managing fuzzy search
-  const [allUsers, setAllUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  // TODO: Should be invalidated by adding/removing a user
+  const {data: allUsers = [], isLoading, isError, error} = useGetUsers({branch, initDataUnsafe});
+  const { mutate: updateRota } = useUpdateRota();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Partial search
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return allUsers
+
+    return allUsers.filter(userObj =>
+      userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [allUsers, searchQuery]);
 
   // Telegram UI Back Button
   useEffect(() => {
@@ -35,29 +41,7 @@ export default function UserSearchPopUp({
       window.Telegram.WebApp.BackButton.offClick(onClose);
       window.Telegram.WebApp.BackButton.hide();
     };
-  
   }, [onClose]);
-
-  // Fetch all users
-  useEffect(() => {
-    fetchAllUsers(branch, initDataUnsafe)
-      .then((result) => {
-        setAllUsers(result);
-        setFilteredUsers(result)
-      })
-      .catch(() => {});
-
-  }, [branch, initDataUnsafe]);
-
-
-  // Fuzzy search
-  useEffect(() => {
-    const results = allUsers.filter((userObj) =>
-      userObj.nick.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredUsers(results);
-  }, [searchQuery, allUsers]);
-
 
   return (
     <div className="popup">
@@ -108,18 +92,22 @@ export default function UserSearchPopUp({
               className="w-full dark:text-white"
               onClick={() => {
                 if (mode === 'rota'){
-                  updateRota({
+                  updateRota(
+                    {
                       type: 'add',
-                      branch: branch,
-                      date: date,
-                      timeRange: timeRange,
+                      branch,
+                      date,
+                      timeRange,
                       userId: userObj.id,
-                      initDataUnsafe: initDataUnsafe
-                    })
-                    .then((result) => {setRotaData(result)})
-                    .catch(() => {});
-                  window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                  onClose();
+                      initDataUnsafe
+                    },
+                    {
+                      onSuccess: (data, variable, context) => {
+                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                        onClose();
+                      }
+                    }
+                  )
                 } else if (mode === 'user_management'){
                   window.Telegram.WebApp.BackButton.offClick(onClose);
                   window.Telegram.WebApp.HapticFeedback.impactOccurred('light');

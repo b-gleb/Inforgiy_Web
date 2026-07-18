@@ -1,7 +1,6 @@
 import { useState} from 'react';
-import api from '@/services/api.js';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useAddRotaMulti, useRemoveRotaMulti } from '@/hooks/rotaHooks';
+import { toast } from 'react-toastify';
 import { eachDayOfInterval } from 'date-fns';
 import { ru } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,10 @@ import {
 
 
 export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
+  // MUTATIONS
+  const { mutate: addRotaMulti } = useAddRotaMulti();
+  const { mutate: removeRotaMulti } = useRemoveRotaMulti();
+  // STATES
   const [step, setStep] = useState(0);
   const [action, setAction] = useState(null);
   const [dateRange, setDateRange] = useState(undefined);
@@ -84,52 +87,44 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
   };
 
-  const handleSubmit = async() => {
-    let apiUrl;
+  const handleSubmit = () => {
     const daysOfWeek = days.map(day => dayOptions.indexOf(day));
     const slotCount = countDaysInRange(dateRange.from, dateRange.to, daysOfWeek) * hours.length;
-    let data = {
+    const data = {
       branch,
       startDate: dateRange.from,
       endDate: dateRange.to,
       timeRanges: hours.map(hour => `${String(hour).padStart(2, "0")}:00 - ${String(hour + 1).padStart(2, "0")}:00`),
       daysOfWeek,
       userId,
+      ...(action === 'add' && { allowOccupiedSlots }),
       initDataUnsafe
     };
 
-    if (action === 'add') {
-      data = {...data, allowOccupiedSlots}
-      apiUrl = '/api/addRotaMulti';
-    } else if (action === 'remove') {
-      apiUrl = '/api/removeRotaMulti';
-    }
+    const toastId = toast.loading("Обновляю график...");
 
-    const requestPromise = api.post(apiUrl, data);
-    
-    toast.promise(
-      requestPromise,
+    const mutation = action === "add" ? addRotaMulti : removeRotaMulti;
+    mutation(
+      data,
       {
-        pending: 'Обновляю график...',
-        success: {
-          render({ data }) {
-            return `Изменено ${data.data.modifiedCount} смен из ${slotCount}`;
-          }
+        onSuccess: (data) => {
+          toast.update(toastId, {
+            render: `Изменено ${data.modifiedCount} смен из ${slotCount}`,
+            type: "success",
+            isLoading: false,
+            autoClose: 5000
+          });
         },
-        error: {
-          render({ data }) {
-            return `Ошибка #${data.status}`;
-          }
+        onError: (error) => {
+          toast.update(toastId, {
+            render: `Ошибка ${error.response.status}: ${error.response.data}`,
+            type: "error",
+            isLoading: false,
+            autoClose: 5000
+          });
         }
       }
-    )
-
-    try {
-      const response = await requestPromise;
-    } catch (error) {
-      console.error(error);
-      window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
-    }
+    );
   };
 
   return (
@@ -246,16 +241,6 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
           </Button>
         </>
       )}
-
-      <ToastContainer
-        position='bottom-center'
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss={false}
-        draggable={false}
-        theme={window.Telegram.WebApp.colorScheme}
-        limit={4}
-      />
     </div>
   )
 };

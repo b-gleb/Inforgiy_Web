@@ -1,0 +1,260 @@
+import React, { useState, useMemo } from 'react';
+import Chart from "react-apexcharts";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
+
+// Components
+import StatCard from '@/components/stats/StatCard.jsx';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// API
+import { useGetStats, useGetStatsCumulative } from '@/hooks/statHooks.js';
+
+function getWeekRange (date) {
+  const weekStart = startOfWeek(date, {weekStartsOn: 1});
+  const weekEnd = endOfWeek(date, {weekStartsOn: 1});
+  return [format(weekStart, 'yyyy-MM-dd'), format(weekEnd, 'yyyy-MM-dd')];
+};
+
+function getMonthRange (date) {
+  const monthStart = startOfMonth(date);
+  const monthEnd = endOfMonth(date);
+  return [format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')];
+};
+
+function getYearRange (date) {
+  const yearStart = startOfYear(date);
+  const yearEnd = endOfYear(date);
+  return [format(yearStart, 'yyyy-MM-dd'), format(yearEnd, 'yyyy-MM-dd')];
+};
+
+
+export default function PersonalStats({ branch, userId }) {
+  // CARDS
+  const now = new Date();
+
+  const { data: personalStatsResponse } = useGetStats({
+    branch,
+    userIds: [userId],
+    dateRanges: [
+      getWeekRange(now),
+      getWeekRange(subWeeks(now, 1)),
+      getMonthRange(now),
+      getMonthRange(subMonths(now, 1)),
+      getYearRange(now)
+    ]
+  })
+
+  const personalStatsData = useMemo(() => {
+    if (!personalStatsResponse) return null;
+
+    const stats = personalStatsResponse[0].data;
+
+    return {
+      currentWeek: stats[0]?.count,
+      previousWeek: stats[1]?.count,
+      currentMonth: stats[2]?.count,
+      previousMonth: stats[3]?.count,
+      currentYear: stats[4]?.count
+    };
+  }, [personalStatsResponse]);
+
+  // Weekly Bars
+  const [weeklyChartOptions, setWeeklyChartOptions] = useState({
+    chart: {
+      id: "weekly-chart",
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false
+      },
+    },
+    grid: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    dataLabels: {
+      formatter: (val) => (val === 0 ? "" : val),
+    },
+    yaxis: {
+      show: false
+    },
+    colors: ["#F69200"],
+  });
+
+  const weekRanges = useMemo(() => {
+    const date = subWeeks(new Date(), 11);
+    const ranges = [];
+
+    for (let i = 0; i <= 11; i++) {
+      ranges.push(getWeekRange(addWeeks(date, i)));
+    }
+
+    return ranges;
+  }, []);
+
+  const { data: weeklyStatsResponse } = useGetStats({
+    branch,
+    userIds: [userId],
+    dateRanges: weekRanges
+  });
+
+  const weeklyChartSeries = useMemo(() => {
+    if (!weeklyStatsResponse) return null;
+
+    setWeeklyChartOptions(prevOptions => ({
+      ...prevOptions,
+      xaxis: {
+        categories: weekRanges.map(range => format(parseISO(range[0]), 'dd LLL', { locale: ru })),
+        labels: {
+          style: {
+            colors: '#808080',
+            fontSize: '12px',
+          }
+        }
+      }
+    }));
+
+    return [{
+      name: weeklyStatsResponse[0]?.user?.nick,
+      data: weeklyStatsResponse[0]?.data?.map(item => item.count)
+    }];
+  }, [weeklyStatsResponse]);
+
+
+  // Cumulative month stats
+  const [dayByDayOptions] = useState({
+    chart: {
+      id: "cumulative",
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false
+      },
+    },
+    grid: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    xaxis: {
+      categories: Array.from({ length: 31 }, (_, i) => i + 1),
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      },
+      labels: {
+        show: false
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#808080',
+          fontSize: '12px',
+        }
+      }
+    },
+    legend: {
+      show: true,
+      labels: {
+        colors: '#808080'
+      },
+    },
+    stroke: {
+      width: [2, 4],
+    },
+    markers: {
+      discrete: [
+        {
+          seriesIndex: 1,
+          dataPointIndex: new Date().getDate() - 1,
+          fillColor: "#F69200",
+          strokeColor: "#FFFFFF",
+          size: 5,
+          shape: "circle",
+        },
+      ],
+    },
+    colors: ["#E6D3B8", "#F69200"],
+  });
+
+  const dateRanges = useMemo(() => {
+    const today = new Date();
+    return [
+      [format(startOfMonth(today), 'yyyy-MM-dd'), format(today, 'yyyy-MM-dd')],
+      getMonthRange(subMonths(today, 1)),
+    ];
+  }, []);
+
+  const { data: cumulativeStatsResponse } = useGetStatsCumulative({
+    branch,
+    userId,
+    dateRanges,
+  });
+
+  const dayByDaySeries = useMemo(() => {
+    if (!cumulativeStatsResponse) {console.log(cumulativeStatsResponse); return []};
+    return [
+      {
+        name: 'Прошлый месяц',
+        data: cumulativeStatsResponse[1].data.map(item => item.count),
+      },
+      {
+        name: 'Текущий месяц',
+        data: cumulativeStatsResponse[0].data.map(item => item.count),
+      },
+    ];
+  }, [cumulativeStatsResponse]);
+
+  return (
+    <>
+    <div className="max-w-md mx-auto flex justify-between gap-x-8 bg-white dark:bg-neutral-900">
+      <StatCard 
+        label="Неделя"
+        sublabel="от прошлой"
+        current={personalStatsData?.currentWeek ?? null}
+        previous={personalStatsData?.previousWeek ?? null}
+      />
+      <StatCard 
+        label="Месяц"
+        sublabel="от прошлого"
+        current={personalStatsData?.currentMonth ?? null}
+        previous={personalStatsData?.previousMonth ?? null}
+      />
+      <StatCard 
+        label="Год"
+        sublabel="от прошлого"
+        current={personalStatsData?.currentYear ?? null}
+        previous={personalStatsData?.previousYear ?? null}
+      />
+    </div>
+
+    <h3 className='text-xs mt-6 text-muted-foreground'>Количество смен за последние 12 недель</h3>
+    <div className="w-full max-w-md mx-auto px-2">
+      {weeklyChartSeries ?
+        <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
+        :
+        <Skeleton className="w-full h-[230px] my-2"/>
+      }
+    </div>
+
+    <h3 className='text-xs text-muted-foreground'>Количество смен относительно прошлого месяца</h3>
+    <div className="w-full max-w-md mx-auto px-2">
+      {dayByDaySeries ?
+        <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
+        :
+        <Skeleton className="w-full h-[230px] my-2"/>
+      }
+    </div>
+
+    </>
+  );
+};

@@ -1,25 +1,25 @@
-import React, { useEffect, useState, Suspense, lazy } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueries } from '@tanstack/react-query';
 import { format, startOfToday } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { UserPlus } from 'lucide-react';
-import api from '../services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom components
 import { Button } from '@/components/ui/button.jsx';
-import Loading from './loading';
-import catchResponseError from '../utils/responseError';
+import Loading from '@/components/loading.jsx';
 
 // API
-import updateRota from '../services/updateRota';
+import { useUpdateRota } from '@/hooks/rotaHooks';
+import { getRota } from '@/services/api.ts';
 
 // CSS
-import '../styles/WeeklyView.css';
+import '@/styles/WeeklyView.css';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '../styles/gridTheme';
+import gridTheme from '@/styles/gridTheme.js';
 import {
   ModuleRegistry,
   ValidationModule,
@@ -38,7 +38,7 @@ ModuleRegistry.registerModules([
 ]);
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('./rota/userSearchPopUp'))
+const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp'))
 
 const today = startOfToday();
 
@@ -48,8 +48,41 @@ function rowIndexToTime(rowIndex) {
   return `${start}:00 - ${end}:00`;
 }
 
+function getDays() {
+  const days = [];
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const lastMonday = new Date(today);
+  lastMonday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
 
-export default function WeeklyView() {
+  for (let i = 0; i < 25; i++) {
+    const date = new Date(lastMonday);
+    date.setDate(lastMonday.getDate() + i);
+    days.push(date);
+  }
+
+  return days;
+};
+
+function transformColumnSchemaToRowSchema(columnDefs, data) {
+  // Extract column names from columnDefs
+  const columnNames = columnDefs.map((col) => col.field);
+
+  // Transpose the data based on column schema to row schema
+  const arrayOfObjects = data[0].map((_, rowIndex) => {
+    const obj = {};
+    columnNames.forEach((colName, colIndex) => {
+      const cellData = data[colIndex][rowIndex];
+      obj[colName] = cellData
+    });
+    return obj;
+  });
+
+  return arrayOfObjects;
+}
+
+
+export default function Calendar() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -67,7 +100,7 @@ export default function WeeklyView() {
   };
 
 
-  const cellRenderer = ( params ) => {
+  const cellRenderer = useCallback(( params ) => {
     const value = params.value;
     if (!Array.isArray(value) || value.length === 0){return value};
   
@@ -91,10 +124,10 @@ export default function WeeklyView() {
         ))}
       </>
     )
-  };
+  }, [branch]);
 
 
-  const cellClass = ( params ) => {
+  const cellClass = useCallback(( params ) => {
     const value = params.value;
     if (!Array.isArray(value)){return ''};
 
@@ -109,15 +142,14 @@ export default function WeeklyView() {
     if (value.some(user => user.id === initDataUnsafe.user.id)) {
       return 'bg-input'
     }
-  }
+  }, [branch, initDataUnsafe.user.id]);
 
-  const handleGridReady = (params) => {
+  const handleGridReady = useCallback((params) => {
     params.api.ensureColumnVisible(format(new Date(), 'yyyy-MM-dd'), 'start');
-    setIsLoading(false);
-  };
+  }, []);
 
 
-  const handleCellClicked = (params) => {
+  const handleCellClicked = useCallback((params) => {
     if (params.colDef.field === 'index') {
       navigate(-1);
     }
@@ -128,56 +160,75 @@ export default function WeeklyView() {
         rowNode: params.node
       })
     }
-  };
+  }, [navigate]);
 
 
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedCellData, setSelectedCellData] = useState(null);
-  const [columnDefs, setColumnDefs] = useState([]);
-  const [rowData, setRowData] = useState(null);
-  const [defaultColDef] = useState({
+  const defaultColDef = useMemo(() => ({
     sortable: false,
     suppressMovable: true,
     width: 75,
-    cellRenderer: cellRenderer,
-    cellClass: cellClass,
+    cellRenderer,
+    cellClass,
     autoHeight: true,
     wrapText: true,
+  }), [cellRenderer, cellClass]);
+
+  const days = useMemo(() => getDays(), []);
+
+  const rotaQueries = useQueries({
+    queries: days.map((day) => ({
+      queryKey: ['rota', branch, format(day, 'yyyy-MM-dd')],
+      queryFn: () =>
+        getRota({
+          branch,
+          date: format(day, 'yyyy-MM-dd'),
+        }),
+      enabled: !!branch,
+      staleTime: 2 * 60 * 1000,
+      retry: false,
+      notifyOnChangeProps: ['data'],
+    })),
   });
 
-  const getDays = () => {
-    const days = [];
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const lastMonday = new Date(today);
-    lastMonday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  const isRotaLoading = useMemo(
+    () => rotaQueries.some(q => q.isLoading),
+    [rotaQueries]
+  );
 
-    for (let i = 0; i < 25; i++) {
-      const date = new Date(lastMonday);
-      date.setDate(lastMonday.getDate() + i);
-      days.push(date);
-    }
+  const rotaDataUpdatedAt = rotaQueries.map(q => q.dataUpdatedAt).join(',');
+  const rotaData = useMemo(
+    () => rotaQueries.map((q) => q.data || []),
+    [rotaDataUpdatedAt]
+  );
 
-    return days;
-  };
+  const formattedDates = useMemo(() => {
+    return days.map((date) => ({
+      field: format(date, 'yyyy-MM-dd'),
+      headerName: format(date, "dd.MM EEEEEE", { locale: ru }),
+    }));
+  }, [days]);
 
-  function transformColumnSchemaToRowSchema(columnDefs, data) {
-    // Extract column names from columnDefs
-    const columnNames = columnDefs.map((col) => col.field);
-  
-    // Transpose the data based on column schema to row schema
-    const arrayOfObjects = data[0].map((_, rowIndex) => {
-      const obj = {};
-      columnNames.forEach((colName, colIndex) => {
-        const cellData = data[colIndex][rowIndex];
-        obj[colName] = cellData
-      });
-      return obj;
-    });
-  
-    return arrayOfObjects;
-  }
+  const columnDefs = useMemo(() => [
+    {
+      field: 'index',
+      pinned: 'left',
+      headerName: '',
+      valueGetter: (params) => rowIndexToTime(params.node.rowIndex),
+      cellRenderer: null,
+      cellStyle: null,
+      cellClass: null,
+    },
+    ...formattedDates,
+  ], [formattedDates]);
 
+
+  const rowData = useMemo(() => {
+    const updated = rotaData.map((day) =>
+      day.map((entry) => entry.users)
+    );
+    return transformColumnSchemaToRowSchema(formattedDates, updated);
+  }, [rotaData, formattedDates]);
 
   // Telegram UI BackButton & Table Theme
   useEffect(() => {
@@ -196,60 +247,6 @@ export default function WeeklyView() {
     };
   }, []);
 
-
-  useEffect(() => {
-    const fetchRotaData = async () => {
-      const fetchedRotaData = [];
-      const days = getDays();
-
-      for (const day of days) {
-        try {
-          const response = await api.get('/api/rota', {
-            params: {
-              branch: branch,
-              date: format(day, 'yyyy-MM-dd')
-            }
-          });
-          fetchedRotaData.push(response.data);
-        } catch (error) {
-          catchResponseError(error);
-          fetchedRotaData.push({});
-        }
-      }
-
-      // Format the dates and add them as columns
-      const formattedDates = days.map((date) => ({
-        field: format(date, 'yyyy-MM-dd'),
-        headerName: format(date, "dd.MM EEEEEE", { locale: ru })
-      }));
-      setColumnDefs([
-        {
-          field: 'index',
-          pinned: 'left',
-          headerName: '',
-          valueGetter: (params) => rowIndexToTime(params.node.rowIndex),
-          cellRenderer: null,
-          cellStyle: null,
-          cellClass: null
-        },
-        ...formattedDates
-      ])
-
-      // Generate row data
-      const updatedRotaData = []
-
-      for (const day of fetchedRotaData) {
-        updatedRotaData.push(day.map(entry => entry.users));
-      };
-
-      const rowData = transformColumnSchemaToRowSchema(formattedDates, updatedRotaData);
-      setRowData(rowData)
-
-    };
-    fetchRotaData();
-  }, [branch]);
-
-
   const closePopup = () => {
     setSelectedCellData(null);
   };
@@ -257,7 +254,7 @@ export default function WeeklyView() {
 
   return (
     <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
-      {isLoading && <Loading />}
+      {isRotaLoading && <Loading />}
 
       {rowData && (
         <div className='w-full h-full fixed inset-0'>
@@ -292,6 +289,8 @@ export default function WeeklyView() {
 
 function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
   const [showSearch, setShowSearch] = useState(false);
+  // 'inactive' is set to prevent table reload when mutating rota data
+  const { mutate: updateRota } = useUpdateRota({}, 'inactive');
 
   let date;
   let rowIndex;
@@ -305,18 +304,24 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
     updateParams.date = selectedCellData.column.colDef.field;
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
-    updateRota(updateParams)
-      .then((result) => {
-        selectedCellData.rowNode.setDataValue(
-          selectedCellData.column,
-          result[rowIndex].users
-        );
-        setSelectedCellData(prevState => ({
-          ...prevState,
-          users: result[rowIndex].users
-        }));
-      })
-      .catch(() => {});
+    updateRota(
+      updateParams,
+      {
+        onSuccess: (data, variable, context) => {
+          selectedCellData.rowNode.setDataValue(
+            selectedCellData.column,
+            data[rowIndex].users
+          );
+
+          setSelectedCellData(prevState => ({
+            ...prevState,
+            users: data[rowIndex].users
+          }));
+
+          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+      }
+    )
   };
 
   return (
@@ -369,8 +374,6 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                             userId: user.id,
                             initDataUnsafe: initDataUnsafe
                           })
-                          .then(window.Telegram.WebApp.HapticFeedback.impactOccurred('light'))
-                          .catch(() => {});
                         }}
                       >
                         ✕
@@ -395,8 +398,6 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                         userId: initDataUnsafe.user.id,
                         initDataUnsafe: initDataUnsafe
                       })
-                      .then(window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'))
-                      .catch(() => {})
                     }}
                   >
                     Взять смену
