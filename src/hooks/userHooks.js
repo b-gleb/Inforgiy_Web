@@ -25,6 +25,7 @@ export const useUpdateUser = (options = {}) => {
 
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({queryKey: ['users', variables.branch]});
+      queryClient.invalidateQueries({queryKey: ['rota', variables.branch]});
       toast.success('Пользователь обновлен!');
       window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
       onSuccess?.(data, variables, context);
