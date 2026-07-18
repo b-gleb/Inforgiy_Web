@@ -19,7 +19,7 @@ export default function StatCard ({ label, sublabel, current, previous }) {
           {showComparison && (
             <div className="flex items-center">
               <span className={`text-[0.6rem] ${isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-                {isPositive ? '↑' : '↓'} {Math.abs(change)}
+                {isPositive ? '+' : '-'}{Math.abs(change)}
               </span>
               <span className="text-[0.6rem] ml-1 text-muted-foreground">{sublabel}</span>
             </div>
