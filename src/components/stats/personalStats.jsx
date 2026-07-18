@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import Chart from "react-apexcharts";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO, subYears } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 // Components
@@ -41,7 +41,8 @@ export default function PersonalStats({ branch, userId }) {
       getWeekRange(subWeeks(now, 1)),
       getMonthRange(now),
       getMonthRange(subMonths(now, 1)),
-      getYearRange(now)
+      getYearRange(now),
+      getYearRange(subYears(now, 1))
     ]
   })
 
@@ -55,7 +56,8 @@ export default function PersonalStats({ branch, userId }) {
       previousWeek: stats[1]?.count,
       currentMonth: stats[2]?.count,
       previousMonth: stats[3]?.count,
-      currentYear: stats[4]?.count
+      currentYear: stats[4]?.count,
+      previousYear: stats[5]?.count
     };
   }, [personalStatsResponse]);
 
