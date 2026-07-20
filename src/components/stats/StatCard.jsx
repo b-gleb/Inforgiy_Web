@@ -1,21 +1,38 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { OctagonX } from "lucide-react";
 
-export default function StatCard ({ label, sublabel, current, previous }) {
-  const showComparison = previous !== undefined && previous !== null;
-  const isPositive = showComparison && current > previous;
-  const change = showComparison ? current - previous : 0;
+export default function StatCard ({ status, label, sublabel, value, previousValue }) {
+  const showComparison = previousValue !== undefined && previousValue !== null;
+  const isPositive = showComparison && value > previousValue;
+  const change = showComparison ? value - previousValue : 0;
 
   return (
     <div className="flex-1 p-2 rounded-2xl shadow-md bg-white dark:bg-neutral-800">
       <h3 className="text-base font-semibold mb-2 text-muted-foreground">{label}</h3>
-      {current === null ? (
+
+      {status === 'pending' && (
         <div className='space-y-2'>
-          <Skeleton className="h-10 w-3/4"/>
-          <Skeleton className="h-4 w-1/2"/>
+          <Skeleton className="h-8 w-5/6"/>
+          <Skeleton className="h-3 w-3/4"/>
         </div>
-      ) : (
+      )}
+
+      {status === "error" && (
         <>
-          <div className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{current}</div>
+          <div className="flex items-center gap-2 text-red-500 dark:text-red-400">
+            <OctagonX className="h-4 w-4" />
+            <span className="text-sm">Ошибка</span>
+          </div>
+
+          <p className="mt-1 text-xs text-muted-foreground">
+            Попробуйте позднее
+          </p>
+        </>
+      )}
+
+      {status === 'success' && (
+        <>
+          <div className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{value}</div>
           {showComparison && (
             <div className="flex items-center">
               <span className={`text-[0.6rem] ${isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>

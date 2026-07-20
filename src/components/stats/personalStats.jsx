@@ -33,7 +33,7 @@ export default function PersonalStats({ branch, userId }) {
   // CARDS
   const now = new Date();
 
-  const { data: personalStatsResponse } = useGetStats({
+  const { data: personalStatsResponse, status: personalStatsStatus } = useGetStats({
     branch,
     userIds: [userId],
     dateRanges: [
@@ -217,23 +217,26 @@ export default function PersonalStats({ branch, userId }) {
   return (
     <>
     <div className="max-w-md mx-auto flex justify-between gap-x-8 bg-white dark:bg-neutral-900">
-      <StatCard 
+      <StatCard
+        status={personalStatsStatus}
         label="Неделя"
         sublabel="от прошлой"
-        current={personalStatsData?.currentWeek ?? null}
-        previous={personalStatsData?.previousWeek ?? null}
+        value={personalStatsData?.currentWeek ?? null}
+        previousValue={personalStatsData?.previousWeek ?? null}
       />
-      <StatCard 
+      <StatCard
+        status={personalStatsStatus}
         label="Месяц"
         sublabel="от прошлого"
-        current={personalStatsData?.currentMonth ?? null}
-        previous={personalStatsData?.previousMonth ?? null}
+        value={personalStatsData?.currentMonth ?? null}
+        previousValue={personalStatsData?.previousMonth ?? null}
       />
-      <StatCard 
+      <StatCard
+        status={personalStatsStatus}
         label="Год"
         sublabel="от прошлого"
-        current={personalStatsData?.currentYear ?? null}
-        previous={personalStatsData?.previousYear ?? null}
+        value={personalStatsData?.currentYear ?? null}
+        previousValue={personalStatsData?.previousYear ?? null}
       />
     </div>
 
