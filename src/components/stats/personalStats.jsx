@@ -242,16 +242,16 @@ export default function PersonalStats({ branch, userId }) {
       {weeklyChartSeries ?
         <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
         :
-        <Skeleton className="w-full h-[230px] my-2"/>
+        <Skeleton className="w-full h-[207px] my-2"/>
       }
     </div>
 
     <h3 className='text-xs text-muted-foreground'>Количество смен относительно прошлого месяца</h3>
     <div className="w-full max-w-md mx-auto px-2">
-      {dayByDaySeries ?
+      {dayByDaySeries.length > 0 ?
         <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
         :
-        <Skeleton className="w-full h-[230px] my-2"/>
+        <Skeleton className="w-full h-[192px] my-2"/>
       }
     </div>
 
