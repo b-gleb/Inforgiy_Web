@@ -68,15 +68,10 @@ function Main() {
     error: rotaError,
   } = useRota({ branch, date });
 
-  const { data: secondaryRotaResponse } = useRota(
+  const { data: secondaryRotaData } = useRota(
     { branch: 'gp', date },
     { enabled: branch === 'di'}
   );
-
-  const secondaryRotaData =
-  branch === 'di'
-    ? secondaryRotaResponse?.data ?? []
-    : [];
 
   useEffect(() => {
     if (rotaError?.status !== 404) return;
@@ -346,7 +341,7 @@ function Main() {
                     branch={branch}
                     date={date}
                     dutyHour={dutyHour}
-                    secondaryDutyHour={secondaryRotaData[index]}
+                    secondaryDutyHour={branch === "di" ? secondaryRotaData[index] : undefined}
                     rotaAdmin={rotaAdmin.includes(branch)}
                     maxDuties={userBranches[branch].maxDuties}
                     initDataUnsafe={initDataUnsafe}

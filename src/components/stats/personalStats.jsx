@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import Chart from "react-apexcharts";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO, subYears } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 // Components
@@ -33,7 +33,7 @@ export default function PersonalStats({ branch, userId }) {
   // CARDS
   const now = new Date();
 
-  const { data: personalStatsResponse } = useGetStats({
+  const { data: personalStatsResponse, status: personalStatsStatus } = useGetStats({
     branch,
     userIds: [userId],
     dateRanges: [
@@ -41,7 +41,8 @@ export default function PersonalStats({ branch, userId }) {
       getWeekRange(subWeeks(now, 1)),
       getMonthRange(now),
       getMonthRange(subMonths(now, 1)),
-      getYearRange(now)
+      getYearRange(now),
+      getYearRange(subYears(now, 1))
     ]
   })
 
@@ -55,7 +56,8 @@ export default function PersonalStats({ branch, userId }) {
       previousWeek: stats[1]?.count,
       currentMonth: stats[2]?.count,
       previousMonth: stats[3]?.count,
-      currentYear: stats[4]?.count
+      currentYear: stats[4]?.count,
+      previousYear: stats[5]?.count
     };
   }, [personalStatsResponse]);
 
@@ -201,7 +203,7 @@ export default function PersonalStats({ branch, userId }) {
   });
 
   const dayByDaySeries = useMemo(() => {
-    if (!cumulativeStatsResponse) {console.log(cumulativeStatsResponse); return []};
+    if (!cumulativeStatsResponse) return [];
     return [
       {
         name: 'Прошлый месяц',
@@ -217,23 +219,26 @@ export default function PersonalStats({ branch, userId }) {
   return (
     <>
     <div className="max-w-md mx-auto flex justify-between gap-x-8 bg-white dark:bg-neutral-900">
-      <StatCard 
+      <StatCard
+        status={personalStatsStatus}
         label="Неделя"
         sublabel="от прошлой"
-        current={personalStatsData?.currentWeek ?? null}
-        previous={personalStatsData?.previousWeek ?? null}
+        value={personalStatsData?.currentWeek ?? null}
+        previousValue={personalStatsData?.previousWeek ?? null}
       />
-      <StatCard 
+      <StatCard
+        status={personalStatsStatus}
         label="Месяц"
         sublabel="от прошлого"
-        current={personalStatsData?.currentMonth ?? null}
-        previous={personalStatsData?.previousMonth ?? null}
+        value={personalStatsData?.currentMonth ?? null}
+        previousValue={personalStatsData?.previousMonth ?? null}
       />
-      <StatCard 
+      <StatCard
+        status={personalStatsStatus}
         label="Год"
         sublabel="от прошлого"
-        current={personalStatsData?.currentYear ?? null}
-        previous={personalStatsData?.previousYear ?? null}
+        value={personalStatsData?.currentYear ?? null}
+        previousValue={personalStatsData?.previousYear ?? null}
       />
     </div>
 
