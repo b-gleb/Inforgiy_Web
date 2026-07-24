@@ -4,7 +4,7 @@ import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, 
 import { ru } from 'date-fns/locale';
 
 // Components
-import StatCard from '@/components/stats/StatCard.jsx';
+import StatCard from '@/pages/statistics/personal/components/StatCard/StatCard.jsx';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // API

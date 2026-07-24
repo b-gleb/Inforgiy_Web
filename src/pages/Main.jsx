@@ -21,7 +21,7 @@ import '@/styles/App.css';
 
 // Lazy Loading
 const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp.jsx'));
-const PersonalStats = lazy(() => import('@/components/stats/personalStats.jsx'));
+const PersonalStats = lazy(() => import('@/pages/statistics/personal/PersonalStats.jsx'));
 const Lottie = lazy(() => import("lottie-react"));
 
 
