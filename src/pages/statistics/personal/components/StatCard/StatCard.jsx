@@ -5,8 +5,10 @@ import { OctagonX } from "lucide-react";
 /** Information card showing statistics and comparing it to the previous period */
 export default function StatCard ({ status, label, sublabel, value, previousValue }) {
   const showComparison = previousValue !== undefined && previousValue !== null;
-  const isPositive = showComparison && value > previousValue;
   const change = showComparison ? value - previousValue : 0;
+  const isPositive = showComparison && change > 0;
+  const isNegative = showComparison && change < 0;
+  const sign = isPositive ? '+' : isNegative ? '-' : '';
 
   return (
     <div className="flex-1 p-2 rounded-2xl shadow-md bg-white dark:bg-neutral-800">
@@ -37,8 +39,16 @@ export default function StatCard ({ status, label, sublabel, value, previousValu
           <div className="text-2xl font-semibold mb-2 text-gray-800 dark:text-white">{value}</div>
           {showComparison && (
             <div className="flex items-center">
-              <span className={`text-[0.6rem] ${isPositive ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-                {isPositive ? '+' : '-'}{Math.abs(change)}
+              <span
+                className={`text-[0.6rem] ${
+                  isPositive
+                    ? 'text-green-500 dark:text-green-400'
+                    : isNegative
+                    ? 'text-red-500 dark:text-red-400'
+                    : 'text-muted-foreground'
+                }`}
+              >
+                {sign}{Math.abs(change)}
               </span>
               <span className="text-[0.6rem] ml-1 text-muted-foreground">{sublabel}</span>
             </div>
@@ -51,13 +61,13 @@ export default function StatCard ({ status, label, sublabel, value, previousValu
 
 StatCard.propTypes = {
   /** API status */
-  status: PropTypes.oneOf(['pending', 'error', 'success']).isRequired,
+  status: PropTypes.oneOf(['success', 'pending', 'error']).isRequired,
   /** Label for the period */
   label: PropTypes.string.isRequired,
   /** Sublabel for the period */
-  sublabel: PropTypes.string.isRequired,
+  sublabel: PropTypes.string,
   /** Statistic value for the period */
-  value: PropTypes.number.isRequired,
+  value: PropTypes.number,
   /** Statistics value for the previous period */
   previousValue: PropTypes.number
 }
