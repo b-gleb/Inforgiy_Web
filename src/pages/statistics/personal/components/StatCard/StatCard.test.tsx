@@ -1,14 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import StatCard from './StatCard';
+import type { ComponentProps } from 'react';
 
-const defaultProps = {
+const defaultProps: ComponentProps<typeof StatCard> = {
   status: 'success',
   label: 'Week',
   sublabel: 'vs last week',
   value: 100,
 };
-
 
 describe('StatCard', () => {
   describe('Status states', () => {
@@ -23,11 +23,10 @@ describe('StatCard', () => {
     });
   });
 
-
   describe('Rendering', () => {
     it('renders the label', () => {
       render(<StatCard {...defaultProps} />);
-      
+
       expect(
         screen.getByRole('heading', { level: 3, name: 'Week' })
       ).toBeInTheDocument();
@@ -38,7 +37,6 @@ describe('StatCard', () => {
       expect(screen.getByText('vs last week')).toBeInTheDocument();
     });
   });
-
 
   describe('Comparison values', () => {
     it('renders the value without comparison when previousValue is missing', () => {
@@ -68,7 +66,7 @@ describe('StatCard', () => {
 
       const change = screen.getByText('0');
       expect(change).toBeInTheDocument();
-      expect(change).toHaveClass('text-muted-foreground')
+      expect(change).toHaveClass('text-muted-foreground');
     });
   });
 });
