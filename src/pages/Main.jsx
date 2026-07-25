@@ -335,6 +335,7 @@ function Main() {
                 animate="animate"
                 exit="exit"
               >
+                {/* FIXME: something here sometimes fails and the whole rota goes blank */}
                 {(rotaData ?? []).map((dutyHour, index) => (
                   <RotaHour
                     key={index}
