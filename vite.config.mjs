@@ -38,6 +38,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/config/test-setup.js',
+    coverage: {
+      provider: 'istanbul'
+    }
     // For tests with storybook
     // projects: [{
     //   extends: true,
