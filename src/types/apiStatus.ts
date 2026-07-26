@@ -1,0 +1,1 @@
+export type apiStatus = 'success' | 'pending' | 'error';
