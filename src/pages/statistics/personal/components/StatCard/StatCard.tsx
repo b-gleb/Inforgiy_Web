@@ -1,10 +1,10 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { OctagonX } from 'lucide-react';
-import { apiStatus } from '@/types/apiStatus';
+import { ApiStatus } from '@/types/apiStatus';
 
 interface StatCardProps {
   /** API status */
-  status: apiStatus;
+  status: ApiStatus;
   /** Label for the period */
   label: string;
   /** Sublabel for the period */
