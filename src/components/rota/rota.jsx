@@ -1,5 +1,5 @@
-import React, { useEffect, useState, Suspense, lazy } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, Suspense, lazy } from 'react';
+import UserBox from '@/pages/rota/components/UserBox/UserBox';
 import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
 
@@ -49,47 +49,30 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
       </div>
 
       <div className="usernames-container">
-        {dutyHour.users.map((userObj, index) => {
-          return (
-            <AnimatePresence key={index}>
-              <motion.div
-                key={index}
-                className={`username-box color-${userObj.color}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-              >
-              <span>{userObj.nick}</span>
-
-              {rotaAdmin && (
-                <button
-                  className="ml-2"
-                    onClick={() => {
-                      updateRota(
-                        {
-                          type: 'remove',
-                          branch,
-                          date,
-                          timeRange: dutyHour.label,
-                          userId: userObj.id,
-                          initDataUnsafe
-                        },
-                        {
-                          onSuccess: (data, variable, context) => {
-                            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                          }
-                        }
-                      )
-                    }}
-                >
-                  ✕
-                </button>
-              )}
-              </motion.div>
-            </AnimatePresence>
-          );
-        })}
+        {dutyHour.users.map((userObj) => (
+          <UserBox
+            key={userObj.id}
+            userObj={userObj}
+            rotaAdmin={rotaAdmin}
+            onRemove={() =>
+              updateRota(
+                {
+                  type: "remove",
+                  branch,
+                  date,
+                  timeRange: dutyHour.label,
+                  userId: userObj.id,
+                  initDataUnsafe,
+                },
+                {
+                  onSuccess: () => {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+                  },
+                }
+              )
+            }
+          />
+        ))}
       </div>
 
       <div className='buttons-container'>
