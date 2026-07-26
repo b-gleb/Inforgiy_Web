@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Custom components
 import BranchSelector from '@/components/BranchSelector';
 import PageSelector from '@/components/PageSelector';
-import RotaHour from '@/components/rota/rota.jsx';
+import RotaHour from '@/pages/rota/Rota.jsx';
 import MyDutiesCard from '@/components/rota/myDuties.jsx';
 import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
