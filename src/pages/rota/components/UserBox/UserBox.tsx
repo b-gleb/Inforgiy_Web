@@ -7,7 +7,7 @@ interface UserBoxProps {
   /** Determines if the cross to remove the user will be shown */
   rotaAdmin: boolean;
   /** Function to be called when pressing the cross */
-  onRemove?: () => void;
+  onRemove: () => void;
 }
 
 /** Box containing user's nickname in the rota*/
