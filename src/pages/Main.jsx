@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BranchSelector from '@/components/BranchSelector';
 import PageSelector from '@/components/PageSelector';
 import RotaHour from '@/pages/rota/Rota.jsx';
-import MyDutiesCard from '@/components/rota/myDuties.jsx';
+import MyDuties from '@/pages/rota/components/MyDuties/MyDuties.jsx';
 import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
@@ -302,7 +302,7 @@ function Main() {
         </>
       )}
 
-      <MyDutiesCard 
+      <MyDuties
         branch={branch}
         userId={initDataUnsafe?.user?.id ?? null}
       />

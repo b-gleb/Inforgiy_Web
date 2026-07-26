@@ -1,4 +1,3 @@
-import React from 'react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton.jsx';
@@ -29,7 +28,7 @@ function convertToDutyString(hours) {
   return result.join("; ");
 }
 
-export default function MyDutiesCard({ branch, userId, prevDays = 0, nextDays = 14 }) {
+export default function MyDuties({ branch, userId, prevDays = 0, nextDays = 14 }) {
   const { data: duties, isLoading, isError, error } = useUserDuties({
     branch,
     userId,

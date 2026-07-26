@@ -11,7 +11,7 @@ import {
 // Sections
 import UserEditForm from "@/components/profile/userEditForm";
 const PersonalStats = lazy(() => import('@/pages/statistics/personal/PersonalStats'));
-const MyDutiesCard = lazy(() => import('@/components/rota/myDuties'));
+const MyDuties = lazy(() => import('@/pages/rota/components/MyDuties/MyDuties'));
 const ModifyRotaMulti = lazy(() => import('@/components/profile/modifyRotaMulti'));
 
 // Styles
@@ -87,7 +87,7 @@ export default function Profile() {
               </AccordionTrigger>
               <AccordionContent>
                 <Suspense fallback={null}>
-                  <MyDutiesCard
+                  <MyDuties
                     branch={branch}
                     userId={editingUser.id}
                     prevDays={14}
