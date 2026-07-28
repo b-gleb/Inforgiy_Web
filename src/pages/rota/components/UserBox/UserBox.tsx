@@ -17,22 +17,19 @@ export default function UserBox({
   onRemove,
 }: UserBoxProps) {
   return (
-    <AnimatePresence>
-      <motion.div
-        className={`username-box color-${userObj.color}`}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2 }}
-      >
-        <span>{userObj.nick}</span>
+    <motion.div
+      className={`username-box color-${userObj.color}`}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
+      exit={{ opacity: 0, scale: 0.85, transition: { duration: 0.12 } }}
+    >
+      <span>{userObj.nick}</span>
 
-        {rotaAdmin && (
-          <button className="ml-2" onClick={onRemove}>
-            ✕
-          </button>
-        )}
-      </motion.div>
-    </AnimatePresence>
+      {rotaAdmin && (
+        <button className="ml-2" onClick={onRemove}>
+          ✕
+        </button>
+      )}
+    </motion.div>
   );
 };

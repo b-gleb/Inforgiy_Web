@@ -1,4 +1,5 @@
 import { useEffect, useState, Suspense, lazy } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import UserBox from '@/pages/rota/components/UserBox/UserBox';
 import { format } from 'date-fns';
 import { User, Plus } from 'lucide-react';
@@ -49,30 +50,32 @@ export default function RotaHour({ branch, date, dutyHour, secondaryDutyHour, ro
       </div>
 
       <div className="usernames-container">
-        {dutyHour.users.map((userObj) => (
-          <UserBox
-            key={userObj.id}
-            userObj={userObj}
-            rotaAdmin={rotaAdmin}
-            onRemove={() =>
-              updateRota(
-                {
-                  type: "remove",
-                  branch,
-                  date,
-                  timeRange: dutyHour.label,
-                  userId: userObj.id,
-                  initDataUnsafe,
-                },
-                {
-                  onSuccess: () => {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+        <AnimatePresence>
+          {dutyHour.users.map((userObj) => (
+            <UserBox
+              key={userObj.id}
+              userObj={userObj}
+              rotaAdmin={rotaAdmin}
+              onRemove={() =>
+                updateRota(
+                  {
+                    type: "remove",
+                    branch,
+                    date,
+                    timeRange: dutyHour.label,
+                    userId: userObj.id,
+                    initDataUnsafe,
                   },
-                }
-              )
-            }
-          />
-        ))}
+                  {
+                    onSuccess: () => {
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+                    },
+                  }
+                )
+              }
+            />
+          ))}
+        </AnimatePresence>
       </div>
 
       <div className='buttons-container'>
