@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { User } from '@/types/user';
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 const api = axios.create({
@@ -10,13 +11,6 @@ type UserId = number;
 type ISODate = `${number}-${number}-${number}`;
 type DateRange = ISODate[];
 type InitDataUnsafe = object;
-
-interface UserObj {
-  id: UserId;
-  username: string;
-  nick: string;
-  color: number;
-};
 
 // /////// //
 // DEFAULT //
@@ -101,7 +95,7 @@ export const getUsers = async (params: {
 
 export const updateUser = async (params: {
   branch: Branch;
-  userObj: UserObj;
+  userObj: User;
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/updateUser', params);
