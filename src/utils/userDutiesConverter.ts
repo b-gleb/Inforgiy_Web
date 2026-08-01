@@ -1,24 +1,27 @@
+/**
+ * Converts an array of hour numbers into a compact duty string
+ * by merging consecutive hours into ranges.
+ *
+ * Example: [1, 2, 3, 5, 8, 9] -> "01:00-04:00; 05:00-06:00; 08:00-10:00"
+ */
 export function convertToDutyString(hours: number[]): string {
-  if (!hours || hours.length === 0) return "";
+  if (!hours?.length) return "";
 
-  hours.sort((a, b) => a - b);
-  let result = [];
-  let start = hours[0]; // Start of the current group
-  let end = start; // End of the current group
+  const sorted = [...new Set(hours)].sort((a, b) => a - b);
 
-  for (let i = 1; i < hours.length; i++) {
-    if (hours[i] === end + 1) {
-      // Extend the current group
-      end = hours[i];
+  const ranges: [start: number, end: number][] = [];
+  for (const hour of sorted) {
+    const current = ranges.at(-1);
+    if (current && hour === current[1] + 1) {
+      current[1] = hour; // extend the open range
     } else {
-      // Push the current group and start a new one
-      result.push(`${start.toString().padStart(2, "0")}:00-${(end + 1).toString().padStart(2, "0")}:00`);
-      start = hours[i];
-      end = start;
+      ranges.push([hour, hour]); // start a new range
     }
   }
 
-  // Push the last group
-  result.push(`${start.toString().padStart(2, "0")}:00-${(end + 1).toString().padStart(2, "0")}:00`);
-  return result.join("; ");
+  return ranges
+    .map(([start, end]) => `${pad(start)}:00-${pad(end + 1)}:00`)
+    .join("; ");
 }
+
+const pad = (n: number): string => n.toString().padStart(2, "0");
