@@ -63,7 +63,6 @@ function Main() {
 
   const { 
     data: rotaData,
-    isLoading: isRotaLoading,
     isError: isRotaError,
     error: rotaError,
   } = useRota({ branch, date });
@@ -307,12 +306,7 @@ function Main() {
       />
 
       {userBranches !== null && (
-        // TODO: Add loading screen
-        isRotaLoading ? (
-          <div className="flex justify-center items-center h-full">
-            <p className="dark:text-white">Загрузка...</p>
-          </div>
-        ) : isRotaError ? (
+        isRotaError ? (
           <Suspense fallback={null}>
             <div className='size-7/12 mx-auto'>
               <Lottie animationData={animationDataShrug} />
