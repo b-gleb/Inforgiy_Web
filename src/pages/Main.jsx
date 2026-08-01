@@ -328,14 +328,13 @@ function Main() {
                 animate="animate"
                 exit="exit"
               >
-                {/* FIXME: something here sometimes fails and the whole rota goes blank */}
                 {(rotaData ?? []).map((dutyHour, index) => (
                   <RotaHour
                     key={index}
                     branch={branch}
                     date={date}
                     dutyHour={dutyHour}
-                    secondaryDutyHour={branch === "di" ? secondaryRotaData[index] : undefined}
+                    secondaryDutyHour={branch === "di" ? secondaryRotaData?.[index] : undefined}
                     rotaAdmin={rotaAdmin.includes(branch)}
                     maxDuties={userBranches[branch].maxDuties}
                     initDataUnsafe={initDataUnsafe}
