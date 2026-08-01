@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BranchSelector from '@/components/BranchSelector';
 import PageSelector from '@/components/PageSelector';
 import RotaHour from '@/pages/rota/Rota.jsx';
-import MyDutiesCard from '@/components/rota/myDuties.jsx';
+import UserDutiesContainer from './rota/components/UserDuties/UserDutiesContainer';
 import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
@@ -86,7 +86,6 @@ function Main() {
 
     return () => controller.abort();
   }, [rotaError]);
-
 
 
   // Prevent page refresh to trigger main page opening with the wrong state
@@ -302,7 +301,7 @@ function Main() {
         </>
       )}
 
-      <MyDutiesCard 
+      <UserDutiesContainer 
         branch={branch}
         userId={initDataUnsafe?.user?.id ?? null}
       />
