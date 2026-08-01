@@ -31,7 +31,7 @@ import { ApiStatus } from '@/types/apiStatus';
 
 // --- Fixtures
 
-const mockDuties = [
+const mockData = [
   { date: '2024-01-15', hours: [9, 10, 11] },
   { date: '2024-01-16', hours: [14, 15] },
 ];
@@ -48,24 +48,24 @@ describe('UserDuties', () => {
 
   describe('common rendering', () => {
     it.each<ApiStatus>(['pending', 'error', 'success'])('always renders heading regardless of status (%s)', (status) => {
-      render(<UserDuties status={status} duties={[]} />);
+      render(<UserDuties status={status} data={[]} />);
       expect(screen.getByRole('heading', { name: 'Смены' })).toBeInTheDocument();
     });
   });
 
   describe('when status is "pending"', () => {
     it('renders two skeleton placeholders', () => {
-      render(<UserDuties status="pending" duties={[]} />);
+      render(<UserDuties status="pending" data={[]} />);
       expect(screen.getAllByTestId('skeleton')).toHaveLength(2);
     });
 
     it('does not render the error alert', () => {
-      render(<UserDuties status="pending" duties={[]} />);
+      render(<UserDuties status="pending" data={[]} />);
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
 
     it('does not render duty entries or the empty-state message', () => {
-      render(<UserDuties status="pending" duties={mockDuties} />);
+      render(<UserDuties status="pending" data={mockData} />);
       expect(screen.queryByText('Смен нет :(')).not.toBeInTheDocument();
       expect(convertToDutyString).not.toHaveBeenCalled();
     });
@@ -73,19 +73,19 @@ describe('UserDuties', () => {
 
   describe('when status is "error"', () => {
     it('renders an alert with the error message', () => {
-      render(<UserDuties status="error" duties={[]} />);
+      render(<UserDuties status="error" data={[]} />);
       const alert = screen.getByRole('alert');
       expect(alert).toBeInTheDocument();
       expect(alert).toHaveTextContent('Ошибка загрузки!');
     });
 
     it('renders the error icon', () => {
-      render(<UserDuties status="error" duties={[]} />);
+      render(<UserDuties status="error" data={[]} />);
       expect(screen.getByTestId('octagon-x-icon')).toBeInTheDocument();
     });
 
     it('does not render skeletons or duty entries', () => {
-      render(<UserDuties status="error" duties={mockDuties} />);
+      render(<UserDuties status="error" data={mockData} />);
       expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument();
       expect(convertToDutyString).not.toHaveBeenCalled();
     });
@@ -93,13 +93,13 @@ describe('UserDuties', () => {
 
   describe('when status is "success" with duties', () => {
     it('renders one entry per duty', () => {
-      render(<UserDuties status="success" duties={mockDuties} />);
-      expect(convertToDutyString).toHaveBeenCalledTimes(mockDuties.length);
+      render(<UserDuties status="success" data={mockData} />);
+      expect(convertToDutyString).toHaveBeenCalledTimes(mockData.length);
     });
 
     it('formats and displays the date for each duty', () => {
-      render(<UserDuties status="success" duties={mockDuties} />);
-      mockDuties.forEach((duty) => {
+      render(<UserDuties status="success" data={mockData} />);
+      mockData.forEach((duty) => {
         expect(
           screen.getByText(`${expectedDateLabel(duty.date)}:`, { exact: false })
         ).toBeInTheDocument();
@@ -107,8 +107,8 @@ describe('UserDuties', () => {
     });
 
     it('passes each duty\'s hours to convertToDutyString and renders the result', () => {
-      render(<UserDuties status="success" duties={mockDuties} />);
-      mockDuties.forEach((duty) => {
+      render(<UserDuties status="success" data={mockData} />);
+      mockData.forEach((duty) => {
         expect(convertToDutyString).toHaveBeenCalledWith(duty.hours);
         expect(
           screen.getByText(`Hours: ${duty.hours.join(', ')}`)
@@ -117,7 +117,7 @@ describe('UserDuties', () => {
     });
 
     it('does not render the skeleton, error alert, or empty-state message', () => {
-      render(<UserDuties status="success" duties={mockDuties} />);
+      render(<UserDuties status="success" data={mockData} />);
       expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument();
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       expect(screen.queryByText('Смен нет :(')).not.toBeInTheDocument();
@@ -126,17 +126,17 @@ describe('UserDuties', () => {
 
   describe('when status is "success" with no duties', () => {
     it('renders the empty-state message', () => {
-      render(<UserDuties status="success" duties={[]} />);
+      render(<UserDuties status="success" data={[]} />);
       expect(screen.getByText('Смен нет :(')).toBeInTheDocument();
     });
 
     it('does not call convertToDutyString or render duty entries', () => {
-      render(<UserDuties status="success" duties={[]} />);
+      render(<UserDuties status="success" data={[]} />);
       expect(convertToDutyString).not.toHaveBeenCalled();
     });
 
     it('does not render the skeleton or error alert', () => {
-      render(<UserDuties status="success" duties={[]} />);
+      render(<UserDuties status="success" data={[]} />);
       expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument();
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
