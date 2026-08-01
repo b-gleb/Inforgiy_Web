@@ -6,7 +6,7 @@ const meta: Meta<typeof UserDuties> = {
   component: UserDuties,
   tags: ['autodocs'],
   args: {
-    duties: [
+    data: [
       {
           "date": "2024-12-31T00:00:00.000Z",
           "hours": [16, 17, 18]
@@ -32,7 +32,7 @@ export const Default: Story = {}
 
 export const NoDuties: Story = {
   args: {
-    duties: []
+    data: []
   }
 }
 

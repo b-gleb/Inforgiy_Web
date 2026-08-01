@@ -9,14 +9,14 @@ interface UserDutiesProps {
   /** API Status */
   status: ApiStatus;
   /** Information about user's duties obtained from the API */
-  duties: Array<{
+  data: Array<{
     date: string;
     hours: Array<number>
   }>
 }
 
 /** Card showing a summary of user's duties for the specified period of time*/
-export default function UserDuties({ status, duties }: UserDutiesProps) {
+export default function UserDuties({ status, data }: UserDutiesProps) {
   return (
     <div className="w-full mb-3 rounded-xl shadow-lg overflow-hidden bg-linear-to-br from-purple-400 to-purple-600 dark:from-[#7941b2] dark:to-[#3d0273]">
       <div className="px-2 py-3">
@@ -37,9 +37,9 @@ export default function UserDuties({ status, duties }: UserDutiesProps) {
         )}
 
         {status === 'success' && (
-          duties.length > 0 ? (
+          data.length > 0 ? (
             <div className="space-y-1">
-              {duties.map((duty, index) => (
+              {data.map((duty, index) => (
                 <p key={index} className="text-sm text-white">
                   <span className="font-semibold">
                     {format(duty.date, 'dd.MM (EEEE)', { locale: ru })}:
