@@ -1,11 +1,11 @@
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton.jsx';
-import { convertToDutyString } from '@/utils/duties.js';
+import { convertToDutyString } from '@/utils/userDutiesConverter.js';
 import { OctagonX } from 'lucide-react';
 import { ApiStatus } from '@/types/apiStatus';
 
-interface MyDutiesProps {
+interface UserDutiesProps {
   /** API Status */
   status: ApiStatus;
   /** Information about user's duties obtained from the API */
@@ -16,7 +16,7 @@ interface MyDutiesProps {
 }
 
 /** Card showing a summary of user's duties for the specified period of time*/
-export default function MyDuties({ status, duties }: MyDutiesProps) {
+export default function UserDuties({ status, duties }: UserDutiesProps) {
   return (
     <div className="w-full mb-3 rounded-xl shadow-lg overflow-hidden bg-linear-to-br from-purple-400 to-purple-600 dark:from-[#7941b2] dark:to-[#3d0273]">
       <div className="px-2 py-3">

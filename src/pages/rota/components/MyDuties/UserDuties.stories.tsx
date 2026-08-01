@@ -1,9 +1,9 @@
-import MyDuties from "./MyDuties";
+import UserDuties from "./UserDuties";
 import type { Meta, StoryObj } from "@storybook/react";
 
 type Story = StoryObj<typeof meta>;
-const meta: Meta<typeof MyDuties> = {
-  component: MyDuties,
+const meta: Meta<typeof UserDuties> = {
+  component: UserDuties,
   tags: ['autodocs'],
   args: {
     duties: [
