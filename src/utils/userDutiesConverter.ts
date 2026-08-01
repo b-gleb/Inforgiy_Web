@@ -1,4 +1,4 @@
-export function convertToDutyString(hours) {
+export function convertToDutyString(hours: number[]): string {
   if (!hours || hours.length === 0) return "";
 
   hours.sort((a, b) => a - b);
