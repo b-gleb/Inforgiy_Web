@@ -63,7 +63,7 @@ export default function RotaSlot({
             <UserBox
               key={user.id}
               userObj={user}
-              rotaAdmin={canRemove}
+              canRemove={canRemove}
               onRemove={() => onRemove(user.id, label)}
             />
           ))}
