@@ -39,7 +39,9 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/config/test-setup.js',
     coverage: {
-      provider: 'istanbul'
+      provider: 'istanbul',
+      include: ['src/**/*.{js,jsx,ts,tsx}'],
+      exclude: ['src/**/*.stories.{js,jsx,ts,tsx}'],
     }
     // For tests with storybook
     // projects: [{
