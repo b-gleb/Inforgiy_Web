@@ -5,7 +5,7 @@ interface UserBoxProps {
   /** Complete user object */
   userObj: User;
   /** Determines if the cross to remove the user will be shown */
-  rotaAdmin: boolean;
+  canRemove: boolean;
   /** Function to be called when pressing the cross icon */
   onRemove: () => void;
 }
@@ -13,7 +13,7 @@ interface UserBoxProps {
 /** Box containing user's nickname in the rota*/
 export default function UserBox({
   userObj,
-  rotaAdmin,
+  canRemove,
   onRemove,
 }: UserBoxProps) {
   return (
@@ -25,7 +25,7 @@ export default function UserBox({
     >
       <span>{userObj.nick}</span>
 
-      {rotaAdmin && (
+      {canRemove && (
         <button className="ml-2" onClick={onRemove}>
           ✕
         </button>
