@@ -16,7 +16,7 @@ const meta: Meta<typeof UserBox> = {
   tags: ['autodocs'],
   args: {
     userObj: defaultUser,
-    rotaAdmin: true,
+    canRemove: true,
     onRemove: fn(),
   },
   decorators: [
@@ -34,7 +34,7 @@ export const Admin: Story = {}
 
 export const NotAnAdmin: Story = {
   args: {
-    rotaAdmin: false
+    canRemove: false
   }
 }
 
