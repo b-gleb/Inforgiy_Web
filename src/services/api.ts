@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: apiUrl
 });
 
-type Branch = 'lns' | 'gp' | 'di' | 'ryaz' | 'orel';
+type Department = string;
 type UserId = number;
 type ISODate = `${number}-${number}-${number}`;
 type DateRange = ISODate[];
@@ -26,7 +26,7 @@ export const getAuth = async (params: {
 // ROTA //
 // //// //
 export const getRota = async (params: {
-  branch: Branch;
+  branch: Department;
   date: ISODate;
 }) => {
   const response = await api.get('/api/rota', { params });
@@ -34,7 +34,7 @@ export const getRota = async (params: {
 };
 
 export const getUserDuties = async (params: {
-  branch: Branch;
+  branch: Department;
   userId: UserId;
   startDate: ISODate;
   endDate: ISODate;
@@ -45,7 +45,7 @@ export const getUserDuties = async (params: {
 
 export const updateRota = async (params: {
   type: string;
-  branch: Branch;
+  branch: Department;
   date: ISODate;
   timeRange: string;
   userId: UserId;
@@ -56,7 +56,7 @@ export const updateRota = async (params: {
 };
 
 export const addRotaMulti = async (params: {
-  branch: Branch;
+  branch: Department;
   startDate: ISODate;
   endDate: ISODate;
   timeRanges: string[];
@@ -70,7 +70,7 @@ export const addRotaMulti = async (params: {
 };
 
 export const removeRotaMulti = async (params: {
-  branch: Branch;
+  branch: Department;
   startDate: ISODate;
   endDate: ISODate;
   timeRanges: string[];
@@ -86,7 +86,7 @@ export const removeRotaMulti = async (params: {
 // USERS //
 // ///// //
 export const getUsers = async (params: {
-  branch: Branch;
+  branch: Department;
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post('/api/users', params);
@@ -94,7 +94,7 @@ export const getUsers = async (params: {
 };
 
 export const updateUser = async (params: {
-  branch: Branch;
+  branch: Department;
   userObj: User;
   initDataUnsafe: InitDataUnsafe;
 }) => {
@@ -103,7 +103,7 @@ export const updateUser = async (params: {
 };
 
 export const removeUser = async (params: {
-  branch: Branch;
+  branch: Department;
   userId: UserId;
   initDataUnsafe: InitDataUnsafe;
 }) => {
@@ -115,7 +115,7 @@ export const removeUser = async (params: {
 // STATS //
 // ///// //
 export const getStats = async (params: {
-  branch: Branch;
+  branch: Department;
   userIds: UserId[];
   dateRanges: DateRange[];
 }) => {
@@ -124,7 +124,7 @@ export const getStats = async (params: {
 };
 
 export const getStatsCumulative = async (params: {
-  branch: Branch;
+  branch: Department;
   userId: UserId;
   dateRanges: DateRange[];
 }) => {

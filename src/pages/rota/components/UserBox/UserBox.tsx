@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { User } from "@/types/user";
 
 interface UserBoxProps {
@@ -6,7 +6,7 @@ interface UserBoxProps {
   userObj: User;
   /** Determines if the cross to remove the user will be shown */
   rotaAdmin: boolean;
-  /** Function to be called when pressing the cross */
+  /** Function to be called when pressing the cross icon */
   onRemove: () => void;
 }
 
