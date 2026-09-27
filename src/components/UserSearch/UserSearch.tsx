@@ -6,7 +6,7 @@ import { User } from '@/types/user';
 import { OctagonX } from 'lucide-react';
 import { ApiStatus } from '@/types/apiStatus';
 
-interface UserSearchProps {
+export interface UserSearchProps {
   /** API Status */
   status: ApiStatus;
   /** User objects for a department */
