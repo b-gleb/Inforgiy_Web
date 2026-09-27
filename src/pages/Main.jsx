@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, Suspense, lazy } from 'react';
+import { useEffect, useState, useCallback, useRef, Suspense, lazy } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { useSwipeable } from 'react-swipeable';
@@ -20,7 +20,7 @@ import { getAuth } from '@/services/api.ts';
 import '@/styles/App.css';
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp.jsx'));
+const UserSearchContainer = lazy(() => import ('@/components/UserSearch/UserSearchContainer'));
 const PersonalStats = lazy(() => import('@/pages/statistics/personal/PersonalStats.jsx'));
 const Lottie = lazy(() => import("lottie-react"));
 
@@ -36,13 +36,18 @@ function Main() {
   const [userBranches, setUserBranches] = useState(null);
   const [branch, setBranch] = useState(sessionStorage.getItem('branch'));
   const [isLoading, setIsLoading] = useState(false);
-  const [showUserManagement, setShowUserManagement] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
   const [showStatDropdown, setShowStatDropdown] = useState(false);
   const [showPersonalStats, setShowPersonalStats] = useState(false);
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
+
+  // User Management
+  const [showUserManagement, setShowUserManagement] = useState(false);
+  const handleUserManagementClose = useCallback(() => {
+    setShowUserManagement(false);
+  }, []);
 
   // Animations
   const [animationDataForbidden, setAnimationDataForbidden] = useState(null);
@@ -396,11 +401,32 @@ function Main() {
 
       {showUserManagement && (
         <Suspense fallback={null}>
-          <UserSearchPopUp
-            mode='user_management'
-            branch={branch}
+          <UserSearchContainer
+            department={branch}
+            showAddUserButton={true}
             initDataUnsafe={initDataUnsafe}
-            onClose={() => setShowUserManagement(false)}
+            onSelectUser={(userObj) => {
+              window.Telegram.WebApp.BackButton.offClick(handleUserManagementClose);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+              navigate('./profile', {
+                state: {
+                  branch,
+                  editingUser: userObj,
+                  initDataUnsafe
+                }
+              });
+            }}
+            onAddUser={() => {
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              navigate('./profile', {
+                state: {
+                  branch,
+                  editingUser: {id: null, username: "@", color: 0},
+                  initDataUnsafe
+                }
+              });
+            }}
+            onClose={handleUserManagementClose}
           />
         </Suspense>
       )}
