@@ -38,7 +38,7 @@ ModuleRegistry.registerModules([
 ]);
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp'))
+const UserSearchContainer = lazy(() => import("@/components/UserSearch/UserSearchContainer"));
 
 const today = startOfToday();
 
@@ -288,9 +288,9 @@ export default function Calendar() {
 
 
 function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
-  const [showSearch, setShowSearch] = useState(false);
+  const [showSearch, setShowSearch] = useState(null);
   // 'inactive' is set to prevent table reload when mutating rota data
-  const { mutate: updateRota } = useUpdateRota({}, 'inactive');
+  const updateRota = useUpdateRota({}, 'inactive');
 
   let date;
   let rowIndex;
@@ -304,7 +304,7 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
     updateParams.date = selectedCellData.column.colDef.field;
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
-    updateRota(
+    updateRota.mutate(
       updateParams,
       {
         onSuccess: (data, variable, context) => {
@@ -385,12 +385,12 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                 <p className="pb-4 text-center text-gray-500">В это время нет дежурных</p>
               )}
 
-              {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
-                <div className='flex justify-between'>
+              <div className='flex justify-between gap-2'>
+                {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
                   <Button
                     variant="default"
                     size="lg"
-                    className="w-4/5 font-semibold"
+                    className="flex-1 font-semibold"
                     onClick={() => {
                       handleUpdateCell({
                         type: 'add',
@@ -402,21 +402,21 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                   >
                     Взять смену
                   </Button>
+                )}
 
-                  {rotaAdmin && (
-                    <Button
-                      variant="outline"
-                      size="icon-lg"
-                      onClick={() => {
-                        setShowSearch(true);
-                        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                      }}
-                    >
-                      <UserPlus className='size-6'/>
-                    </Button>
-                  )}
-                </div>
-              )}
+                {rotaAdmin && (
+                  <Button
+                    variant="outline"
+                    size="icon-lg"
+                    onClick={() => {
+                      setShowSearch(true);
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                    }}
+                  >
+                    <UserPlus className='size-6'/>
+                  </Button>
+                )}
+              </div>
               
             </div>
           </motion.div>
@@ -425,12 +425,20 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
 
       {showSearch && (
         <Suspense fallback={null}>
-          <UserSearchPopUp 
-            mode='rota_weekly'
-            branch={branch}
+          <UserSearchContainer 
+            department={branch}
+            showAddUserButton={false}
             initDataUnsafe={initDataUnsafe}
-            handleUpdateCell={handleUpdateCell}
-            onClose={() => {setShowSearch(false)}}
+            onSelectUser={(userObj) => {
+              handleUpdateCell({
+                type: 'add',
+                branch: branch,
+                userId: userObj.id,
+                initDataUnsafe: initDataUnsafe,
+              });
+              setShowSearch(null);
+            }}
+            onClose={() => setShowSearch(null)}
           />
         </Suspense>
       )}
