@@ -39,7 +39,7 @@ const defaultProps: ComponentProps<typeof UserBox> = {
     nick: "Nick",
     color: 3
   },
-  rotaAdmin: false,
+  canRemove: false,
   onRemove: vi.fn(),
 };
 
@@ -59,14 +59,14 @@ describe("UserBox", () => {
       expect(screen.getByText(defaultProps.userObj.nick).parentElement).toHaveClass(`color-${defaultProps.userObj.color}`);
     });
 
-    describe("remove from rota control visibility based on admin permissions", () => {
+    describe("remove from rota control visibility based on canRemove argument", () => {
       it("does not render a remove button when the interracting user is not an admin", () => {
-        render(<UserBox {...defaultProps} rotaAdmin={false} />)
+        render(<UserBox {...defaultProps} canRemove={false} />)
         expect(screen.queryByRole("button", { name: "✕" })).not.toBeInTheDocument();
       });
 
       it("renders remove button when the interracting user is an admin", () => {
-        render(<UserBox {...defaultProps} rotaAdmin={true} />)
+        render(<UserBox {...defaultProps} canRemove={true} />)
         expect(screen.queryByRole("button", { name: "✕" })).toBeInTheDocument();
       });
     });
@@ -74,20 +74,20 @@ describe("UserBox", () => {
     describe("remove from rota interaction", () => {
       it("calls onRemove once when remove button is clicked", async () => {
         const user = userEvent.setup();
-        render(<UserBox {...defaultProps} rotaAdmin={true} />)
+        render(<UserBox {...defaultProps} canRemove={true} />)
 
         await user.click(screen.getByRole("button", { name: "✕" }));
         expect(defaultProps.onRemove).toHaveBeenCalledTimes(1);
       });
 
-      it("never calls onRemove when rotaAdmin is false", () => {
-        render(<UserBox {...defaultProps} rotaAdmin={false} />)
+      it("never calls onRemove when canRemove is false", () => {
+        render(<UserBox {...defaultProps} canRemove={false} />)
         expect(defaultProps.onRemove).not.toHaveBeenCalled();
       });
 
       it("should not call onRemove by clicking anywhere else", async () => {
         const user = userEvent.setup();
-        render(<UserBox {...defaultProps} rotaAdmin={true} />)
+        render(<UserBox {...defaultProps} canRemove={true} />)
 
         await user.click(screen.getByText(defaultProps.userObj.nick));
         expect(defaultProps.onRemove).not.toHaveBeenCalled();

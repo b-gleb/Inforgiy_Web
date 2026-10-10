@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
+import { useEffect, useState, useCallback, useRef, Suspense, lazy } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { useSwipeable } from 'react-swipeable';
@@ -7,20 +7,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Custom components
 import BranchSelector from '@/components/BranchSelector';
 import PageSelector from '@/components/PageSelector';
-import RotaHour from '@/pages/rota/Rota.jsx';
+import RotaSlotContainer from '@/pages/rota/components/RotaSlot/RotaSlotContainer';
 import UserDutiesContainer from './rota/components/UserDuties/UserDutiesContainer';
 import Loading from '@/components/loading.jsx';
 import catchResponseError from '@/utils/responseError.jsx';
 
 // API
-import { useRota } from '@/hooks/rotaHooks';
+import { useRota, useUpdateRota } from '@/hooks/rotaHooks';
 import { getAuth } from '@/services/api.ts';
 
 // CSS
 import '@/styles/App.css';
 
 // Lazy Loading
-const UserSearchPopUp = lazy(() => import('@/components/userSearchPopUp.jsx'));
+const UserSearchContainer = lazy(() => import ('@/components/UserSearch/UserSearchContainer'));
 const PersonalStats = lazy(() => import('@/pages/statistics/personal/PersonalStats.jsx'));
 const Lottie = lazy(() => import("lottie-react"));
 
@@ -29,19 +29,25 @@ function Main() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [today] = useState(() => format(new Date(), 'yyyy-MM-dd'));
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [rotaAdmin, setRotaAdmin] = useState([]);
   const [date, setDate] = useState(sessionStorage.getItem('date') || format(new Date(), 'yyyy-MM-dd'));
   const [userBranches, setUserBranches] = useState(null);
   const [branch, setBranch] = useState(sessionStorage.getItem('branch'));
   const [isLoading, setIsLoading] = useState(false);
-  const [showUserManagement, setShowUserManagement] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
   const [showStatDropdown, setShowStatDropdown] = useState(false);
   const [showPersonalStats, setShowPersonalStats] = useState(false);
   const isFirstMount = useRef(true);
   const [swipeDirection, setSwipeDirection] = useState('left');
+
+  // User Management
+  const [showUserManagement, setShowUserManagement] = useState(false);
+  const handleUserManagementClose = useCallback(() => {
+    setShowUserManagement(false);
+  }, []);
 
   // Animations
   const [animationDataForbidden, setAnimationDataForbidden] = useState(null);
@@ -257,6 +263,8 @@ function Main() {
     }),
   };
 
+  // API mutations
+  const updateRota = useUpdateRota();
 
   return (
     <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
@@ -329,15 +337,51 @@ function Main() {
                 exit="exit"
               >
                 {(rotaData ?? []).map((dutyHour, index) => (
-                  <RotaHour
+                  <RotaSlotContainer
                     key={index}
-                    branch={branch}
+                    department={branch}
                     date={date}
-                    dutyHour={dutyHour}
-                    secondaryDutyHour={branch === "di" ? secondaryRotaData?.[index] : undefined}
-                    rotaAdmin={rotaAdmin.includes(branch)}
-                    maxDuties={userBranches[branch].maxDuties}
                     initDataUnsafe={initDataUnsafe}
+                    label={dutyHour.label}
+                    users={dutyHour.users}
+                    secondaryUsers={branch === "di" ? secondaryRotaData?.[index] : undefined}
+                    canAddSelf={date >= today && !dutyHour.users.some(user => user.id === initDataUnsafe.user.id)}
+                    canAddOthers={rotaAdmin.includes(branch)}
+                    canRemove={rotaAdmin.includes(branch)}
+                    onRemove={(userId, timeRange)=>{
+                      updateRota.mutate(
+                        {
+                          type: 'remove',
+                          branch,
+                          date,
+                          timeRange,
+                          userId,
+                          initDataUnsafe
+                        },
+                        {
+                          onSuccess: () => {
+                            window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+                          }
+                        }
+                      )
+                    }}
+                    onAddSelf={(timeRange)=>{
+                      updateRota.mutate(
+                        {
+                          type: 'add',
+                          branch,
+                          date,
+                          timeRange,
+                          userId: initDataUnsafe.user.id,
+                          initDataUnsafe
+                        },
+                        {
+                          onSuccess: () => {
+                            window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+                          }
+                        }
+                      )
+                    }}
                   />
                 ))}
               </motion.div>
@@ -359,11 +403,32 @@ function Main() {
 
       {showUserManagement && (
         <Suspense fallback={null}>
-          <UserSearchPopUp
-            mode='user_management'
-            branch={branch}
+          <UserSearchContainer
+            department={branch}
+            showAddUserButton={true}
             initDataUnsafe={initDataUnsafe}
-            onClose={() => setShowUserManagement(false)}
+            onSelectUser={(userObj) => {
+              window.Telegram.WebApp.BackButton.offClick(handleUserManagementClose);
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+              navigate('./profile', {
+                state: {
+                  branch,
+                  editingUser: userObj,
+                  initDataUnsafe
+                }
+              });
+            }}
+            onAddUser={() => {
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              navigate('./profile', {
+                state: {
+                  branch,
+                  editingUser: {id: null, username: "@", color: 0},
+                  initDataUnsafe
+                }
+              });
+            }}
+            onClose={handleUserManagementClose}
           />
         </Suspense>
       )}
