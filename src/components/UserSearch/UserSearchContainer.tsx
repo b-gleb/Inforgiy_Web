@@ -1,4 +1,4 @@
-import UserSearch, {UserSearchProps} from "./UserSearch";
+import UserSearch, { UserSearchProps } from "./UserSearch";
 import { useGetUsers } from "@/hooks/userHooks";
 
 interface UserSearchContainerProps extends Omit<UserSearchProps, 'status' | 'users'> {
@@ -14,17 +14,17 @@ export default function UserSearchContainer({
   onAddUser,
   onClose
 }: UserSearchContainerProps) {
-  const { status, data } = useGetUsers({branch: department, initDataUnsafe})
+  const { status, data } = useGetUsers({ branch: department, initDataUnsafe });
   return (
     <div className="popup">
       <UserSearch
         status={status}
-        users={data}
+        users={data ?? []}
         showAddUserButton={showAddUserButton}
         onSelectUser={onSelectUser}
         onAddUser={onAddUser}
         onClose={onClose}
-      />;
+      />
     </div>
-  )
+  );
 }
