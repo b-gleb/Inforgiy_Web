@@ -99,6 +99,13 @@ export default function Calendar() {
     return null;
   };
 
+  const valueFormatter = useCallback((params) => {
+    const value = params.value;
+    if (!Array.isArray(value)) return value ?? '';
+    return value
+      .map(user => user?.nick?.split(' ')[0] ?? user?.username ?? '')
+      .join(', ');
+  }, []);
 
   const cellRenderer = useCallback(( params ) => {
     const value = params.value;
@@ -206,8 +213,9 @@ export default function Calendar() {
     return days.map((date) => ({
       field: format(date, 'yyyy-MM-dd'),
       headerName: format(date, "dd.MM EEEEEE", { locale: ru }),
+      valueFormatter,
     }));
-  }, [days]);
+  }, [days, valueFormatter,]);
 
   const columnDefs = useMemo(() => [
     {
