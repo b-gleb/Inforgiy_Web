@@ -25,7 +25,7 @@ export interface RotaSlotProps {
   /** Function to be called when pressing the plus icon */
   onAddSelf: (timeRange: string) => void;
   /** Function to be called when pressing the user icon */
-  onOpenUserSearch: () => void;
+  onOpenUserSearch: (timeRange: string) => void;
 }
 
 /** Component representing a single time slot in the rota */
@@ -72,7 +72,7 @@ export default function RotaSlot({
 
       <div className="buttons-container">
         {canAddOthers && onOpenUserSearch && (
-          <button className="p-1" onClick={onOpenUserSearch} aria-label="Assign user">
+          <button className="p-1" onClick={() => onOpenUserSearch(label)} aria-label="Assign user">
             <User size={15} className="icon-text" />
           </button>
         )}

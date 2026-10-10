@@ -340,6 +340,8 @@ function Main() {
                   <RotaSlotContainer
                     key={index}
                     department={branch}
+                    date={date}
+                    initDataUnsafe={initDataUnsafe}
                     label={dutyHour.label}
                     users={dutyHour.users}
                     secondaryUsers={branch === "di" ? secondaryRotaData?.[index] : undefined}
