@@ -1,33 +1,43 @@
-import React, { useState, useMemo } from 'react';
+import {
+  addWeeks,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  format,
+  parseISO,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subMonths,
+  subWeeks,
+  subYears
+} from "date-fns";
+import { ru } from "date-fns/locale";
+import React, { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, subMonths, parseISO, subYears } from 'date-fns';
-import { ru } from 'date-fns/locale';
-
-// Components
-import StatCard from '@/pages/statistics/personal/components/StatCard/StatCard.tsx';
-import { Skeleton } from '@/components/ui/skeleton';
-
+import { Skeleton } from "@/components/ui/skeleton";
 // API
-import { useGetStats, useGetStatsCumulative } from '@/hooks/statHooks.js';
+import { useGetStats, useGetStatsCumulative } from "@/hooks/statHooks.js";
+// Components
+import StatCard from "@/pages/statistics/personal/components/StatCard/StatCard.tsx";
 
-function getWeekRange (date) {
-  const weekStart = startOfWeek(date, {weekStartsOn: 1});
-  const weekEnd = endOfWeek(date, {weekStartsOn: 1});
-  return [format(weekStart, 'yyyy-MM-dd'), format(weekEnd, 'yyyy-MM-dd')];
-};
+function getWeekRange(date) {
+  const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
+  return [format(weekStart, "yyyy-MM-dd"), format(weekEnd, "yyyy-MM-dd")];
+}
 
-function getMonthRange (date) {
+function getMonthRange(date) {
   const monthStart = startOfMonth(date);
   const monthEnd = endOfMonth(date);
-  return [format(monthStart, 'yyyy-MM-dd'), format(monthEnd, 'yyyy-MM-dd')];
-};
+  return [format(monthStart, "yyyy-MM-dd"), format(monthEnd, "yyyy-MM-dd")];
+}
 
-function getYearRange (date) {
+function getYearRange(date) {
   const yearStart = startOfYear(date);
   const yearEnd = endOfYear(date);
-  return [format(yearStart, 'yyyy-MM-dd'), format(yearEnd, 'yyyy-MM-dd')];
-};
-
+  return [format(yearStart, "yyyy-MM-dd"), format(yearEnd, "yyyy-MM-dd")];
+}
 
 export default function PersonalStats({ branch, userId }) {
   // CARDS
@@ -44,7 +54,7 @@ export default function PersonalStats({ branch, userId }) {
       getYearRange(now),
       getYearRange(subYears(now, 1))
     ]
-  })
+  });
 
   const personalStatsData = useMemo(() => {
     if (!personalStatsResponse) return null;
@@ -66,11 +76,11 @@ export default function PersonalStats({ branch, userId }) {
     chart: {
       id: "weekly-chart",
       toolbar: {
-        show: false,
+        show: false
       },
       zoom: {
         enabled: false
-      },
+      }
     },
     grid: {
       show: false
@@ -79,12 +89,12 @@ export default function PersonalStats({ branch, userId }) {
       enabled: false
     },
     dataLabels: {
-      formatter: (val) => (val === 0 ? "" : val),
+      formatter: val => (val === 0 ? "" : val)
     },
     yaxis: {
       show: false
     },
-    colors: ["#F69200"],
+    colors: ["#F69200"]
   });
 
   const weekRanges = useMemo(() => {
@@ -110,33 +120,36 @@ export default function PersonalStats({ branch, userId }) {
     setWeeklyChartOptions(prevOptions => ({
       ...prevOptions,
       xaxis: {
-        categories: weekRanges.map(range => format(parseISO(range[0]), 'dd LLL', { locale: ru })),
+        categories: weekRanges.map(range =>
+          format(parseISO(range[0]), "dd LLL", { locale: ru })
+        ),
         labels: {
           style: {
-            colors: '#808080',
-            fontSize: '12px',
+            colors: "#808080",
+            fontSize: "12px"
           }
         }
       }
     }));
 
-    return [{
-      name: weeklyStatsResponse[0]?.user?.nick,
-      data: weeklyStatsResponse[0]?.data?.map(item => item.count)
-    }];
+    return [
+      {
+        name: weeklyStatsResponse[0]?.user?.nick,
+        data: weeklyStatsResponse[0]?.data?.map(item => item.count)
+      }
+    ];
   }, [weeklyStatsResponse]);
-
 
   // Cumulative month stats
   const [dayByDayOptions] = useState({
     chart: {
       id: "cumulative",
       toolbar: {
-        show: false,
+        show: false
       },
       zoom: {
         enabled: false
-      },
+      }
     },
     grid: {
       show: false
@@ -154,24 +167,24 @@ export default function PersonalStats({ branch, userId }) {
       },
       labels: {
         show: false
-      },
+      }
     },
     yaxis: {
       labels: {
         style: {
-          colors: '#808080',
-          fontSize: '12px',
+          colors: "#808080",
+          fontSize: "12px"
         }
       }
     },
     legend: {
       show: true,
       labels: {
-        colors: '#808080'
-      },
+        colors: "#808080"
+      }
     },
     stroke: {
-      width: [2, 4],
+      width: [2, 4]
     },
     markers: {
       discrete: [
@@ -181,85 +194,88 @@ export default function PersonalStats({ branch, userId }) {
           fillColor: "#F69200",
           strokeColor: "#FFFFFF",
           size: 5,
-          shape: "circle",
-        },
-      ],
+          shape: "circle"
+        }
+      ]
     },
-    colors: ["#E6D3B8", "#F69200"],
+    colors: ["#E6D3B8", "#F69200"]
   });
 
   const dateRanges = useMemo(() => {
     const today = new Date();
     return [
-      [format(startOfMonth(today), 'yyyy-MM-dd'), format(today, 'yyyy-MM-dd')],
-      getMonthRange(subMonths(today, 1)),
+      [format(startOfMonth(today), "yyyy-MM-dd"), format(today, "yyyy-MM-dd")],
+      getMonthRange(subMonths(today, 1))
     ];
   }, []);
 
   const { data: cumulativeStatsResponse } = useGetStatsCumulative({
     branch,
     userId,
-    dateRanges,
+    dateRanges
   });
 
   const dayByDaySeries = useMemo(() => {
     if (!cumulativeStatsResponse) return [];
     return [
       {
-        name: 'Прошлый месяц',
-        data: cumulativeStatsResponse[1].data.map(item => item.count),
+        name: "Прошлый месяц",
+        data: cumulativeStatsResponse[1].data.map(item => item.count)
       },
       {
-        name: 'Текущий месяц',
-        data: cumulativeStatsResponse[0].data.map(item => item.count),
-      },
+        name: "Текущий месяц",
+        data: cumulativeStatsResponse[0].data.map(item => item.count)
+      }
     ];
   }, [cumulativeStatsResponse]);
 
   return (
     <>
-    <div className="max-w-md mx-auto flex justify-between gap-x-8 bg-white dark:bg-neutral-900">
-      <StatCard
-        status={personalStatsStatus}
-        label="Неделя"
-        sublabel="от прошлой"
-        value={personalStatsData?.currentWeek ?? null}
-        previousValue={personalStatsData?.previousWeek ?? null}
-      />
-      <StatCard
-        status={personalStatsStatus}
-        label="Месяц"
-        sublabel="от прошлого"
-        value={personalStatsData?.currentMonth ?? null}
-        previousValue={personalStatsData?.previousMonth ?? null}
-      />
-      <StatCard
-        status={personalStatsStatus}
-        label="Год"
-        sublabel="от прошлого"
-        value={personalStatsData?.currentYear ?? null}
-        previousValue={personalStatsData?.previousYear ?? null}
-      />
-    </div>
+      <div className="max-w-md mx-auto flex justify-between gap-x-8 bg-white dark:bg-neutral-900">
+        <StatCard
+          status={personalStatsStatus}
+          label="Неделя"
+          sublabel="от прошлой"
+          value={personalStatsData?.currentWeek ?? null}
+          previousValue={personalStatsData?.previousWeek ?? null}
+        />
+        <StatCard
+          status={personalStatsStatus}
+          label="Месяц"
+          sublabel="от прошлого"
+          value={personalStatsData?.currentMonth ?? null}
+          previousValue={personalStatsData?.previousMonth ?? null}
+        />
+        <StatCard
+          status={personalStatsStatus}
+          label="Год"
+          sublabel="от прошлого"
+          value={personalStatsData?.currentYear ?? null}
+          previousValue={personalStatsData?.previousYear ?? null}
+        />
+      </div>
 
-    <h3 className='text-xs mt-6 text-muted-foreground'>Количество смен за последние 12 недель</h3>
-    <div className="w-full max-w-md mx-auto px-2">
-      {weeklyChartSeries ?
-        <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
-        :
-        <Skeleton className="w-full h-[207px] my-2"/>
-      }
-    </div>
+      <h3 className="text-xs mt-6 text-muted-foreground">
+        Количество смен за последние 12 недель
+      </h3>
+      <div className="w-full max-w-md mx-auto px-2">
+        {weeklyChartSeries ? (
+          <Chart options={weeklyChartOptions} series={weeklyChartSeries} type="bar" />
+        ) : (
+          <Skeleton className="w-full h-[207px] my-2" />
+        )}
+      </div>
 
-    <h3 className='text-xs text-muted-foreground'>Количество смен относительно прошлого месяца</h3>
-    <div className="w-full max-w-md mx-auto px-2">
-      {dayByDaySeries.length > 0 ?
-        <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
-        :
-        <Skeleton className="w-full h-[192px] my-2"/>
-      }
-    </div>
-
+      <h3 className="text-xs text-muted-foreground">
+        Количество смен относительно прошлого месяца
+      </h3>
+      <div className="w-full max-w-md mx-auto px-2">
+        {dayByDaySeries.length > 0 ? (
+          <Chart options={dayByDayOptions} series={dayByDaySeries} type="line" />
+        ) : (
+          <Skeleton className="w-full h-[192px] my-2" />
+        )}
+      </div>
     </>
   );
-};
+}

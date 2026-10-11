@@ -1,67 +1,53 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addDays, subDays, format } from "date-fns";
-import { getRota, getUserDuties, updateRota, addRotaMulti, removeRotaMulti } from "@/services/api.ts";
-import catchResponseError from '@/utils/responseError';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { addDays, format, subDays } from "date-fns";
+import {
+  addRotaMulti,
+  getRota,
+  getUserDuties,
+  removeRotaMulti,
+  updateRota
+} from "@/services/api.ts";
+import catchResponseError from "@/utils/responseError";
 
-
-export function useRota(
-  {
-    branch,
-    date
-  },
-  options = {}
-) {
+export function useRota({ branch, date }, options = {}) {
   return useQuery({
-    queryKey: [
-      'rota',
-      branch,
-      date
-    ],
-    queryFn: () => getRota({
-      branch,
-      date
-    }),
+    queryKey: ["rota", branch, date],
+    queryFn: () =>
+      getRota({
+        branch,
+        date
+      }),
     retry: false,
     enabled: !!branch,
     staleTime: 2 * 60 * 1000,
     ...options
-  })
-};
+  });
+}
 
 export function useUserDuties(
-  {
-    branch,
-    userId,
-    prevDays = 0,
-    nextDays = 14,
-  },
+  { branch, userId, prevDays = 0, nextDays = 14 },
   options = {}
 ) {
   const today = new Date();
-  const startDate = format(subDays(today, prevDays), 'yyyy-MM-dd');
-  const endDate = format(addDays(today, nextDays), 'yyyy-MM-dd');
+  const startDate = format(subDays(today, prevDays), "yyyy-MM-dd");
+  const endDate = format(addDays(today, nextDays), "yyyy-MM-dd");
 
   return useQuery({
-    queryKey: [
-      'userDuties',
-      branch,
-      userId,
-      prevDays,
-      nextDays,
-    ],
-    queryFn: () => getUserDuties({
-      branch,
-      userId,
-      startDate,
-      endDate,
-    }),
+    queryKey: ["userDuties", branch, userId, prevDays, nextDays],
+    queryFn: () =>
+      getUserDuties({
+        branch,
+        userId,
+        startDate,
+        endDate
+      }),
     enabled: !!branch && !!userId,
     staleTime: 2 * 60 * 1000,
     ...options
-  })
-};
+  });
+}
 
-export const useUpdateRota = (options = {}, rotaRefetchType = 'active') => {
+export const useUpdateRota = (options = {}, rotaRefetchType = "active") => {
   const queryClient = useQueryClient();
   const { onSuccess, onError, ...restOptions } = options;
 
@@ -70,12 +56,17 @@ export const useUpdateRota = (options = {}, rotaRefetchType = 'active') => {
     ...restOptions,
 
     onSuccess: (data, variables, context) => {
-      if (rotaRefetchType === 'active') {
-        queryClient.setQueryData(['rota', variables.branch, variables.date], data);
+      if (rotaRefetchType === "active") {
+        queryClient.setQueryData(["rota", variables.branch, variables.date], data);
       } else {
-        queryClient.invalidateQueries({queryKey: ['rota', variables.branch, variables.date], refetchType: rotaRefetchType});
+        queryClient.invalidateQueries({
+          queryKey: ["rota", variables.branch, variables.date],
+          refetchType: rotaRefetchType
+        });
       }
-      queryClient.invalidateQueries({queryKey: ['userDuties', variables.branch, variables.userId]});
+      queryClient.invalidateQueries({
+        queryKey: ["userDuties", variables.branch, variables.userId]
+      });
 
       onSuccess?.(data, variables, context);
     },
@@ -83,7 +74,7 @@ export const useUpdateRota = (options = {}, rotaRefetchType = 'active') => {
     onError: (error, variables, context) => {
       catchResponseError(error);
       onError?.(error, variables, context);
-    },
+    }
   });
 };
 
@@ -96,14 +87,14 @@ export const useAddRotaMulti = (options = {}) => {
     ...restOptions,
 
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({queryKey: ['rota', variables.branch]});
+      queryClient.invalidateQueries({ queryKey: ["rota", variables.branch] });
       onSuccess?.(data, variables, context);
     },
 
     onError: (error, variables, context) => {
       window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
       onError?.(error, variables, context);
-    },
+    }
   });
 };
 
@@ -116,13 +107,13 @@ export const useRemoveRotaMulti = (options = {}) => {
     ...restOptions,
 
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({queryKey: ['rota', variables.branch]});
+      queryClient.invalidateQueries({ queryKey: ["rota", variables.branch] });
       onSuccess?.(data, variables, context);
     },
 
     onError: (error, variables, context) => {
       window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
       onError?.(error, variables, context);
-    },
+    }
   });
 };
