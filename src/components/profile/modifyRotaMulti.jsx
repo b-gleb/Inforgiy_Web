@@ -1,19 +1,13 @@
-import { useState} from 'react';
-import { useAddRotaMulti, useRemoveRotaMulti } from '@/hooks/rotaHooks';
-import { toast } from 'react-toastify';
-import { eachDayOfInterval } from 'date-fns';
+import { eachDayOfInterval } from "date-fns";
 import { ru } from "date-fns/locale";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Field,
-  FieldDescription,
-  FieldContent,
-  FieldLabel
-} from "@/components/ui/field";
-
+import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { useAddRotaMulti, useRemoveRotaMulti } from "@/hooks/rotaHooks";
 
 export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
   // MUTATIONS
@@ -28,17 +22,17 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
   const [allowOccupiedSlots, setAllowOccupiedSlots] = useState(true);
 
   const actionOptions = {
-    'add': '+ Добавить',
-    'remove': '– Удалить'
+    add: "+ Добавить",
+    remove: "– Удалить"
   };
   const dayOptions = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
   const hourOptions = [...Array(24).keys()];
 
   function countDaysInRange(startDate, endDate, targetDays) {
-    const jsDays = targetDays.map(d => (d + 1) % 7);
+    const jsDays = targetDays.map((d) => (d + 1) % 7);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
-    return days.filter(d => jsDays.includes(d.getDay())).length;
-  };
+    return days.filter((d) => jsDays.includes(d.getDay())).length;
+  }
 
   const handleChangeAction = (selected) => {
     if (selected !== action) {
@@ -50,13 +44,19 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
       setAllowOccupiedSlots(true);
     }
 
-    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
   const handleChangeDateRange = (range) => {
     setDateRange(range);
-    if (range === undefined || range.from === range.to) {setStep(1); setDays([]); setHours([]);}
-    if (range !== undefined && range.from !== range.to && step < 2) {setStep(2)}
+    if (range === undefined || range.from === range.to) {
+      setStep(1);
+      setDays([]);
+      setHours([]);
+    }
+    if (range !== undefined && range.from !== range.to && step < 2) {
+      setStep(2);
+    }
 
     window.Telegram.WebApp.HapticFeedback.selectionChanged();
   };
@@ -71,60 +71,63 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
       setStep(3);
     }
 
-    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
   const handleChangeHours = (hour) => {
-    const newHours = hours.includes(hour) ? hours.filter((h) => h !== hour) : [...hours, hour];
+    const newHours = hours.includes(hour)
+      ? hours.filter((h) => h !== hour)
+      : [...hours, hour];
     setHours(newHours);
     setAllowOccupiedSlots(true);
     newHours.length === 0 ? setStep(3) : setStep(4);
-    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
   const handleChangeAllowOccupiedSlots = (checked) => {
-    setAllowOccupiedSlots(checked)
-    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    setAllowOccupiedSlots(checked);
+    window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
   const handleSubmit = () => {
-    const daysOfWeek = days.map(day => dayOptions.indexOf(day));
-    const slotCount = countDaysInRange(dateRange.from, dateRange.to, daysOfWeek) * hours.length;
+    const daysOfWeek = days.map((day) => dayOptions.indexOf(day));
+    const slotCount =
+      countDaysInRange(dateRange.from, dateRange.to, daysOfWeek) * hours.length;
     const data = {
       branch,
       startDate: dateRange.from,
       endDate: dateRange.to,
-      timeRanges: hours.map(hour => `${String(hour).padStart(2, "0")}:00 - ${String(hour + 1).padStart(2, "0")}:00`),
+      timeRanges: hours.map(
+        (hour) =>
+          `${String(hour).padStart(2, "0")}:00 - ${String(hour + 1).padStart(2, "0")}:00`
+      ),
       daysOfWeek,
       userId,
-      ...(action === 'add' && { allowOccupiedSlots }),
+      ...(action === "add" && { allowOccupiedSlots }),
       initDataUnsafe
     };
 
     const toastId = toast.loading("Обновляю график...");
 
     const mutation = action === "add" ? addRotaMulti : removeRotaMulti;
-    mutation(
-      data,
-      {
-        onSuccess: (data) => {
-          toast.update(toastId, {
-            render: `Изменено ${data.modifiedCount} смен из ${slotCount}`,
-            type: "success",
-            isLoading: false,
-            autoClose: 5000
-          });
-        },
-        onError: (error) => {
-          toast.update(toastId, {
-            render: `Ошибка ${error.response.status}: ${error.response.data}`,
-            type: "error",
-            isLoading: false,
-            autoClose: 5000
-          });
-        }
+    mutation(data, {
+      onSuccess: (data) => {
+        toast.update(toastId, {
+          render: `Изменено ${data.modifiedCount} смен из ${slotCount}`,
+          type: "success",
+          isLoading: false,
+          autoClose: 5000
+        });
+      },
+      onError: (error) => {
+        toast.update(toastId, {
+          render: `Ошибка ${error.response.status}: ${error.response.data}`,
+          type: "error",
+          isLoading: false,
+          autoClose: 5000
+        });
       }
-    );
+    });
   };
 
   return (
@@ -151,7 +154,9 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
       {/* Date Range */}
       {step >= 1 && (
         <div className="w-full space-y-2">
-          <p className="text-sm font-semibold text-muted-foreground text-center">Выберите период</p>
+          <p className="text-sm font-semibold text-muted-foreground text-center">
+            Выберите период
+          </p>
           <Calendar
             mode="range"
             defaultMonth={dateRange?.from}
@@ -165,7 +170,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
       )}
 
       {/* Days of the Week */}
-      {step >=2 && (
+      {step >= 2 && (
         <div className="w-full space-y-2">
           <p className="text-sm font-semibold text-muted-foreground text-center">
             Дни недели
@@ -188,30 +193,28 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
       {/* Hours of the day */}
       {step >= 3 && (
         <div className="w-full space-y-2">
-          <p className="text-sm font-semibold text-muted-foreground text-center">
-            Часы
-          </p>
-            <div className='w-full grid grid-cols-6 gap-2'>
-              {hourOptions.map((hour) => {
-                return (
-                  <Button
-                    key={hour}
-                    variant={hours.includes(hour) ? "default" : "outline"}
-                    onClick={() => handleChangeHours(hour)}
-                    className="text-xs py-1"
-                  >
-                    {`${String(hour).padStart(2, "0")}:00`}
-                  </Button>
-                )
-              })}
-            </div>
+          <p className="text-sm font-semibold text-muted-foreground text-center">Часы</p>
+          <div className="w-full grid grid-cols-6 gap-2">
+            {hourOptions.map((hour) => {
+              return (
+                <Button
+                  key={hour}
+                  variant={hours.includes(hour) ? "default" : "outline"}
+                  onClick={() => handleChangeHours(hour)}
+                  className="text-xs py-1"
+                >
+                  {`${String(hour).padStart(2, "0")}:00`}
+                </Button>
+              );
+            })}
+          </div>
         </div>
       )}
 
       {/* allowOccupiedSlots */}
       {step >= 4 && (
         <>
-          {action === 'add' && (
+          {action === "add" && (
             <div className="w-full">
               <Field orientation="horizontal" className="justify-center">
                 <Checkbox
@@ -224,7 +227,8 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
                     Ставить в занятые смены
                   </FieldLabel>
                   <FieldDescription>
-                    Отключите опцию если не хотите добавлять дежурного на уже занятую смену
+                    Отключите опцию если не хотите добавлять дежурного на уже занятую
+                    смену
                   </FieldDescription>
                 </FieldContent>
               </Field>
@@ -242,5 +246,5 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
         </>
       )}
     </div>
-  )
-};
+  );
+}
