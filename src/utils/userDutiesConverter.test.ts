@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from "vitest";
 import { convertToDutyString } from "./userDutiesConverter";
 
 describe("convertToDutyString", () => {
@@ -19,21 +19,15 @@ describe("convertToDutyString", () => {
   });
 
   it("formats multiple non-consecutive ranges", () => {
-    expect(convertToDutyString([0, 1, 17, 18])).toBe(
-      "00:00-02:00; 17:00-19:00"
-    );
+    expect(convertToDutyString([0, 1, 17, 18])).toBe("00:00-02:00; 17:00-19:00");
   });
 
   it("sorts hours before formatting", () => {
-    expect(convertToDutyString([18, 0, 17, 1])).toBe(
-      "00:00-02:00; 17:00-19:00"
-    );
+    expect(convertToDutyString([18, 0, 17, 1])).toBe("00:00-02:00; 17:00-19:00");
   });
 
   it("handles completely separate hours", () => {
-    expect(convertToDutyString([1, 3, 5])).toBe(
-      "01:00-02:00; 03:00-04:00; 05:00-06:00"
-    );
+    expect(convertToDutyString([1, 3, 5])).toBe("01:00-02:00; 03:00-04:00; 05:00-06:00");
   });
 
   it("handles consecutive hours ending at 23", () => {
@@ -41,14 +35,10 @@ describe("convertToDutyString", () => {
   });
 
   it("handles a range followed by a single hour", () => {
-    expect(convertToDutyString([1, 2, 3, 7])).toBe(
-      "01:00-04:00; 07:00-08:00"
-    );
+    expect(convertToDutyString([1, 2, 3, 7])).toBe("01:00-04:00; 07:00-08:00");
   });
 
   it("handles a single hour followed by a range", () => {
-    expect(convertToDutyString([1, 5, 6, 7])).toBe(
-      "01:00-02:00; 05:00-08:00"
-    );
+    expect(convertToDutyString([1, 5, 6, 7])).toBe("01:00-02:00; 05:00-08:00");
   });
 });

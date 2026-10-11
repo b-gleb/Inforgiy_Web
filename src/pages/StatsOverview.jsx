@@ -1,32 +1,37 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, isSameMonth} from 'date-fns';
-import { ru } from "date-fns/locale";
-
-// API
-import { useGetUsers } from '@/hooks/userHooks';
-import { useGetStats } from '@/hooks/statHooks';
-import { getStats } from '@/services/api.ts';
-
-// Utils
-import { calcYearIntervals, transformStatsOverviewData } from '@/utils/statUtils';
-import { userColors } from '@/utils/userColors.js';
-
-// AG Grid
-import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '@/styles/gridTheme';
-import localeText from '@/utils/gridLocale';
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  ModuleRegistry,
-  ValidationModule,
-  NumberFilterModule,
-  ExternalFilterModule,
+  CellStyleModule,
   ClientSideRowModelModule,
   ColumnAutoSizeModule,
-  CellStyleModule,
+  ExternalFilterModule,
   LocaleModule,
-} from 'ag-grid-community';
+  ModuleRegistry,
+  NumberFilterModule,
+  ValidationModule
+} from "ag-grid-community";
+// AG Grid
+import { AgGridReact } from "ag-grid-react";
+import {
+  addWeeks,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek
+} from "date-fns";
+import { ru } from "date-fns/locale";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useGetStats } from "@/hooks/statHooks";
+// API
+import { useGetUsers } from "@/hooks/userHooks";
+import { getStats } from "@/services/api.ts";
+import gridTheme from "@/styles/gridTheme";
+import localeText from "@/utils/gridLocale";
+// Utils
+import { calcYearIntervals, transformStatsOverviewData } from "@/utils/statUtils";
+import { userColors } from "@/utils/userColors.js";
 
 ModuleRegistry.registerModules([
   ValidationModule,
@@ -38,7 +43,6 @@ ModuleRegistry.registerModules([
   LocaleModule
 ]);
 
-
 export default function StatsOverview() {
   const location = useLocation();
   const { branch, initDataUnsafe } = location.state || {};
@@ -49,10 +53,10 @@ export default function StatsOverview() {
   const year = new Date().getFullYear();
   const yearlyColumnDefs = useMemo(() => generateColumnDefs(year), [year]);
   const dateRanges = useMemo(() => calcYearIntervals(year), [year]);
-  const getRowId = useCallback((params) => params.data.user?.nick, []);
+  const getRowId = useCallback(params => params.data.user?.nick, []);
 
-  const colorFilterRef = useRef('all');
-  const [colorMap, setColorMap] = useState({'all': 'Все цвета'});
+  const colorFilterRef = useRef("all");
+  const [colorMap, setColorMap] = useState({ all: "Все цвета" });
 
   const { data: userIds = [] } = useGetUsers(
     { branch, initDataUnsafe },
@@ -66,7 +70,7 @@ export default function StatsOverview() {
         const transformed = transformStatsOverviewData(stats);
         return {
           stats: transformed,
-          colors: getColorMap(transformed),
+          colors: getColorMap(transformed)
         };
       },
       enabled: userIds.length >= 1
@@ -79,9 +83,9 @@ export default function StatsOverview() {
     sortable: true,
     filter: "agNumberColumnFilter",
     filterParams: {
-      filterOptions: ['inRange'],
+      filterOptions: ["inRange"],
       inRangeInclusive: true,
-      buttons: ['apply', 'reset'],
+      buttons: ["apply", "reset"],
       closeOnApply: true,
       maxNumConditions: 1
     },
@@ -90,12 +94,12 @@ export default function StatsOverview() {
     cellClass: cellClass
   });
 
-// Checking if all the neccessary location states exist, otherwise redirect
+  // Checking if all the neccessary location states exist, otherwise redirect
   const missingParams = branch === undefined || initDataUnsafe === undefined;
 
   useEffect(() => {
     if (missingParams) {
-      navigate('/Inforgiy_Web/', { replace: true });
+      navigate("/Inforgiy_Web/", { replace: true });
     }
   }, [navigate, missingParams]);
 
@@ -117,57 +121,62 @@ export default function StatsOverview() {
 
   // Set Table Theme
   useEffect(() => {
-    document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
+    document.body.dataset.agThemeMode = sessionStorage.getItem("theme") || "light";
   }, []);
 
   const autoSizeStrategy = useMemo(() => {
     return {
-      type: 'fitCellContents'
+      type: "fitCellContents"
     };
   }, []);
 
-  const onColumnGroupOpened = useCallback( async (params) => {
-    if (params.columnGroup.level === 1 && params.columnGroup.isExpanded() === true) {
-      const intervals = [];
+  const onColumnGroupOpened = useCallback(
+    async params => {
+      if (params.columnGroup.level === 1 && params.columnGroup.isExpanded() === true) {
+        const intervals = [];
 
-      for (const column of params.columnGroup.children) {
-        const colIdSplit = column.colId.split('_');
-        intervals.push([colIdSplit[0], colIdSplit[1]]);
-      };
+        for (const column of params.columnGroup.children) {
+          const colIdSplit = column.colId.split("_");
+          intervals.push([colIdSplit[0], colIdSplit[1]]);
+        }
 
-      const data = await queryClient.fetchQuery({
-        queryKey: ['overviewStats', branch, {userIds, dateRanges: intervals}],
-        queryFn: () => getStats({branch, userIds, dateRanges: intervals})
-      });
-      const newRowData = transformStatsOverviewData(data);
-
-      if (newRowData) {
-        setRowData((prevData) => {
-          return prevData.map((row) => {
-            const newColumns = newRowData.find((item) => item.user.nick === row.user.nick);
-            return newColumns ? { ...row, ...newColumns } : row;
-          });
+        const data = await queryClient.fetchQuery({
+          queryKey: ["overviewStats", branch, { userIds, dateRanges: intervals }],
+          queryFn: () => getStats({ branch, userIds, dateRanges: intervals })
         });
-      }
-    };
+        const newRowData = transformStatsOverviewData(data);
 
-    // Adjust the width of opened columns
-    if (params.columnGroup.isExpanded() === true){
-      const colArray = params.columnGroup.children.map(col => col.getId());
-      params.api.autoSizeColumns(colArray)
-    }
-  }, [branch, userIds, queryClient]);
+        if (newRowData) {
+          setRowData(prevData => {
+            return prevData.map(row => {
+              const newColumns = newRowData.find(
+                item => item.user.nick === row.user.nick
+              );
+              return newColumns ? { ...row, ...newColumns } : row;
+            });
+          });
+        }
+      }
+
+      // Adjust the width of opened columns
+      if (params.columnGroup.isExpanded() === true) {
+        const colArray = params.columnGroup.children.map(col => col.getId());
+        params.api.autoSizeColumns(colArray);
+      }
+    },
+    [branch, userIds, queryClient]
+  );
 
   const isExternalFilterPresent = useCallback(() => {
     return colorFilterRef.current !== "all";
   }, []);
 
-  const externalFilterChanged = useCallback((newValue) => {
+  const externalFilterChanged = useCallback(newValue => {
     colorFilterRef.current = newValue;
     gridRef.current.api.onFilterChanged();
   }, []);
 
-  const doesExternalFilterPass = useCallback((node) => {
+  const doesExternalFilterPass = useCallback(node => {
     if (node.data) {
       return node.data.user.color == colorFilterRef.current;
     }
@@ -182,43 +191,42 @@ export default function StatsOverview() {
       {
         field: "user",
         headerName: "Позывной",
-        pinned: 'left',
+        pinned: "left",
         filter: null,
-        valueGetter: (params) => params.data.user?.nick || '???',
+        valueGetter: params => params.data.user?.nick || "???",
         cellClass: null
       },
       ...yearlyColumnDefs
     ]);
     setColorMap(data.colors);
-  }, [data, yearlyColumnDefs])
+  }, [data, yearlyColumnDefs]);
 
   if (missingParams) {
     return null;
   }
 
   return (
-    <div className={`w-full h-full flex flex-col fixed inset-0 bg-background ${sessionStorage.getItem('theme') || 'light'}`}>
-        <div className='ml-1 text-black dark:text-[#D9D6D6] text-sm'>
-          <label htmlFor='colorFilter'>Цвет: </label>
-          <select
-            name='colorFilter'
-            id='colorFilter'
-            onChange={(e) => externalFilterChanged(e.target.value)}
-          >
-            {Object.keys(colorMap).map((colorId) => {
-              return (
-                <option
-                  key={colorId}
-                  value={colorId}
-                >
-                  {colorMap[colorId]}
-                </option>
-              )
-            })}
-          </select>
-        </div>
+    <div
+      className={`w-full h-full flex flex-col fixed inset-0 bg-background ${sessionStorage.getItem("theme") || "light"}`}
+    >
+      <div className="ml-1 text-black dark:text-[#D9D6D6] text-sm">
+        <label htmlFor="colorFilter">Цвет: </label>
+        <select
+          name="colorFilter"
+          id="colorFilter"
+          onChange={e => externalFilterChanged(e.target.value)}
+        >
+          {Object.keys(colorMap).map(colorId => {
+            return (
+              <option key={colorId} value={colorId}>
+                {colorMap[colorId]}
+              </option>
+            );
+          })}
+        </select>
+      </div>
 
-      <div className='w-full h-full flex-1 overflow-hidden'>
+      <div className="w-full h-full flex-1 overflow-hidden">
         <AgGridReact
           ref={gridRef}
           getRowId={getRowId}
@@ -233,14 +241,13 @@ export default function StatsOverview() {
           localeText={localeText}
           hidePaddedHeaderRows={true}
           gridOptions={{
-            theme: gridTheme,
+            theme: gridTheme
           }}
         />
       </div>
     </div>
   );
-};
-
+}
 
 function generateColumnDefs(year) {
   const columnDefs = [];
@@ -249,7 +256,7 @@ function generateColumnDefs(year) {
   const yearColumnDefs = {
     field: `${year}`,
     openByDefault: true,
-    children: [],
+    children: []
   };
 
   for (const month of months) {
@@ -263,48 +270,47 @@ function generateColumnDefs(year) {
       // Ensure the week is only within the current month
       if (!isSameMonth(currentWeekStart, monthStart)) {
         currentWeekStart = addWeeks(currentWeekStart, 1);
-      };
+      }
 
       let currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
 
       monthChildren.push({
-        field: `${format(currentWeekStart, 'yyyy-MM-dd')}_${format(currentWeekEnd, 'yyyy-MM-dd')}`,
-        headerName: `${format(currentWeekStart, 'dd.MM')} - ${format(currentWeekEnd, 'dd.MM')}`,
-        columnGroupShow: 'open'
+        field: `${format(currentWeekStart, "yyyy-MM-dd")}_${format(currentWeekEnd, "yyyy-MM-dd")}`,
+        headerName: `${format(currentWeekStart, "dd.MM")} - ${format(currentWeekEnd, "dd.MM")}`,
+        columnGroupShow: "open"
       });
 
       currentWeekStart = addWeeks(currentWeekStart, 1);
-    };
+    }
 
     // Monthly total
     monthChildren.push({
-      field: `${format(monthStart, 'yyyy-MM-dd')}_${format(monthEnd, 'yyyy-MM-dd')}`,
-      headerName: 'Итого',
-      columnGroupShow: 'closed'
-    })
+      field: `${format(monthStart, "yyyy-MM-dd")}_${format(monthEnd, "yyyy-MM-dd")}`,
+      headerName: "Итого",
+      columnGroupShow: "closed"
+    });
 
     yearColumnDefs.children.push({
-      field: format(monthStart, 'yyyy-MM'),
-      headerName: format(monthStart, 'LLLL', { locale: ru }),
-      columnGroupShow: 'open',
-      children: monthChildren,
+      field: format(monthStart, "yyyy-MM"),
+      headerName: format(monthStart, "LLLL", { locale: ru }),
+      columnGroupShow: "open",
+      children: monthChildren
     });
-  };
+  }
 
   // Yearly totals
   yearColumnDefs.children.push({
-    field: `${format(new Date(year, 0, 1), 'yyyy-MM-dd')}_${format(new Date(year, 11, 31), 'yyyy-MM-dd')}`,
-    headerName: 'Итого',
-    columnGroupShow: 'closed'
-  })
+    field: `${format(new Date(year, 0, 1), "yyyy-MM-dd")}_${format(new Date(year, 11, 31), "yyyy-MM-dd")}`,
+    headerName: "Итого",
+    columnGroupShow: "closed"
+  });
 
   columnDefs.push(yearColumnDefs);
   return columnDefs;
-};
+}
 
-
-const getColorMap = (data) => {
-  const colorMap = {all: 'Все цвета'};
+const getColorMap = data => {
+  const colorMap = { all: "Все цвета" };
   const seenColors = new Set();
 
   for (const item of data) {
@@ -315,18 +321,17 @@ const getColorMap = (data) => {
         colorMap[color] = userColors[color];
       }
     }
-  };
+  }
 
   return colorMap;
 };
 
-
-const cellClass = ( params ) => {
+const cellClass = params => {
   if (
-    params.value <= 0 && 
+    params.value <= 0 &&
     params.column?.originalParent?.expanded === true &&
     params.column?.originalParent?.expandable === true
-  ){
-    return 'text-[#ff0000]'
+  ) {
+    return "text-[#ff0000]";
   }
 };

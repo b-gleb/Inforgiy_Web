@@ -25,7 +25,7 @@ export default function PageSelector({
           value={date}
           min="2024-12-23"
           max={format(addDays(new Date(), 365), "yyyy-MM-dd")}
-          onChange={(e) => {
+          onChange={e => {
             onDateChange(e.target.value);
             window.Telegram.WebApp.HapticFeedback.selectionChanged();
           }}
@@ -58,7 +58,7 @@ export default function PageSelector({
           className="rounded-lg"
           onClick={() => {
             window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
-            isRotaAdmin ? setShowStatDropdown((prev) => !prev) : onShowPersonalStats();
+            isRotaAdmin ? setShowStatDropdown(prev => !prev) : onShowPersonalStats();
           }}
         >
           <ChartNoAxesCombined size={25} className="size-6" />

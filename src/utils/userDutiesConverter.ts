@@ -19,9 +19,7 @@ export function convertToDutyString(hours: number[]): string {
     }
   }
 
-  return ranges
-    .map(([start, end]) => `${pad(start)}:00-${pad(end + 1)}:00`)
-    .join("; ");
+  return ranges.map(([start, end]) => `${pad(start)}:00-${pad(end + 1)}:00`).join("; ");
 }
 
 const pad = (n: number): string => n.toString().padStart(2, "0");

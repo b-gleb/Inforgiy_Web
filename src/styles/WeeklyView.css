@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
@@ -19,12 +19,12 @@
   }
 }
 
-.empty { @apply
-    bg-red-100 dark:bg-[#3a0808]
+.empty {
+  @apply bg-red-100 dark:bg-[#3a0808];
 }
 
-.empty.gp { @apply
-    bg-[#fbe4a2] dark:bg-[#62501d]
+.empty.gp {
+  @apply bg-[#fbe4a2] dark:bg-[#62501d];
 }
 
 .pop-up { @apply
@@ -39,6 +39,6 @@
     bg-white dark:bg-black
 }
 
-.gp-green { @apply 
-    text-green-700 dark:text-[#44cd77]
+.gp-green {
+  @apply text-green-700 dark:text-[#44cd77];
 }

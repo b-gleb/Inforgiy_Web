@@ -11,11 +11,7 @@ interface UserBoxProps {
 }
 
 /** Box containing user's nickname in the rota*/
-export default function UserBox({
-  userObj,
-  canRemove,
-  onRemove,
-}: UserBoxProps) {
+export default function UserBox({ userObj, canRemove, onRemove }: UserBoxProps) {
   return (
     <motion.div
       className={`username-box color-${userObj.color}`}
@@ -32,4 +28,4 @@ export default function UserBox({
       )}
     </motion.div>
   );
-};
+}

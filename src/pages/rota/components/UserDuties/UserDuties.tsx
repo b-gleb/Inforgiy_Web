@@ -1,9 +1,9 @@
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
-import { Skeleton } from '@/components/ui/skeleton.jsx';
-import { convertToDutyString } from '@/utils/userDutiesConverter.js';
-import { OctagonX } from 'lucide-react';
-import { ApiStatus } from '@/types/apiStatus';
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
+import { OctagonX } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton.jsx";
+import { ApiStatus } from "@/types/apiStatus";
+import { convertToDutyString } from "@/utils/userDutiesConverter.js";
 
 interface UserDutiesProps {
   /** API Status */
@@ -11,8 +11,8 @@ interface UserDutiesProps {
   /** Information about user's duties obtained from the API */
   data: Array<{
     date: string;
-    hours: Array<number>
-  }>
+    hours: Array<number>;
+  }>;
 }
 
 /** Card showing a summary of user's duties for the specified period of time*/
@@ -22,36 +22,35 @@ export default function UserDuties({ status, data }: UserDutiesProps) {
       <div className="px-2 py-3">
         <h2 className="text-lg font-bold text-white mb-2">Смены</h2>
 
-        {status === 'pending' && (
+        {status === "pending" && (
           <div className="space-y-2">
             <Skeleton className="h-4" />
             <Skeleton className="h-4 w-5/6" />
           </div>
         )}
 
-        {status === 'error' && (
-          <div className='flex items-center gap-1 text-white' role='alert'>
-            <OctagonX className='h-4 w-4'/>
+        {status === "error" && (
+          <div className="flex items-center gap-1 text-white" role="alert">
+            <OctagonX className="h-4 w-4" />
             <span className="text-sm">Ошибка загрузки!</span>
           </div>
         )}
 
-        {status === 'success' && (
-          data.length > 0 ? (
+        {status === "success" &&
+          (data.length > 0 ? (
             <div className="space-y-1">
               {data.map((duty, index) => (
                 <p key={index} className="text-sm text-white">
                   <span className="font-semibold">
-                    {format(duty.date, 'dd.MM (EEEE)', { locale: ru })}:
-                  </span>{' '}
+                    {format(duty.date, "dd.MM (EEEE)", { locale: ru })}:
+                  </span>{" "}
                   {convertToDutyString(duty.hours)}
                 </p>
               ))}
             </div>
           ) : (
             <p className="text-sm text-white">Смен нет :(</p>
-          )
-        )}
+          ))}
       </div>
     </div>
   );

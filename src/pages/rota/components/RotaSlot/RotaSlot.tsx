@@ -1,7 +1,7 @@
-import { User as UserType } from '@/types/user';
-import { AnimatePresence } from 'framer-motion';
-import UserBox from '@/pages/rota/components/UserBox/UserBox';
-import { User, Plus } from 'lucide-react';
+import { AnimatePresence } from "framer-motion";
+import { Plus, User } from "lucide-react";
+import UserBox from "@/pages/rota/components/UserBox/UserBox";
+import { User as UserType } from "@/types/user";
 
 export interface RotaSlotProps {
   /** Department slug, used to add users to rota and determine the background of an empty slot */
@@ -10,7 +10,7 @@ export interface RotaSlotProps {
   label: string;
   /** Array of user objects for the time slot */
   users: UserType[];
-  /** Array of user objects for the time slot in another department. 
+  /** Array of user objects for the time slot in another department.
    * Allows to display limited information about duties from another department.
    */
   secondaryUsers?: UserType[] | null;
@@ -39,9 +39,10 @@ export default function RotaSlot({
   canRemove = false,
   onRemove,
   onAddSelf,
-  onOpenUserSearch,
+  onOpenUserSearch
 }: RotaSlotProps) {
-  const containerClass = users.length === 0 ? `hour-container empty ${department}` : 'hour-container';
+  const containerClass =
+    users.length === 0 ? `hour-container empty ${department}` : "hour-container";
 
   return (
     <div className={containerClass}>
@@ -50,7 +51,7 @@ export default function RotaSlot({
 
         {secondaryUsers && secondaryUsers.length > 0 && (
           <div className="flex gap-1">
-            {secondaryUsers.map((user) => (
+            {secondaryUsers.map(user => (
               <div key={user.id} className={`user-box color-${user.color}`} />
             ))}
           </div>
@@ -59,7 +60,7 @@ export default function RotaSlot({
 
       <div className="usernames-container">
         <AnimatePresence>
-          {users.map((user) => (
+          {users.map(user => (
             <UserBox
               key={user.id}
               userObj={user}
@@ -72,17 +73,25 @@ export default function RotaSlot({
 
       <div className="buttons-container">
         {canAddOthers && onOpenUserSearch && (
-          <button className="p-1" onClick={() => onOpenUserSearch(label)} aria-label="Assign user">
+          <button
+            className="p-1"
+            onClick={() => onOpenUserSearch(label)}
+            aria-label="Assign user"
+          >
             <User size={15} className="icon-text" />
           </button>
         )}
 
         {canAddSelf && (
-          <button className="p-1" onClick={() => onAddSelf(label)} aria-label="Add yourself">
+          <button
+            className="p-1"
+            onClick={() => onAddSelf(label)}
+            aria-label="Add yourself"
+          >
             <Plus size={15} className="icon-text" />
           </button>
         )}
       </div>
     </div>
   );
-};
+}

@@ -20,25 +20,25 @@ export default function UserEditForm({ branch, User, initDataUnsafe }) {
   const { mutate: updateUser } = useUpdateUser();
   const { mutate: removeUser } = useRemoveUser();
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
 
     if (name === "color") {
       window.Telegram.WebApp.HapticFeedback.selectionChanged();
     }
 
-    setEditingUser((prevUser) => ({
+    setEditingUser(prevUser => ({
       ...prevUser,
       [name]: value
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     updateUser(
       { branch, userObj: editingUser, initDataUnsafe },
       {
-        onSuccess: (data) => {
+        onSuccess: data => {
           navigate("/Inforgiy_Web/", {
             state: {
               showUserManagement: true
@@ -83,9 +83,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }) {
             id="color"
             name="color"
             value={String(editingUser.color)}
-            onValueChange={(val) =>
-              handleChange({ target: { name: "color", value: val } })
-            }
+            onValueChange={val => handleChange({ target: { name: "color", value: val } })}
           >
             <SelectTrigger>
               <SelectValue />
@@ -112,7 +110,7 @@ export default function UserEditForm({ branch, User, initDataUnsafe }) {
                 removeUser(
                   { branch, userId: editingUser.id, initDataUnsafe },
                   {
-                    onSuccess: (data) => {
+                    onSuccess: data => {
                       navigate("/Inforgiy_Web/", { state: { showUserManagement: true } });
                     }
                   }

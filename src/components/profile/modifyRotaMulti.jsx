@@ -29,12 +29,12 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
   const hourOptions = [...Array(24).keys()];
 
   function countDaysInRange(startDate, endDate, targetDays) {
-    const jsDays = targetDays.map((d) => (d + 1) % 7);
+    const jsDays = targetDays.map(d => (d + 1) % 7);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
-    return days.filter((d) => jsDays.includes(d.getDay())).length;
+    return days.filter(d => jsDays.includes(d.getDay())).length;
   }
 
-  const handleChangeAction = (selected) => {
+  const handleChangeAction = selected => {
     if (selected !== action) {
       setAction(selected);
       setStep(1);
@@ -47,7 +47,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
     window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
-  const handleChangeDateRange = (range) => {
+  const handleChangeDateRange = range => {
     setDateRange(range);
     if (range === undefined || range.from === range.to) {
       setStep(1);
@@ -61,8 +61,8 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
     window.Telegram.WebApp.HapticFeedback.selectionChanged();
   };
 
-  const handleChangeDay = (day) => {
-    const newDays = days.includes(day) ? days.filter((d) => d !== day) : [...days, day];
+  const handleChangeDay = day => {
+    const newDays = days.includes(day) ? days.filter(d => d !== day) : [...days, day];
     setDays(newDays);
     if (newDays.length === 0) {
       setStep(2);
@@ -74,9 +74,9 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
     window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
-  const handleChangeHours = (hour) => {
+  const handleChangeHours = hour => {
     const newHours = hours.includes(hour)
-      ? hours.filter((h) => h !== hour)
+      ? hours.filter(h => h !== hour)
       : [...hours, hour];
     setHours(newHours);
     setAllowOccupiedSlots(true);
@@ -84,13 +84,13 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
     window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
-  const handleChangeAllowOccupiedSlots = (checked) => {
+  const handleChangeAllowOccupiedSlots = checked => {
     setAllowOccupiedSlots(checked);
     window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
   };
 
   const handleSubmit = () => {
-    const daysOfWeek = days.map((day) => dayOptions.indexOf(day));
+    const daysOfWeek = days.map(day => dayOptions.indexOf(day));
     const slotCount =
       countDaysInRange(dateRange.from, dateRange.to, daysOfWeek) * hours.length;
     const data = {
@@ -98,7 +98,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
       startDate: dateRange.from,
       endDate: dateRange.to,
       timeRanges: hours.map(
-        (hour) =>
+        hour =>
           `${String(hour).padStart(2, "0")}:00 - ${String(hour + 1).padStart(2, "0")}:00`
       ),
       daysOfWeek,
@@ -111,7 +111,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
 
     const mutation = action === "add" ? addRotaMulti : removeRotaMulti;
     mutation(data, {
-      onSuccess: (data) => {
+      onSuccess: data => {
         toast.update(toastId, {
           render: `Изменено ${data.modifiedCount} смен из ${slotCount}`,
           type: "success",
@@ -119,7 +119,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
           autoClose: 5000
         });
       },
-      onError: (error) => {
+      onError: error => {
         toast.update(toastId, {
           render: `Ошибка ${error.response.status}: ${error.response.data}`,
           type: "error",
@@ -138,7 +138,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
           Выберите действие
         </p>
         <ButtonGroup className="w-full flex justify-center">
-          {Object.keys(actionOptions).map((btn) => (
+          {Object.keys(actionOptions).map(btn => (
             <Button
               key={btn}
               className="flex-1"
@@ -161,7 +161,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
             mode="range"
             defaultMonth={dateRange?.from}
             selected={dateRange}
-            onSelect={(range) => handleChangeDateRange(range)}
+            onSelect={range => handleChangeDateRange(range)}
             locale={ru}
             weekStartsOn={1}
             className="rounded-lg border dark:border-input shadow-sm mx-auto"
@@ -176,7 +176,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
             Дни недели
           </p>
           <ButtonGroup className="w-full flex justify-center flex-wrap">
-            {dayOptions.map((day) => (
+            {dayOptions.map(day => (
               <Button
                 key={day}
                 className="px-3.5"
@@ -195,7 +195,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
         <div className="w-full space-y-2">
           <p className="text-sm font-semibold text-muted-foreground text-center">Часы</p>
           <div className="w-full grid grid-cols-6 gap-2">
-            {hourOptions.map((hour) => {
+            {hourOptions.map(hour => {
               return (
                 <Button
                   key={hour}
@@ -220,7 +220,7 @@ export default function ModifyRotaMulti({ branch, userId, initDataUnsafe }) {
                 <Checkbox
                   id="allowOccupiedSlots"
                   checked={allowOccupiedSlots}
-                  onCheckedChange={(checked) => handleChangeAllowOccupiedSlots(checked)}
+                  onCheckedChange={checked => handleChangeAllowOccupiedSlots(checked)}
                 />
                 <FieldContent>
                   <FieldLabel htmlFor="allowOccupiedSlots">

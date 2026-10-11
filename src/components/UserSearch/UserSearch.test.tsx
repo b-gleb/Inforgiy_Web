@@ -67,7 +67,7 @@ describe("UserSearch - filtering logic", () => {
   it("shows all users when the search query is empty", () => {
     render(<UserSearch {...defaultProps} onSelectUser={vi.fn()} onClose={noop} />);
 
-    users.forEach((user) => {
+    users.forEach(user => {
       expect(screen.getByText(user.nick)).toBeInTheDocument();
     });
   });
@@ -92,7 +92,7 @@ describe("UserSearch - filtering logic", () => {
     const input = screen.getByPlaceholderText("Поиск...");
     await user.type(input, "zzz-not-a-match");
 
-    users.forEach((u) => {
+    users.forEach(u => {
       expect(screen.queryByText(u.nick)).not.toBeInTheDocument();
     });
   });
@@ -122,7 +122,7 @@ describe("UserSearch - status handling", () => {
 
     expect(screen.getByRole("alert")).toBeInTheDocument();
     expect(screen.getByText("Ошибка загрузки!")).toBeInTheDocument();
-    users.forEach((u) => {
+    users.forEach(u => {
       expect(screen.queryByText(u.nick)).not.toBeInTheDocument();
     });
   });
@@ -136,7 +136,7 @@ describe("UserSearch - status handling", () => {
     const skeletons = container.querySelectorAll(".animate-pulse");
     expect(skeletons).toHaveLength(22);
 
-    users.forEach((u) => {
+    users.forEach(u => {
       expect(screen.queryByText(u.nick)).not.toBeInTheDocument();
     });
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -145,7 +145,7 @@ describe("UserSearch - status handling", () => {
   it('renders the filtered user list when status is "success"', () => {
     render(<UserSearch {...defaultProps} status="success" onClose={noop} />);
 
-    users.forEach((u) => {
+    users.forEach(u => {
       expect(screen.getByText(u.nick)).toBeInTheDocument();
     });
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -161,7 +161,7 @@ describe("UserSearch - user interactions / callbacks", () => {
     await user.click(screen.getByText("Bob"));
 
     expect(onSelectUser).toHaveBeenCalledTimes(1);
-    expect(onSelectUser).toHaveBeenCalledWith(users.find((u) => u.nick === "Bob"));
+    expect(onSelectUser).toHaveBeenCalledWith(users.find(u => u.nick === "Bob"));
   });
 
   it("calls onClose when the close button is pressed", async () => {

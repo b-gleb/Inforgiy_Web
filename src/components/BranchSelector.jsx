@@ -4,7 +4,7 @@ export default function BranchSelector({ userBranches, branch, onClick }) {
   return (
     <div className="branches-container">
       <div className="branches-flexbox">
-        {Object.keys(userBranches).map((key) => (
+        {Object.keys(userBranches).map(key => (
           <button
             key={key}
             onClick={() => onClick(key)}

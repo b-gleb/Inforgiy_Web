@@ -1,10 +1,10 @@
-import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { User } from '@/types/user';
-import { OctagonX } from 'lucide-react';
-import { ApiStatus } from '@/types/apiStatus';
+import { motion } from "framer-motion";
+import { OctagonX } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ApiStatus } from "@/types/apiStatus";
+import { User } from "@/types/user";
 
 export interface UserSearchProps {
   /** API Status */
@@ -12,7 +12,7 @@ export interface UserSearchProps {
   /** User objects for a department */
   users: User[];
   /** Determines if the "Add User" button will be shown */
-  showAddUserButton?: boolean
+  showAddUserButton?: boolean;
   /** Function to be called when a user is selected */
   onSelectUser: (user: User) => void;
   /** Function to be called when "Add User" button is pressed */
@@ -35,26 +35,22 @@ export default function UserSearch({
   const filteredUsers = useMemo(() => {
     if (!searchQuery) return users;
 
-    return users.filter(user => 
+    return users.filter(user =>
       user.nick.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }, [users, searchQuery])
-
+    );
+  }, [users, searchQuery]);
 
   return (
     <>
       <div className="flex items-center mb-2">
-        <Input 
+        <Input
           type="text"
           placeholder="Поиск..."
           value={searchQuery}
-          onChange={(e:any) => setSearchQuery(e.target.value)}
+          onChange={(e: any) => setSearchQuery(e.target.value)}
           className="mr-2"
         />
-        <button
-          onClick={() => onClose()}
-          className="p-2 text-[#007aff] text-xl"
-        >
+        <button onClick={() => onClose()} className="p-2 text-[#007aff] text-xl">
           ✕
         </button>
       </div>
@@ -70,13 +66,13 @@ export default function UserSearch({
         </Button>
       )}
 
-      {status === 'error' && (
-        <div className='flex justify-center gap-1 text-red-500' role='alert'>
-        <OctagonX/> <span>Ошибка загрузки!</span>
+      {status === "error" && (
+        <div className="flex justify-center gap-1 text-red-500" role="alert">
+          <OctagonX /> <span>Ошибка загрузки!</span>
         </div>
       )}
 
-      {status === 'pending' && (
+      {status === "pending" && (
         <div className="search_results_container auto-rows-10.5!">
           {Array.from({ length: 22 }).map((_, i) => (
             <div
@@ -88,12 +84,16 @@ export default function UserSearch({
         </div>
       )}
 
-      {status === 'success' && (
+      {status === "success" && (
         <div className="search_results_container">
-          {filteredUsers.map((user) => (
+          {filteredUsers.map(user => (
             <motion.div
               initial={{ opacity: 0.5, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1, transition: { ease: 'easeOut', duration: 0.2 } }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                transition: { ease: "easeOut", duration: 0.2 }
+              }}
               key={user.id}
             >
               <Button
@@ -109,5 +109,5 @@ export default function UserSearch({
         </div>
       )}
     </>
-  )
+  );
 }
