@@ -29,10 +29,10 @@
   px-3
   bg-gray-100 dark:bg-neutral-900
   dark:text-foreground
-}
+;}
 
-.icon-text { @apply
-  text-black dark:text-muted-foreground
+.icon-text {
+  @apply text-black dark:text-muted-foreground;
 }
 
 .dropdown-container { @apply
@@ -44,7 +44,7 @@
   mt-2
   z-50
   bg-background dark:bg-input
-}
+;}
 
 .dropdown-button { @apply
   block
@@ -54,7 +54,7 @@
   text-left text-sm
   rounded-md
   bg-background dark:bg-input
-}
+;}
 
 /* BRANCHES */
 .branches-container { @apply
@@ -64,7 +64,7 @@
   mb-2
 
   bg-white dark:bg-neutral-700
-}
+;}
 
 .branches-flexbox {@apply
   flex
@@ -73,7 +73,7 @@
   p-1
 
   bg-[#e9e9eb] dark:bg-neutral-800
-}
+;}
 
 .branch-button {@apply
   flex-1
@@ -85,19 +85,19 @@
 
   text-[#007aff]
   transition-all duration-300
-}
+;}
 
 .branch-button.selected {@apply
   shadow-sm
   bg-white dark:bg-neutral-950
-}
+;}
 
 /* ROTA */
 .hours-grid { @apply
   grid
   grid-cols-[repeat(1,1fr)]
   gap-[5px]
-}
+;}
 
 .hour-container { @apply
  flex
@@ -109,14 +109,14 @@
  pl-1
  border rounded-lg border-border
  bg-white dark:bg-input
+;}
+
+.hour-container.empty {
+  @apply bg-red-300 dark:bg-red-900/70;
 }
 
-.hour-container.empty { @apply
-  bg-red-300 dark:bg-red-900/70
-}
-
-.hour-container.empty.gp { @apply
-  bg-[#fbe4a2] dark:bg-yellow-500/30
+.hour-container.empty.gp {
+  @apply bg-[#fbe4a2] dark:bg-yellow-500/30;
 }
 
 .hour-label { @apply
@@ -125,14 +125,14 @@
   font-semibold
   mr-1
   text-[#393939] dark:text-muted-foreground
-}
+;}
 
 .usernames-container { @apply
   flex
   flex-nowrap
   overflow-x-auto
   gap-1
-}
+;}
 
 .username-box { @apply
   whitespace-nowrap
@@ -142,69 +142,68 @@
   border-2
   text-xs
   font-medium
-}
+;}
 
-.buttons-container { @apply
-  ml-auto
-  shrink-0
-}
+.buttons-container {
+  @apply ml-auto shrink-0
+;}
 
 /* Color Variants */
 .username-box.color-0 { @apply
   bg-[#e0f3ff] dark:bg-[#1b2f3a]
   text-[#007acc] dark:text-[#4aa3df]
   border-[#007acc] dark:border-[#4aa3df]
-}
+;}
 
 .username-box.color-1 { @apply
   bg-[#e6f7e5] dark:bg-[#1f4030]
   text-[#228b22] dark:text-[#32a869]
   border-[#228b22] dark:border-[#32a869]
-}
+;}
 
 .username-box.color-2 { @apply
   bg-[#fdecea] dark:bg-[#3a1b1b]
   text-[#d9534f] dark:text-[#e57373]
   border-[#d9534f] dark:border-[#e57373]
-}
+;}
 
 .username-box.color-3 { @apply 
   bg-white dark:bg-[#1c1c1c] 
   text-black dark:text-[#d1d1d1] 
   border-black dark:border-[#d1d1d1]; 
-}
+;}
 
 .username-box.color-4 { @apply 
   bg-[#f3e8ff] dark:bg-[#2d1b3a] 
   text-[#8a2be2] dark:text-[#c5a6d9] 
   border-[#8a2be2] dark:border-[#a879c7]; 
-}
+;}
 
 .username-box.color-5 { @apply 
   bg-[#fff4e6] dark:bg-[#402c1f] 
   text-[#b16100] dark:text-[#f4a261] 
   border-[#ff8c00] dark:border-[#f4a261]; 
-}
+;}
 
 .username-box.color-6 { @apply 
   bg-[#fffde6] dark:bg-[#403f1f] 
   text-[#746204] dark:text-[#eac54f] 
   border-[#ffd700] dark:border-[#eac54f]; 
-}
+;}
 
 .user-box { @apply
   w-2
   h-2
   rounded-xs
-}
+;}
 
 .user-box.color-1 { @apply
   bg-[#228b22] dark:bg-[#1a871a]
-}
+;}
 
 .user-box.color-3 { @apply
   bg-black dark:bg-[#0f0f0f]
-}
+;}
 
 .popup { @apply
   max-w-[600px]
@@ -217,7 +216,7 @@
   z-50
 
   bg-white dark:bg-neutral-900
-}
+;}
 
 .search_results_container{ @apply
   h-[calc(100vh-100px)]
@@ -229,7 +228,7 @@
   auto-rows-9.5
 
   dark:text-gray-400
-}
+;}
 
 /*
   ---break---
