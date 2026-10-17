@@ -2,9 +2,8 @@ name: Code Quality
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
 
 jobs:
   quality:
@@ -23,6 +22,6 @@ jobs:
         uses: biomejs/setup-biome@v2
         with:
           version: 2.5.15
- 
+
       - name: Run Biome
         run: biome ci .
