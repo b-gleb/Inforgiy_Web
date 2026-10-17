@@ -22,7 +22,7 @@
 
 .app { @apply
   min-h-screen
-  max-w-[600px]
+  max-w-150
   font-['Arial']
   mx-auto my-0
   py-5
@@ -57,24 +57,6 @@
 ;}
 
 /* BRANCHES */
-.branches-container { @apply
-  p-2
-  rounded-lg
-  shadow-sm
-  mb-2
-
-  bg-white dark:bg-neutral-700
-;}
-
-.branches-flexbox {@apply
-  flex
-  justify-between
-  rounded-lg
-  p-1
-
-  bg-[#e9e9eb] dark:bg-neutral-800
-;}
-
 .branch-button {@apply
   flex-1
   py-2
@@ -93,12 +75,6 @@
 ;}
 
 /* ROTA */
-.hours-grid { @apply
-  grid
-  grid-cols-[repeat(1,1fr)]
-  gap-[5px]
-;}
-
 .hour-container { @apply
  flex
  justify-between
@@ -119,21 +95,6 @@
   @apply bg-[#fbe4a2] dark:bg-yellow-500/30;
 }
 
-.hour-label { @apply
-  shrink-0
-  text-[0.6rem]
-  font-semibold
-  mr-1
-  text-[#393939] dark:text-muted-foreground
-;}
-
-.usernames-container { @apply
-  flex
-  flex-nowrap
-  overflow-x-auto
-  gap-1
-;}
-
 .username-box { @apply
   whitespace-nowrap
   px-1
@@ -142,10 +103,6 @@
   border-2
   text-xs
   font-medium
-;}
-
-.buttons-container {
-  @apply ml-auto shrink-0
 ;}
 
 /* Color Variants */
@@ -206,7 +163,7 @@
 ;}
 
 .popup { @apply
-  max-w-[600px]
+  max-w-150
   mx-auto my-0
   overflow-x-auto
   py-5

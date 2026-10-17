@@ -47,7 +47,9 @@ export default function RotaSlot({
   return (
     <div className={containerClass}>
       <div className="flex flex-col">
-        <span className="hour-label">{label}</span>
+        <span className="shrink-0 text-[0.6rem] font-semibold mr-1 text-[#393939] dark:text-muted-foreground">
+          {label}
+        </span>
 
         {secondaryUsers && secondaryUsers.length > 0 && (
           <div className="flex gap-1">
@@ -58,7 +60,7 @@ export default function RotaSlot({
         )}
       </div>
 
-      <div className="usernames-container">
+      <div className="flex flex-nowrap overflow-x-auto gap-1">
         <AnimatePresence>
           {users.map(user => (
             <UserBox
@@ -71,7 +73,7 @@ export default function RotaSlot({
         </AnimatePresence>
       </div>
 
-      <div className="buttons-container">
+      <div className="ml-auto shrink-0">
         {canAddOthers && onOpenUserSearch && (
           <button
             className="p-1"

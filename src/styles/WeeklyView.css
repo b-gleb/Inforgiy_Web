@@ -34,7 +34,7 @@
     shadow-lg
     p-6
     max-h-[70%]
-    w-full max-w-[600px]
+    w-full max-w-150
     overflow-y-auto
     bg-white dark:bg-black
 ;}

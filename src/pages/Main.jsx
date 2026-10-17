@@ -326,7 +326,7 @@ function Main() {
             {showRota && (
               <motion.div
                 {...swipeHandlers}
-                className="hours-grid"
+                className="grid grid-cols-[repeat(1,1fr)] gap-1.25"
                 key={date}
                 custom={swipeDirection}
                 variants={animationVariants}
