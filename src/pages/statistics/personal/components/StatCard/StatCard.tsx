@@ -1,6 +1,6 @@
 import { OctagonX } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ApiStatus } from "@/types/apiStatus";
+import type { ApiStatus } from "@/types/apiStatus";
 
 interface StatCardProps {
   /** API status */

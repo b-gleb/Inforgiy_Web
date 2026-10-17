@@ -272,7 +272,7 @@ function generateColumnDefs(year) {
         currentWeekStart = addWeeks(currentWeekStart, 1);
       }
 
-      let currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
+      const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
 
       monthChildren.push({
         field: `${format(currentWeekStart, "yyyy-MM-dd")}_${format(currentWeekEnd, "yyyy-MM-dd")}`,

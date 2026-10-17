@@ -3,8 +3,8 @@ import { OctagonX } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ApiStatus } from "@/types/apiStatus";
-import { User } from "@/types/user";
+import type { ApiStatus } from "@/types/apiStatus";
+import type { User } from "@/types/user";
 
 export interface UserSearchProps {
   /** API Status */

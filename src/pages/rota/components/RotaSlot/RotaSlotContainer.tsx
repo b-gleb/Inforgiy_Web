@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 // API
 import { useUpdateRota } from "@/hooks/rotaHooks";
-import RotaSlot, { RotaSlotProps } from "./RotaSlot";
+import RotaSlot, { type RotaSlotProps } from "./RotaSlot";
 
 // Lazy Loading
 const UserSearchContainer = lazy(

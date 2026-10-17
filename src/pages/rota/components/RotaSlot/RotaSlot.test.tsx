@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import RotaSlot, { RotaSlotProps } from "@/pages/rota/components/RotaSlot/RotaSlot";
+import RotaSlot, { type RotaSlotProps } from "@/pages/rota/components/RotaSlot/RotaSlot";
 import type { User as UserType } from "@/types/user";
 
 // framer-motion's AnimatePresence is purely an animation wrapper; for logic

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { User } from "@/types/user";
+import type { User } from "@/types/user";
 
 interface UserBoxProps {
   /** Complete user object */

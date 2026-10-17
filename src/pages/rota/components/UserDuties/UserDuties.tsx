@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { OctagonX } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton.jsx";
-import { ApiStatus } from "@/types/apiStatus";
+import type { ApiStatus } from "@/types/apiStatus";
 import { convertToDutyString } from "@/utils/userDutiesConverter.js";
 
 interface UserDutiesProps {
