@@ -41,13 +41,15 @@
     "deploy": "gh-pages -d dist --repo https://github.com/b-gleb/Inforgiy_Web.git",
     "start": "vite",
     "build": "vite build",
+    "serve": "vite preview",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "serve": "vite preview",
+    "check": "npx @biomejs/biome check --write",
     "storybook": "storybook dev -p 6006 --disable-telemetry",
     "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.15",
     "@storybook/addon-a11y": "^10.6.1",
     "@storybook/addon-docs": "^10.6.1",
     "@storybook/addon-vitest": "^10.6.1",

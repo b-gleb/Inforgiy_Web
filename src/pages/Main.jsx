@@ -1,47 +1,49 @@
-import { useEffect, useState, useCallback, useRef, Suspense, lazy } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { format, addDays } from 'date-fns';
-import { useSwipeable } from 'react-swipeable';
-import { motion, AnimatePresence } from 'framer-motion';
+import { addDays, format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSwipeable } from "react-swipeable";
 
 // Custom components
-import BranchSelector from '@/components/BranchSelector';
-import PageSelector from '@/components/PageSelector';
-import RotaSlotContainer from '@/pages/rota/components/RotaSlot/RotaSlotContainer';
-import UserDutiesContainer from './rota/components/UserDuties/UserDutiesContainer';
-import Loading from '@/components/loading.jsx';
-import catchResponseError from '@/utils/responseError.jsx';
-
+import BranchSelector from "@/components/BranchSelector";
+import Loading from "@/components/loading.jsx";
+import PageSelector from "@/components/PageSelector";
 // API
-import { useRota, useUpdateRota } from '@/hooks/rotaHooks';
-import { getAuth } from '@/services/api.ts';
+import { useRota, useUpdateRota } from "@/hooks/rotaHooks";
+import RotaSlotContainer from "@/pages/rota/components/RotaSlot/RotaSlotContainer";
+import { getAuth } from "@/services/api.ts";
+import catchResponseError from "@/utils/responseError.jsx";
+import UserDutiesContainer from "./rota/components/UserDuties/UserDutiesContainer";
 
 // CSS
-import '@/styles/App.css';
+import "@/styles/App.css";
 
 // Lazy Loading
-const UserSearchContainer = lazy(() => import ('@/components/UserSearch/UserSearchContainer'));
-const PersonalStats = lazy(() => import('@/pages/statistics/personal/PersonalStats.jsx'));
+const UserSearchContainer = lazy(
+  () => import("@/components/UserSearch/UserSearchContainer")
+);
+const PersonalStats = lazy(() => import("@/pages/statistics/personal/PersonalStats.jsx"));
 const Lottie = lazy(() => import("lottie-react"));
-
 
 function Main() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [today] = useState(() => format(new Date(), 'yyyy-MM-dd'));
+  const [today] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [initDataUnsafe, setInitDataUnsafe] = useState(null);
   const [rotaAdmin, setRotaAdmin] = useState([]);
-  const [date, setDate] = useState(sessionStorage.getItem('date') || format(new Date(), 'yyyy-MM-dd'));
+  const [date, setDate] = useState(
+    sessionStorage.getItem("date") || format(new Date(), "yyyy-MM-dd")
+  );
   const [userBranches, setUserBranches] = useState(null);
-  const [branch, setBranch] = useState(sessionStorage.getItem('branch'));
+  const [branch, setBranch] = useState(sessionStorage.getItem("branch"));
   const [isLoading, setIsLoading] = useState(false);
   const [showForbidden, setShowForbidden] = useState(false);
   const [showRota, setShowRota] = useState(true);
   const [showStatDropdown, setShowStatDropdown] = useState(false);
   const [showPersonalStats, setShowPersonalStats] = useState(false);
   const isFirstMount = useRef(true);
-  const [swipeDirection, setSwipeDirection] = useState('left');
+  const [swipeDirection, setSwipeDirection] = useState("left");
 
   // User Management
   const [showUserManagement, setShowUserManagement] = useState(false);
@@ -67,15 +69,15 @@ function Main() {
     return () => controller.abort();
   }, [showForbidden]);
 
-  const { 
+  const {
     data: rotaData,
     isError: isRotaError,
-    error: rotaError,
+    error: rotaError
   } = useRota({ branch, date });
 
   const { data: secondaryRotaData } = useRota(
-    { branch: 'gp', date },
-    { enabled: branch === 'di'}
+    { branch: "gp", date },
+    { enabled: branch === "di" }
   );
 
   useEffect(() => {
@@ -92,10 +94,9 @@ function Main() {
     return () => controller.abort();
   }, [rotaError]);
 
-
   // Prevent page refresh to trigger main page opening with the wrong state
   useEffect(() => {
-    const { showUserManagement, ...rest } = location.state || {};    
+    const { showUserManagement, ...rest } = location.state || {};
 
     if (showUserManagement) {
       setShowUserManagement(showUserManagement);
@@ -104,21 +105,19 @@ function Main() {
     if (showUserManagement) {
       navigate(location.pathname, {
         replace: true,
-        state: rest,
+        state: rest
       });
     }
   }, [navigate, location.state]);
 
-
   // Prevent main page from scorlling when a pop-up is open on top
   useEffect(() => {
     if (showUserManagement || showPersonalStats || showForbidden) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
   }, [showUserManagement, showPersonalStats, showForbidden]);
-
 
   useEffect(() => {
     const handleBackClick = () => {
@@ -128,38 +127,39 @@ function Main() {
     if (showPersonalStats) {
       window.Telegram.WebApp.BackButton.onClick(handleBackClick);
       window.Telegram.WebApp.BackButton.show();
-    }
-    else {
+    } else {
       window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
-    };
+    }
   }, [showPersonalStats]);
-
 
   const storeLastLogin = () => {
     const currentDateTime = new Date().toISOString();
-    window.Telegram.WebApp.CloudStorage.setItem("lastLogin", currentDateTime, (err, success) => {
-      if (err) {
-        console.error("Error storing last login:", err);
-      } else if (success) {
-        console.log("Last login time successfully stored:", currentDateTime);
+    window.Telegram.WebApp.CloudStorage.setItem(
+      "lastLogin",
+      currentDateTime,
+      (err, success) => {
+        if (err) {
+          console.error("Error storing last login:", err);
+        } else if (success) {
+          console.log("Last login time successfully stored:", currentDateTime);
+        }
       }
-    });
+    );
   };
 
-  
   useEffect(() => {
-    if (! window.Telegram.WebApp){
-      console.warn('Telegram WebApp is not avaliable')
-      return
+    if (!window.Telegram.WebApp) {
+      console.warn("Telegram WebApp is not avaliable");
+      return;
     } else if (Object.keys(window.Telegram.WebApp.initDataUnsafe).length === 0) {
-      console.log('Using mock Telegram data');
+      console.log("Using mock Telegram data");
       console.log(import.meta.env.VITE_INIT_DATA_UNSAFE);
-      sessionStorage.setItem('theme', 'light');
+      sessionStorage.setItem("theme", "light");
       setInitDataUnsafe(JSON.parse(import.meta.env.VITE_INIT_DATA_UNSAFE));
     } else {
-      console.log('Using real Telegram data');
-      sessionStorage.setItem('theme', window.Telegram.WebApp.colorScheme);
+      console.log("Using real Telegram data");
+      sessionStorage.setItem("theme", window.Telegram.WebApp.colorScheme);
       setInitDataUnsafe(window.Telegram.WebApp.initDataUnsafe);
       window.Telegram.WebApp.disableVerticalSwipes();
       window.Telegram.WebApp.expand();
@@ -167,14 +167,15 @@ function Main() {
     }
   }, []);
 
-
   useEffect(() => {
     let showLoadingTimeout;
     let minimumLoadingTimer;
 
     if (userBranches === null) {
       // Start a timeout to delay showing the loader
-      showLoadingTimeout = setTimeout(() => {setIsLoading(true)}, 170);
+      showLoadingTimeout = setTimeout(() => {
+        setIsLoading(true);
+      }, 170);
     } else {
       if (isLoading) {
         clearTimeout(minimumLoadingTimer);
@@ -190,22 +191,20 @@ function Main() {
     };
   }, [userBranches, isLoading]);
 
-
   useEffect(() => {
     const fetchAuthData = async () => {
       try {
-        const response = await getAuth({initDataUnsafe});
+        const response = await getAuth({ initDataUnsafe });
 
         setRotaAdmin(response.data.rotaAdmin);
         setUserBranches(response.data.branches);
 
-        if (sessionStorage.getItem('branch') === null) {
+        if (sessionStorage.getItem("branch") === null) {
           setBranch(Object.keys(response.data.branches)[0]);
-          sessionStorage.setItem('branch', Object.keys(response.data.branches)[0]);
+          sessionStorage.setItem("branch", Object.keys(response.data.branches)[0]);
         }
-      }
-      catch (error) {
-        if (error.response.status === 404 || error.response.status === 403){
+      } catch (error) {
+        if (error.response.status === 404 || error.response.status === 403) {
           setShowForbidden(true);
         } else {
           catchResponseError(error);
@@ -213,17 +212,17 @@ function Main() {
       }
     };
 
-    if (initDataUnsafe !== null){
-      fetchAuthData()
-    };
+    if (initDataUnsafe !== null) {
+      fetchAuthData();
+    }
   }, [initDataUnsafe]);
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      const newDate = format(addDays(new Date(date), 1), 'yyyy-MM-dd');
+      const newDate = format(addDays(new Date(date), 1), "yyyy-MM-dd");
       setDate(newDate);
-      sessionStorage.setItem('date', newDate);
-      setSwipeDirection('left');
+      sessionStorage.setItem("date", newDate);
+      setSwipeDirection("left");
       setShowRota(false);
       setTimeout(() => {
         setShowRota(true);
@@ -232,65 +231,67 @@ function Main() {
     },
 
     onSwipedRight: () => {
-      const newDate = format(addDays(new Date(date), -1), 'yyyy-MM-dd');
+      const newDate = format(addDays(new Date(date), -1), "yyyy-MM-dd");
       setDate(newDate);
-      sessionStorage.setItem('date', newDate);
-      setSwipeDirection('right');
+      sessionStorage.setItem("date", newDate);
+      setSwipeDirection("right");
       setShowRota(false);
       setTimeout(() => {
         setShowRota(true);
       }, 400);
       isFirstMount.current = false;
     },
-    delta: 75,
+    delta: 75
   });
 
-
   const animationVariants = {
-    initial: (direction) => (isFirstMount.current ? false : {
-      x: direction === 'left' ? '100%' : '-100%',
-      opacity: 0,
-    }),
+    initial: direction =>
+      isFirstMount.current
+        ? false
+        : {
+            x: direction === "left" ? "100%" : "-100%",
+            opacity: 0
+          },
     animate: {
       x: 0,
       opacity: 1,
-      transition: { duration: 0.4, ease: 'easeOut' },
+      transition: { duration: 0.4, ease: "easeOut" }
     },
-    exit: (direction) => ({
-      x: direction === 'left' ? '-100%' : '100%',
+    exit: direction => ({
+      x: direction === "left" ? "-100%" : "100%",
       opacity: 0,
-      transition: { duration: 0.4, ease: 'easeOut' },
-    }),
+      transition: { duration: 0.4, ease: "easeOut" }
+    })
   };
 
   // API mutations
   const updateRota = useUpdateRota();
 
   return (
-    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
-      <h1 className='text-3xl font-bold mb-2 dark:text-slate-100'>График</h1>
+    <div className={`app ${sessionStorage.getItem("theme") || "light"}`}>
+      <h1 className="text-3xl font-bold mb-2 dark:text-slate-100">График</h1>
 
       {isLoading && <Loading />}
 
       {!isLoading && userBranches && (
         <>
           {Object.keys(userBranches).length >= 2 && (
-            <BranchSelector 
+            <BranchSelector
               userBranches={userBranches}
               branch={branch}
-              onClick={(key) => {
+              onClick={key => {
                 setBranch(key);
-                sessionStorage.setItem('branch', key);
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                sessionStorage.setItem("branch", key);
+                window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
               }}
             />
           )}
 
-          <PageSelector 
+          <PageSelector
             date={date}
-            onDateChange={(newDate) => {
+            onDateChange={newDate => {
               setDate(newDate);
-              sessionStorage.setItem('date', newDate);
+              sessionStorage.setItem("date", newDate);
             }}
             branch={branch}
             isRotaAdmin={rotaAdmin.includes(branch)}
@@ -302,23 +303,20 @@ function Main() {
             onShowPersonalStats={() => setShowPersonalStats(true)}
             onShowUserManagement={() => {
               setShowUserManagement(true);
-              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+              window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
             }}
           />
         </>
       )}
 
-      <UserDutiesContainer 
-        branch={branch}
-        userId={initDataUnsafe?.user?.id ?? null}
-      />
+      <UserDutiesContainer branch={branch} userId={initDataUnsafe?.user?.id ?? null} />
 
-      {userBranches !== null && (
-        isRotaError ? (
+      {userBranches !== null &&
+        (isRotaError ? (
           <Suspense fallback={null}>
-            <div className='size-7/12 mx-auto'>
+            <div className="size-7/12 mx-auto">
               <Lottie animationData={animationDataShrug} />
-              <p className='text-center dark:text-white'>
+              <p className="text-center dark:text-white">
                 График за этот день недоступен :(
               </p>
             </div>
@@ -326,9 +324,9 @@ function Main() {
         ) : (
           <AnimatePresence custom={swipeDirection}>
             {showRota && (
-              <motion.div 
+              <motion.div
                 {...swipeHandlers}
-                className='hours-grid'
+                className="hours-grid"
                 key={date}
                 custom={swipeDirection}
                 variants={animationVariants}
@@ -344,14 +342,19 @@ function Main() {
                     initDataUnsafe={initDataUnsafe}
                     label={dutyHour.label}
                     users={dutyHour.users}
-                    secondaryUsers={branch === "di" ? secondaryRotaData?.[index] : undefined}
-                    canAddSelf={date >= today && !dutyHour.users.some(user => user.id === initDataUnsafe.user.id)}
+                    secondaryUsers={
+                      branch === "di" ? secondaryRotaData?.[index] : undefined
+                    }
+                    canAddSelf={
+                      date >= today &&
+                      !dutyHour.users.some(user => user.id === initDataUnsafe.user.id)
+                    }
                     canAddOthers={rotaAdmin.includes(branch)}
                     canRemove={rotaAdmin.includes(branch)}
-                    onRemove={(userId, timeRange)=>{
+                    onRemove={(userId, timeRange) => {
                       updateRota.mutate(
                         {
-                          type: 'remove',
+                          type: "remove",
                           branch,
                           date,
                           timeRange,
@@ -363,12 +366,12 @@ function Main() {
                             window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
                           }
                         }
-                      )
+                      );
                     }}
-                    onAddSelf={(timeRange)=>{
+                    onAddSelf={timeRange => {
                       updateRota.mutate(
                         {
-                          type: 'add',
+                          type: "add",
                           branch,
                           date,
                           timeRange,
@@ -380,22 +383,21 @@ function Main() {
                             window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
                           }
                         }
-                      )
+                      );
                     }}
                   />
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
-        )
-      )}
+        ))}
 
       {showForbidden && (
         <Suspense fallback={null}>
-          <div className='popup flex justify-center items-center'>
-            <div className='w-[50%]'>
+          <div className="popup flex justify-center items-center">
+            <div className="w-[50%]">
               <Lottie animationData={animationDataForbidden} />
-              <p className='text-center dark:text-white'>Недостаточно прав!</p>
+              <p className="text-center dark:text-white">Недостаточно прав!</p>
             </div>
           </div>
         </Suspense>
@@ -407,10 +409,10 @@ function Main() {
             department={branch}
             showAddUserButton={true}
             initDataUnsafe={initDataUnsafe}
-            onSelectUser={(userObj) => {
+            onSelectUser={userObj => {
               window.Telegram.WebApp.BackButton.offClick(handleUserManagementClose);
-              window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-              navigate('./profile', {
+              window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
+              navigate("./profile", {
                 state: {
                   branch,
                   editingUser: userObj,
@@ -419,11 +421,11 @@ function Main() {
               });
             }}
             onAddUser={() => {
-              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-              navigate('./profile', {
+              window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
+              navigate("./profile", {
                 state: {
                   branch,
-                  editingUser: {id: null, username: "@", color: 0},
+                  editingUser: { id: null, username: "@", color: 0 },
                   initDataUnsafe
                 }
               });
@@ -435,15 +437,12 @@ function Main() {
 
       {showPersonalStats && (
         <Suspense fallback={null}>
-          <div className='popup'>
-            <PersonalStats
-              branch={branch}
-              userId={initDataUnsafe.user.id}
-            />
+          <div className="popup">
+            <PersonalStats branch={branch} userId={initDataUnsafe.user.id} />
           </div>
         </Suspense>
       )}
-  </div>
+    </div>
   );
 }
 

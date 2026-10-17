@@ -1,21 +1,23 @@
-import { useEffect, Suspense, lazy } from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
-import { NotepadText, ChartColumn, User, Wrench } from "lucide-react";
+import { ChartColumn, NotepadText, User, Wrench } from "lucide-react";
+import { lazy, Suspense, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+// Sections
+import UserEditForm from "@/components/profile/userEditForm";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+  AccordionTrigger
+} from "@/components/ui/accordion";
 
-// Sections
-import UserEditForm from "@/components/profile/userEditForm";
-const PersonalStats = lazy(() => import('@/pages/statistics/personal/PersonalStats'));
-const UserDutiesContainer = lazy(() => import('@/pages/rota/components/UserDuties/UserDutiesContainer'));
-const ModifyRotaMulti = lazy(() => import('@/components/profile/modifyRotaMulti'));
+const PersonalStats = lazy(() => import("@/pages/statistics/personal/PersonalStats"));
+const UserDutiesContainer = lazy(
+  () => import("@/pages/rota/components/UserDuties/UserDutiesContainer")
+);
+const ModifyRotaMulti = lazy(() => import("@/components/profile/modifyRotaMulti"));
 
 // Styles
-import '@/styles/App.css';
+import "@/styles/App.css";
 
 export default function Profile() {
   const location = useLocation();
@@ -25,19 +27,19 @@ export default function Profile() {
   const { branch, editingUser, initDataUnsafe } = location.state || {};
   const requiredParams = [branch, editingUser, initDataUnsafe];
   useEffect(() => {
-    if (requiredParams.some(param => param === undefined)){
-      navigate('/Inforgiy_Web/', { replace: true })
+    if (requiredParams.some(param => param === undefined)) {
+      navigate("/Inforgiy_Web/", { replace: true });
     }
-  }, [navigate, requiredParams])
+  }, [navigate, requiredParams]);
 
-  if (requiredParams.some(param => param === undefined)){
+  if (requiredParams.some(param => param === undefined)) {
     return null;
-  };
+  }
 
   // Telegram UI Back Button
   useEffect(() => {
     const handleBackClick = () => {
-      navigate('/Inforgiy_Web/', { state: { showUserManagement: true } });
+      navigate("/Inforgiy_Web/", { state: { showUserManagement: true } });
     };
 
     window.Telegram.WebApp.BackButton.onClick(handleBackClick);
@@ -46,26 +48,21 @@ export default function Profile() {
     return () => {
       window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
-    }
-  }, [editingUser])
+    };
+  }, [editingUser]);
 
   const accordionClass = "text-lg font-semibold";
-  const accordionTitleClass = "flex items-center gap-2"
+  const accordionTitleClass = "flex items-center gap-2";
 
   return (
-    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
+    <div className={`app ${sessionStorage.getItem("theme") || "light"}`}>
       <div className="popup">
-        <Accordion
-          type="single"
-          defaultValue="settings"
-          collapsible
-        >
+        <Accordion type="single" defaultValue="settings" collapsible>
           <AccordionItem value="settings">
-            <AccordionTrigger
-              className={accordionClass}>
-                <div className={accordionTitleClass}>
-                  <User/> Профиль
-                </div>
+            <AccordionTrigger className={accordionClass}>
+              <div className={accordionTitleClass}>
+                <User /> Профиль
+              </div>
             </AccordionTrigger>
             <AccordionContent>
               <UserEditForm
@@ -77,64 +74,58 @@ export default function Profile() {
           </AccordionItem>
 
           {editingUser.id !== null && (
-          <>
-            <AccordionItem value="duties">
-              <AccordionTrigger
-                className={accordionClass}>
+            <>
+              <AccordionItem value="duties">
+                <AccordionTrigger className={accordionClass}>
                   <div className={accordionTitleClass}>
-                    <NotepadText/> Смены
+                    <NotepadText /> Смены
                   </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <Suspense fallback={null}>
-                  <UserDutiesContainer
-                    branch={branch}
-                    userId={editingUser.id}
-                    prevDays={14}
-                    nextDays={30}
-                  />
-                </Suspense>
-              </AccordionContent>
-            </AccordionItem>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Suspense fallback={null}>
+                    <UserDutiesContainer
+                      branch={branch}
+                      userId={editingUser.id}
+                      prevDays={14}
+                      nextDays={30}
+                    />
+                  </Suspense>
+                </AccordionContent>
+              </AccordionItem>
 
-            <AccordionItem value="modify_rota_multi">
-              <AccordionTrigger
-                className={accordionClass}>
+              <AccordionItem value="modify_rota_multi">
+                <AccordionTrigger className={accordionClass}>
                   <div className={accordionTitleClass}>
-                    <Wrench/> Групповые операции
+                    <Wrench /> Групповые операции
                   </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <Suspense fallback={null}>
-                  <ModifyRotaMulti
-                    branch={branch}
-                    userId={editingUser.id}
-                    initDataUnsafe={initDataUnsafe}
-                  />
-                </Suspense>
-              </AccordionContent>
-            </AccordionItem>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Suspense fallback={null}>
+                    <ModifyRotaMulti
+                      branch={branch}
+                      userId={editingUser.id}
+                      initDataUnsafe={initDataUnsafe}
+                    />
+                  </Suspense>
+                </AccordionContent>
+              </AccordionItem>
 
-            <AccordionItem value="personal_stats">
-              <AccordionTrigger
-                className={accordionClass}>
+              <AccordionItem value="personal_stats">
+                <AccordionTrigger className={accordionClass}>
                   <div className={accordionTitleClass}>
-                    <ChartColumn/> Статистика
+                    <ChartColumn /> Статистика
                   </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <Suspense fallback={null}>
-                  <PersonalStats
-                    branch={branch}
-                    userId={editingUser.id}
-                  />
-                </Suspense>
-              </AccordionContent>
-            </AccordionItem>
-          </>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Suspense fallback={null}>
+                    <PersonalStats branch={branch} userId={editingUser.id} />
+                  </Suspense>
+                </AccordionContent>
+              </AccordionItem>
+            </>
           )}
         </Accordion>
       </div>
     </div>
-  )
+  );
 }

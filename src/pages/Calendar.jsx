@@ -1,50 +1,51 @@
-import React, { useEffect, useState, useMemo, useCallback, Suspense, lazy } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useQueries } from '@tanstack/react-query';
-import { format, startOfToday } from 'date-fns';
-import { ru } from 'date-fns/locale';
-import { UserPlus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-
+import { useQueries } from "@tanstack/react-query";
+import { format, startOfToday } from "date-fns";
+import { ru } from "date-fns/locale";
+import { AnimatePresence, motion } from "framer-motion";
+import { UserPlus } from "lucide-react";
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import Loading from "@/components/loading.jsx";
 // Custom components
-import { Button } from '@/components/ui/button.jsx';
-import Loading from '@/components/loading.jsx';
+import { Button } from "@/components/ui/button.jsx";
 
 // API
-import { useUpdateRota } from '@/hooks/rotaHooks';
-import { getRota } from '@/services/api.ts';
+import { useUpdateRota } from "@/hooks/rotaHooks";
+import { getRota } from "@/services/api.ts";
 
 // CSS
-import '@/styles/WeeklyView.css';
+import "@/styles/WeeklyView.css";
 
-// AG Grid
-import { AgGridReact } from 'ag-grid-react';
-import gridTheme from '@/styles/gridTheme.js';
 import {
-  ModuleRegistry,
-  ValidationModule,
-  ScrollApiModule,
-  ClientSideRowModelModule,
-  RowAutoHeightModule,
   CellStyleModule,
-} from 'ag-grid-community';
+  ClientSideRowModelModule,
+  ModuleRegistry,
+  RowAutoHeightModule,
+  ScrollApiModule,
+  ValidationModule
+} from "ag-grid-community";
+// AG Grid
+import { AgGridReact } from "ag-grid-react";
+import gridTheme from "@/styles/gridTheme.js";
 
 ModuleRegistry.registerModules([
   ValidationModule,
   ScrollApiModule,
   ClientSideRowModelModule,
   RowAutoHeightModule,
-  CellStyleModule,
+  CellStyleModule
 ]);
 
 // Lazy Loading
-const UserSearchContainer = lazy(() => import("@/components/UserSearch/UserSearchContainer"));
+const UserSearchContainer = lazy(
+  () => import("@/components/UserSearch/UserSearchContainer")
+);
 
 const today = startOfToday();
 
 function rowIndexToTime(rowIndex) {
-  const start = rowIndex.toString().padStart(2, '0');
-  const end = (rowIndex + 1).toString().padStart(2, '0');
+  const start = rowIndex.toString().padStart(2, "0");
+  const end = (rowIndex + 1).toString().padStart(2, "0");
   return `${start}:00 - ${end}:00`;
 }
 
@@ -62,25 +63,24 @@ function getDays() {
   }
 
   return days;
-};
+}
 
 function transformColumnSchemaToRowSchema(columnDefs, data) {
   // Extract column names from columnDefs
-  const columnNames = columnDefs.map((col) => col.field);
+  const columnNames = columnDefs.map(col => col.field);
 
   // Transpose the data based on column schema to row schema
   const arrayOfObjects = data[0].map((_, rowIndex) => {
     const obj = {};
     columnNames.forEach((colName, colIndex) => {
       const cellData = data[colIndex][rowIndex];
-      obj[colName] = cellData
+      obj[colName] = cellData;
     });
     return obj;
   });
 
   return arrayOfObjects;
 }
-
 
 export default function Calendar() {
   const location = useLocation();
@@ -91,150 +91,160 @@ export default function Calendar() {
   const requiredParams = [branch, rotaAdmin, maxDuties, initDataUnsafe];
   useEffect(() => {
     if (requiredParams.some(param => param === undefined)) {
-      navigate('/Inforgiy_Web/', { replace: true })
+      navigate("/Inforgiy_Web/", { replace: true });
     }
-  }, [navigate, requiredParams])
+  }, [navigate, requiredParams]);
 
-  if (requiredParams.some(param => param === undefined)){
+  if (requiredParams.some(param => param === undefined)) {
     return null;
-  };
+  }
 
-  const valueFormatter = useCallback((params) => {
+  const valueFormatter = useCallback(params => {
     const value = params.value;
-    if (!Array.isArray(value)) return value ?? '';
+    if (!Array.isArray(value)) return value ?? "";
     return value
-      .map(user => user?.nick?.split(' ')[0] ?? user?.username ?? '')
-      .join(', ');
+      .map(user => user?.nick?.split(" ")[0] ?? user?.username ?? "")
+      .join(", ");
   }, []);
 
-  const cellRenderer = useCallback(( params ) => {
-    const value = params.value;
-    if (!Array.isArray(value) || value.length === 0){return value};
-  
-    const nicks = value.map(user => {
-      const nickName = user?.nick.split(' ')[0] ?? user.username;
-  
-      if (branch === 'gp' && user.color === 1) {
-        return <span key={user.id} className="gp-green">{nickName}</span>;
-      } else {
-        return nickName;
+  const cellRenderer = useCallback(
+    params => {
+      const value = params.value;
+      if (!Array.isArray(value) || value.length === 0) {
+        return value;
       }
-    });
-  
-    return (
-      <>
-        {nicks.map((nick, index) => (
-          <React.Fragment key={index}>
-            {index > 0 && ', '}
-            {nick}
-          </React.Fragment>
-        ))}
-      </>
-    )
-  }, [branch]);
 
+      const nicks = value.map(user => {
+        const nickName = user?.nick.split(" ")[0] ?? user.username;
 
-  const cellClass = useCallback(( params ) => {
-    const value = params.value;
-    if (!Array.isArray(value)){return ''};
+        if (branch === "gp" && user.color === 1) {
+          return (
+            <span key={user.id} className="gp-green">
+              {nickName}
+            </span>
+          );
+        } else {
+          return nickName;
+        }
+      });
 
-    if (value.length === 0){
-      if (branch === 'gp'){
-        return 'empty gp'
-      } else {
-        return 'empty'
+      return (
+        <>
+          {nicks.map((nick, index) => (
+            <React.Fragment key={index}>
+              {index > 0 && ", "}
+              {nick}
+            </React.Fragment>
+          ))}
+        </>
+      );
+    },
+    [branch]
+  );
+
+  const cellClass = useCallback(
+    params => {
+      const value = params.value;
+      if (!Array.isArray(value)) {
+        return "";
       }
-    }
 
-    if (value.some(user => user.id === initDataUnsafe.user.id)) {
-      return 'bg-input'
-    }
-  }, [branch, initDataUnsafe.user.id]);
+      if (value.length === 0) {
+        if (branch === "gp") {
+          return "empty gp";
+        } else {
+          return "empty";
+        }
+      }
 
-  const handleGridReady = useCallback((params) => {
-    params.api.ensureColumnVisible(format(new Date(), 'yyyy-MM-dd'), 'start');
+      if (value.some(user => user.id === initDataUnsafe.user.id)) {
+        return "bg-input";
+      }
+    },
+    [branch, initDataUnsafe.user.id]
+  );
+
+  const handleGridReady = useCallback(params => {
+    params.api.ensureColumnVisible(format(new Date(), "yyyy-MM-dd"), "start");
   }, []);
 
-
-  const handleCellClicked = useCallback((params) => {
-    if (params.colDef.field === 'index') {
-      navigate(-1);
-    }
-    else {
-      setSelectedCellData({
-        users: params?.value ?? [],
-        column: params.column,
-        rowNode: params.node
-      })
-    }
-  }, [navigate]);
-
+  const handleCellClicked = useCallback(
+    params => {
+      if (params.colDef.field === "index") {
+        navigate(-1);
+      } else {
+        setSelectedCellData({
+          users: params?.value ?? [],
+          column: params.column,
+          rowNode: params.node
+        });
+      }
+    },
+    [navigate]
+  );
 
   const [selectedCellData, setSelectedCellData] = useState(null);
-  const defaultColDef = useMemo(() => ({
-    sortable: false,
-    suppressMovable: true,
-    width: 75,
-    cellRenderer,
-    cellClass,
-    autoHeight: true,
-    wrapText: true,
-  }), [cellRenderer, cellClass]);
+  const defaultColDef = useMemo(
+    () => ({
+      sortable: false,
+      suppressMovable: true,
+      width: 75,
+      cellRenderer,
+      cellClass,
+      autoHeight: true,
+      wrapText: true
+    }),
+    [cellRenderer, cellClass]
+  );
 
   const days = useMemo(() => getDays(), []);
 
   const rotaQueries = useQueries({
-    queries: days.map((day) => ({
-      queryKey: ['rota', branch, format(day, 'yyyy-MM-dd')],
+    queries: days.map(day => ({
+      queryKey: ["rota", branch, format(day, "yyyy-MM-dd")],
       queryFn: () =>
         getRota({
           branch,
-          date: format(day, 'yyyy-MM-dd'),
+          date: format(day, "yyyy-MM-dd")
         }),
       enabled: !!branch,
       staleTime: 2 * 60 * 1000,
       retry: false,
-      notifyOnChangeProps: ['data'],
-    })),
+      notifyOnChangeProps: ["data"]
+    }))
   });
 
-  const isRotaLoading = useMemo(
-    () => rotaQueries.some(q => q.isLoading),
-    [rotaQueries]
-  );
+  const isRotaLoading = useMemo(() => rotaQueries.some(q => q.isLoading), [rotaQueries]);
 
-  const rotaDataUpdatedAt = rotaQueries.map(q => q.dataUpdatedAt).join(',');
-  const rotaData = useMemo(
-    () => rotaQueries.map((q) => q.data || []),
-    [rotaDataUpdatedAt]
-  );
+  const rotaDataUpdatedAt = rotaQueries.map(q => q.dataUpdatedAt).join(",");
+  const rotaData = useMemo(() => rotaQueries.map(q => q.data || []), [rotaDataUpdatedAt]);
 
   const formattedDates = useMemo(() => {
-    return days.map((date) => ({
-      field: format(date, 'yyyy-MM-dd'),
+    return days.map(date => ({
+      field: format(date, "yyyy-MM-dd"),
       headerName: format(date, "dd.MM EEEEEE", { locale: ru }),
-      valueFormatter,
+      valueFormatter
     }));
-  }, [days, valueFormatter,]);
+  }, [days, valueFormatter]);
 
-  const columnDefs = useMemo(() => [
-    {
-      field: 'index',
-      pinned: 'left',
-      headerName: '',
-      valueGetter: (params) => rowIndexToTime(params.node.rowIndex),
-      cellRenderer: null,
-      cellStyle: null,
-      cellClass: null,
-    },
-    ...formattedDates,
-  ], [formattedDates]);
-
+  const columnDefs = useMemo(
+    () => [
+      {
+        field: "index",
+        pinned: "left",
+        headerName: "",
+        valueGetter: params => rowIndexToTime(params.node.rowIndex),
+        cellRenderer: null,
+        cellStyle: null,
+        cellClass: null
+      },
+      ...formattedDates
+    ],
+    [formattedDates]
+  );
 
   const rowData = useMemo(() => {
-    const updated = rotaData.map((day) =>
-      day.map((entry) => entry.users)
-    );
+    const updated = rotaData.map(day => day.map(entry => entry.users));
     return transformColumnSchemaToRowSchema(formattedDates, updated);
   }, [rotaData, formattedDates]);
 
@@ -246,7 +256,7 @@ export default function Calendar() {
 
     window.Telegram.WebApp.BackButton.onClick(handleBackClick);
     window.Telegram.WebApp.BackButton.show();
-    document.body.dataset.agThemeMode = sessionStorage.getItem('theme') || 'light';
+    document.body.dataset.agThemeMode = sessionStorage.getItem("theme") || "light";
 
     // Cleanup the event listener when the component unmounts
     return () => {
@@ -259,19 +269,18 @@ export default function Calendar() {
     setSelectedCellData(null);
   };
 
-
   return (
-    <div className={`app ${sessionStorage.getItem('theme') || 'light'}`}>
+    <div className={`app ${sessionStorage.getItem("theme") || "light"}`}>
       {isRotaLoading && <Loading />}
 
       {rowData && (
-        <div className='w-full h-full fixed inset-0'>
+        <div className="w-full h-full fixed inset-0">
           <AgGridReact
             onGridReady={handleGridReady}
             rowData={rowData}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
-            className='w-full h-full'
+            className="w-full h-full"
             getRowHeight={() => 13}
             onCellClicked={handleCellClicked}
             gridOptions={{
@@ -292,13 +301,20 @@ export default function Calendar() {
       />
     </div>
   );
-};
+}
 
-
-function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelectedCellData, initDataUnsafe, closePopup }) {
+function CellPopUp({
+  selectedCellData,
+  branch,
+  rotaAdmin,
+  maxDuties,
+  setSelectedCellData,
+  initDataUnsafe,
+  closePopup
+}) {
   const [showSearch, setShowSearch] = useState(null);
   // 'inactive' is set to prevent table reload when mutating rota data
-  const updateRota = useUpdateRota({}, 'inactive');
+  const updateRota = useUpdateRota({}, "inactive");
 
   let date;
   let rowIndex;
@@ -306,30 +322,27 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
   if (selectedCellData) {
     date = new Date(selectedCellData.column.colDef.field);
     rowIndex = selectedCellData.rowNode.rowIndex;
-  };
+  }
 
-  const handleUpdateCell = async (updateParams) => {
+  const handleUpdateCell = async updateParams => {
     updateParams.date = selectedCellData.column.colDef.field;
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
-    updateRota.mutate(
-      updateParams,
-      {
-        onSuccess: (data, variable, context) => {
-          selectedCellData.rowNode.setDataValue(
-            selectedCellData.column,
-            data[rowIndex].users
-          );
+    updateRota.mutate(updateParams, {
+      onSuccess: (data, variable, context) => {
+        selectedCellData.rowNode.setDataValue(
+          selectedCellData.column,
+          data[rowIndex].users
+        );
 
-          setSelectedCellData(prevState => ({
-            ...prevState,
-            users: data[rowIndex].users
-          }));
+        setSelectedCellData(prevState => ({
+          ...prevState,
+          users: data[rowIndex].users
+        }));
 
-          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-        }
+        window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
       }
-    )
+    });
   };
 
   return (
@@ -350,10 +363,10 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
         {selectedCellData && (
           <motion.div
             className="pop-up"
-            initial={{ y: '100%' }}
+            initial={{ y: "100%" }}
             animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
@@ -365,23 +378,28 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
               </button>
             </div>
 
-            <h3 className="text-sm font-medium mb-2 text-gray-500">{format(date, 'EEEE dd.MM', { locale: ru })}, {rowIndexToTime(rowIndex)}</h3>
+            <h3 className="text-sm font-medium mb-2 text-gray-500">
+              {format(date, "EEEE dd.MM", { locale: ru })}, {rowIndexToTime(rowIndex)}
+            </h3>
 
             <div>
               {Object.values(selectedCellData.users).length > 0 ? (
                 Object.values(selectedCellData.users).map((user, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg"
+                  >
                     <span className="font-medium">{user.nick}</span>
 
                     {rotaAdmin && (
                       <button
                         onClick={() => {
                           handleUpdateCell({
-                            type: 'remove',
+                            type: "remove",
                             branch: branch,
                             userId: user.id,
                             initDataUnsafe: initDataUnsafe
-                          })
+                          });
                         }}
                       >
                         ✕
@@ -393,24 +411,28 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                 <p className="pb-4 text-center text-gray-500">В это время нет дежурных</p>
               )}
 
-              <div className='flex justify-between gap-2'>
-                {date >= today && !(selectedCellData.users.some(user => user.id === initDataUnsafe.user.id)) && selectedCellData.users.length < maxDuties && (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="flex-1 font-semibold"
-                    onClick={() => {
-                      handleUpdateCell({
-                        type: 'add',
-                        branch: branch,
-                        userId: initDataUnsafe.user.id,
-                        initDataUnsafe: initDataUnsafe
-                      })
-                    }}
-                  >
-                    Взять смену
-                  </Button>
-                )}
+              <div className="flex justify-between gap-2">
+                {date >= today &&
+                  !selectedCellData.users.some(
+                    user => user.id === initDataUnsafe.user.id
+                  ) &&
+                  selectedCellData.users.length < maxDuties && (
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="flex-1 font-semibold"
+                      onClick={() => {
+                        handleUpdateCell({
+                          type: "add",
+                          branch: branch,
+                          userId: initDataUnsafe.user.id,
+                          initDataUnsafe: initDataUnsafe
+                        });
+                      }}
+                    >
+                      Взять смену
+                    </Button>
+                  )}
 
                 {rotaAdmin && (
                   <Button
@@ -418,14 +440,13 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
                     size="icon-lg"
                     onClick={() => {
                       setShowSearch(true);
-                      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                      window.Telegram.WebApp.HapticFeedback.impactOccurred("light");
                     }}
                   >
-                    <UserPlus className='size-6'/>
+                    <UserPlus className="size-6" />
                   </Button>
                 )}
               </div>
-              
             </div>
           </motion.div>
         )}
@@ -433,16 +454,16 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
 
       {showSearch && (
         <Suspense fallback={null}>
-          <UserSearchContainer 
+          <UserSearchContainer
             department={branch}
             showAddUserButton={false}
             initDataUnsafe={initDataUnsafe}
-            onSelectUser={(userObj) => {
+            onSelectUser={userObj => {
               handleUpdateCell({
-                type: 'add',
+                type: "add",
                 branch: branch,
                 userId: userObj.id,
-                initDataUnsafe: initDataUnsafe,
+                initDataUnsafe: initDataUnsafe
               });
               setShowSearch(null);
             }}
@@ -450,7 +471,6 @@ function CellPopUp({ selectedCellData, branch, rotaAdmin, maxDuties, setSelected
           />
         </Suspense>
       )}
-
     </>
   );
-};
+}

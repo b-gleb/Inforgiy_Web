@@ -1,5 +1,6 @@
-import axios from 'axios';
-import { User } from '@/types/user';
+import axios from "axios";
+import { User } from "@/types/user";
+
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
 const api = axios.create({
@@ -15,21 +16,16 @@ type InitDataUnsafe = object;
 // /////// //
 // DEFAULT //
 // /////// //
-export const getAuth = async (params: {
-  initDataUnsafe: InitDataUnsafe;
-}) => {
-  const response = await api.post('/api/auth', params);
+export const getAuth = async (params: { initDataUnsafe: InitDataUnsafe }) => {
+  const response = await api.post("/api/auth", params);
   return response;
 };
 
 // //// //
 // ROTA //
 // //// //
-export const getRota = async (params: {
-  branch: Department;
-  date: ISODate;
-}) => {
-  const response = await api.get('/api/rota', { params });
+export const getRota = async (params: { branch: Department; date: ISODate }) => {
+  const response = await api.get("/api/rota", { params });
   return response.data;
 };
 
@@ -39,7 +35,7 @@ export const getUserDuties = async (params: {
   startDate: ISODate;
   endDate: ISODate;
 }) => {
-  const response = await api.get('/api/userDuties', { params });
+  const response = await api.get("/api/userDuties", { params });
   return response.data;
 };
 
@@ -51,7 +47,7 @@ export const updateRota = async (params: {
   userId: UserId;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post('/api/updateRota', params);
+  const response = await api.post("/api/updateRota", params);
   return response.data;
 };
 
@@ -65,7 +61,7 @@ export const addRotaMulti = async (params: {
   allowOccupiedSlots?: Boolean;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post('/api/addRotaMulti', params);
+  const response = await api.post("/api/addRotaMulti", params);
   return response.data;
 };
 
@@ -78,7 +74,7 @@ export const removeRotaMulti = async (params: {
   userId: UserId;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post('/api/removeRotaMulti', params);
+  const response = await api.post("/api/removeRotaMulti", params);
   return response.data;
 };
 
@@ -89,7 +85,7 @@ export const getUsers = async (params: {
   branch: Department;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post('/api/users', params);
+  const response = await api.post("/api/users", params);
   return response.data;
 };
 
@@ -98,7 +94,7 @@ export const updateUser = async (params: {
   userObj: User;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post('/api/updateUser', params);
+  const response = await api.post("/api/updateUser", params);
   return response.data;
 };
 
@@ -107,7 +103,7 @@ export const removeUser = async (params: {
   userId: UserId;
   initDataUnsafe: InitDataUnsafe;
 }) => {
-  const response = await api.post('/api/removeUser', params);
+  const response = await api.post("/api/removeUser", params);
   return response.data;
 };
 
@@ -119,7 +115,7 @@ export const getStats = async (params: {
   userIds: UserId[];
   dateRanges: DateRange[];
 }) => {
-  const response = await api.post('/api/stats', params);
+  const response = await api.post("/api/stats", params);
   return response.data;
 };
 
@@ -128,7 +124,7 @@ export const getStatsCumulative = async (params: {
   userId: UserId;
   dateRanges: DateRange[];
 }) => {
-  const response = await api.post('/api/stats/cumulative', params);
+  const response = await api.post("/api/stats/cumulative", params);
   return response.data;
 };
 

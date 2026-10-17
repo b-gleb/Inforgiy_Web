@@ -1,1 +1,1 @@
-export type ApiStatus = 'success' | 'pending' | 'error';
+export type ApiStatus = "success" | "pending" | "error";

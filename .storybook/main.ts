@@ -1,4 +1,5 @@
-import type { StorybookConfig } from '@storybook/react-vite';
+// biome-ignore-all format: formatting not needed
+import type { StorybookConfig } from "@storybook/react-vite";
 
 const config: StorybookConfig = {
   "stories": [

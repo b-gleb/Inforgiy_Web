@@ -1,7 +1,7 @@
-import UserSearch, { UserSearchProps } from "./UserSearch";
 import { useGetUsers } from "@/hooks/userHooks";
+import UserSearch, { UserSearchProps } from "./UserSearch";
 
-interface UserSearchContainerProps extends Omit<UserSearchProps, 'status' | 'users'> {
+interface UserSearchContainerProps extends Omit<UserSearchProps, "status" | "users"> {
   department: string;
   initDataUnsafe: object;
 }

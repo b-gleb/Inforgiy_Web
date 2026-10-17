@@ -1,17 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import UserBox from './UserBox';
-import type { ComponentProps } from 'react';
+import type { ComponentProps } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import UserBox from "./UserBox";
 
 // framer-motion's AnimatePresence/motion.div add exit-animation timing and
 // DOM behaviour that isn't part of this component's own logic. We stub them
 // with plain passthrough elements so tests exercise UserBox's actual
 // rendering decisions (props -> markup) rather than animation internals.
 vi.mock("framer-motion", () => ({
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => (
-    <>{children}</>
-  ),
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, className, ...rest }: any) => {
       // Strip framer-motion-only props (initial/animate/exit/transition) so
@@ -28,8 +26,8 @@ vi.mock("framer-motion", () => ({
           {children}
         </div>
       );
-    },
-  },
+    }
+  }
 }));
 
 const defaultProps: ComponentProps<typeof UserBox> = {
@@ -40,7 +38,7 @@ const defaultProps: ComponentProps<typeof UserBox> = {
     color: 3
   },
   canRemove: false,
-  onRemove: vi.fn(),
+  onRemove: vi.fn()
 };
 
 describe("UserBox", () => {
@@ -56,17 +54,19 @@ describe("UserBox", () => {
 
     it("reflects the user's color as part of the box styling", () => {
       render(<UserBox {...defaultProps} />);
-      expect(screen.getByText(defaultProps.userObj.nick).parentElement).toHaveClass(`color-${defaultProps.userObj.color}`);
+      expect(screen.getByText(defaultProps.userObj.nick).parentElement).toHaveClass(
+        `color-${defaultProps.userObj.color}`
+      );
     });
 
     describe("remove from rota control visibility based on canRemove argument", () => {
       it("does not render a remove button when the interracting user is not an admin", () => {
-        render(<UserBox {...defaultProps} canRemove={false} />)
+        render(<UserBox {...defaultProps} canRemove={false} />);
         expect(screen.queryByRole("button", { name: "✕" })).not.toBeInTheDocument();
       });
 
       it("renders remove button when the interracting user is an admin", () => {
-        render(<UserBox {...defaultProps} canRemove={true} />)
+        render(<UserBox {...defaultProps} canRemove={true} />);
         expect(screen.queryByRole("button", { name: "✕" })).toBeInTheDocument();
       });
     });
@@ -74,20 +74,20 @@ describe("UserBox", () => {
     describe("remove from rota interaction", () => {
       it("calls onRemove once when remove button is clicked", async () => {
         const user = userEvent.setup();
-        render(<UserBox {...defaultProps} canRemove={true} />)
+        render(<UserBox {...defaultProps} canRemove={true} />);
 
         await user.click(screen.getByRole("button", { name: "✕" }));
         expect(defaultProps.onRemove).toHaveBeenCalledTimes(1);
       });
 
       it("never calls onRemove when canRemove is false", () => {
-        render(<UserBox {...defaultProps} canRemove={false} />)
+        render(<UserBox {...defaultProps} canRemove={false} />);
         expect(defaultProps.onRemove).not.toHaveBeenCalled();
       });
 
       it("should not call onRemove by clicking anywhere else", async () => {
         const user = userEvent.setup();
-        render(<UserBox {...defaultProps} canRemove={true} />)
+        render(<UserBox {...defaultProps} canRemove={true} />);
 
         await user.click(screen.getByText(defaultProps.userObj.nick));
         expect(defaultProps.onRemove).not.toHaveBeenCalled();
