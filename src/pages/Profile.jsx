@@ -49,7 +49,7 @@ export default function Profile() {
       window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
     };
-  }, [editingUser]);
+  }, [navigate]);
 
   const accordionClass = "text-lg font-semibold";
   const accordionTitleClass = "flex items-center gap-2";

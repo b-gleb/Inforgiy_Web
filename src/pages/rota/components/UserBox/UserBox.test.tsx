@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: any allowed to be used for mocking
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";

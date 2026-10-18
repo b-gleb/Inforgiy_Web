@@ -22,7 +22,7 @@ export default function UserBox({ userObj, canRemove, onRemove }: UserBoxProps) 
       <span>{userObj.nick}</span>
 
       {canRemove && (
-        <button className="ml-2" onClick={onRemove}>
+        <button type="button" className="ml-2" onClick={onRemove}>
           ✕
         </button>
       )}

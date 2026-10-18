@@ -138,7 +138,7 @@ export default function PersonalStats({ branch, userId }) {
         data: weeklyStatsResponse[0]?.data?.map(item => item.count)
       }
     ];
-  }, [weeklyStatsResponse]);
+  }, [weekRanges, weeklyStatsResponse]);
 
   // Cumulative month stats
   const [dayByDayOptions] = useState({

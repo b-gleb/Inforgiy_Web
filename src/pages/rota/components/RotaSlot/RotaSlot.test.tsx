@@ -24,7 +24,7 @@ vi.mock("@/pages/rota/components/UserBox/UserBox", () => ({
   default: vi.fn(({ userObj, canRemove, onRemove }) => (
     <div data-testid={`user-box-${userObj.id}`} data-rota-admin={String(canRemove)}>
       {userObj.name}
-      <button aria-label={`remove-${userObj.id}`} onClick={onRemove}>
+      <button type="button" aria-label={`remove-${userObj.id}`} onClick={onRemove}>
         remove
       </button>
     </div>

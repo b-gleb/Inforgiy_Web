@@ -50,7 +50,11 @@ export default function UserSearch({
           onChange={(e: any) => setSearchQuery(e.target.value)}
           className="mr-2"
         />
-        <button onClick={() => onClose()} className="p-2 text-[#007aff] text-xl">
+        <button
+          type="button"
+          onClick={() => onClose()}
+          className="p-2 text-[#007aff] text-xl"
+        >
           ✕
         </button>
       </div>

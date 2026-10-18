@@ -76,6 +76,7 @@ export default function RotaSlot({
       <div className="ml-auto shrink-0">
         {canAddOthers && onOpenUserSearch && (
           <button
+            type="button"
             className="p-1"
             onClick={() => onOpenUserSearch(label)}
             aria-label="Assign user"
@@ -86,6 +87,7 @@ export default function RotaSlot({
 
         {canAddSelf && (
           <button
+            type="button"
             className="p-1"
             onClick={() => onAddSelf(label)}
             aria-label="Add yourself"

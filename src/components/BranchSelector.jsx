@@ -6,6 +6,7 @@ export default function BranchSelector({ userBranches, branch, onClick }) {
       <div className="flex justify-between rounded-lg p-1 bg-[#e9e9eb] dark:bg-neutral-800">
         {Object.keys(userBranches).map(key => (
           <button
+            type="button"
             key={key}
             onClick={() => onClick(key)}
             className={`branch-button ${branch === key ? "selected" : ""}`}
