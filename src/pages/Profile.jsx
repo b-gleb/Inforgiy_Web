@@ -25,14 +25,17 @@ export default function Profile() {
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, editingUser, initDataUnsafe } = location.state || {};
-  const requiredParams = [branch, editingUser, initDataUnsafe];
+
+  const hasRequiredParams =
+    branch !== undefined && editingUser !== undefined && initDataUnsafe !== undefined;
+
   useEffect(() => {
-    if (requiredParams.some(param => param === undefined)) {
+    if (!hasRequiredParams) {
       navigate("/Inforgiy_Web/", { replace: true });
     }
-  }, [navigate, requiredParams]);
+  }, [navigate, hasRequiredParams]);
 
-  if (requiredParams.some(param => param === undefined)) {
+  if (!hasRequiredParams) {
     return null;
   }
 

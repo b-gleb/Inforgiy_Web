@@ -47,7 +47,9 @@ export default function UserSearch({
           type="text"
           placeholder="Поиск..."
           value={searchQuery}
-          onChange={(e: any) => setSearchQuery(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchQuery(e.target.value)
+          }
           className="mr-2"
         />
         <button
@@ -78,9 +80,9 @@ export default function UserSearch({
 
       {status === "pending" && (
         <div className="search_results_container auto-rows-10.5!">
-          {Array.from({ length: 22 }).map((_, i) => (
+          {Array.from({ length: 22 }, (_, i) => `skeleton-${i}`).map((key, i) => (
             <div
-              key={i}
+              key={key}
               className="w-full h-10 rounded-md border border-input bg-muted animate-pulse"
               style={{ animationDelay: `${i * 75}ms` }}
             />

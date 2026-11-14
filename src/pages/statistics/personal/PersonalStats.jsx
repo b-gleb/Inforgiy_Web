@@ -13,7 +13,7 @@ import {
   subYears
 } from "date-fns";
 import { ru } from "date-fns/locale";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { Skeleton } from "@/components/ui/skeleton";
 // API

@@ -88,14 +88,19 @@ export default function Calendar() {
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || {};
-  const requiredParams = [branch, rotaAdmin, maxDuties, initDataUnsafe];
+  const hasRequiredParams =
+    branch !== undefined &&
+    rotaAdmin !== undefined &&
+    maxDuties !== undefined &&
+    initDataUnsafe !== undefined;
+
   useEffect(() => {
-    if (requiredParams.some(param => param === undefined)) {
+    if (!hasRequiredParams) {
       navigate("/Inforgiy_Web/", { replace: true });
     }
-  }, [navigate, requiredParams]);
+  }, [navigate, hasRequiredParams]);
 
-  if (requiredParams.some(param => param === undefined)) {
+  if (!hasRequiredParams) {
     return null;
   }
 
@@ -215,9 +220,7 @@ export default function Calendar() {
   });
 
   const isRotaLoading = useMemo(() => rotaQueries.some(q => q.isLoading), [rotaQueries]);
-
-  const rotaDataUpdatedAt = rotaQueries.map(q => q.dataUpdatedAt).join(",");
-  const rotaData = useMemo(() => rotaQueries.map(q => q.data || []), [rotaDataUpdatedAt]);
+  const rotaData = useMemo(() => rotaQueries.map(q => q.data || []), [rotaQueries]);
 
   const formattedDates = useMemo(() => {
     return days.map(date => ({
@@ -263,7 +266,7 @@ export default function Calendar() {
       window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
     };
-  }, []);
+  }, [navigate]);
 
   const closePopup = () => {
     setSelectedCellData(null);
@@ -329,7 +332,7 @@ function CellPopUp({
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
     updateRota.mutate(updateParams, {
-      onSuccess: (data, variable, context) => {
+      onSuccess: (data, _variable, _context) => {
         selectedCellData.rowNode.setDataValue(
           selectedCellData.column,
           data[rowIndex].users
@@ -371,6 +374,7 @@ function CellPopUp({
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
               <button
+                type="button"
                 className="pr-2 text-red-500 text-lg font-bold"
                 onClick={closePopup}
               >
@@ -393,6 +397,7 @@ function CellPopUp({
 
                     {rotaAdmin && (
                       <button
+                        type="button"
                         onClick={() => {
                           handleUpdateCell({
                             type: "remove",

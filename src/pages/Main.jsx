@@ -336,7 +336,7 @@ function Main() {
               >
                 {(rotaData ?? []).map((dutyHour, index) => (
                   <RotaSlotContainer
-                    key={index}
+                    key={dutyHour.label}
                     department={branch}
                     date={date}
                     initDataUnsafe={initDataUnsafe}

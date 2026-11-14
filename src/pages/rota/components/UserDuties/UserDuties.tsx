@@ -39,8 +39,8 @@ export default function UserDuties({ status, data }: UserDutiesProps) {
         {status === "success" &&
           (data.length > 0 ? (
             <div className="space-y-1">
-              {data.map((duty, index) => (
-                <p key={index} className="text-sm text-white">
+              {data.map(duty => (
+                <p key={duty.date} className="text-sm text-white">
                   <span className="font-semibold">
                     {format(duty.date, "dd.MM (EEEE)", { locale: ru })}:
                   </span>{" "}
