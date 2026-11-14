@@ -343,7 +343,9 @@ function Main() {
                     label={dutyHour.label}
                     users={dutyHour.users}
                     secondaryUsers={
-                      branch === "di" && date === today ? secondaryRotaData?.[index]?.users : undefined
+                      branch === "di" && date === today
+                        ? secondaryRotaData?.[index]?.users
+                        : undefined
                     }
                     canAddSelf={
                       date >= today &&
