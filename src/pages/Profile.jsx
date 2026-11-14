@@ -35,10 +35,6 @@ export default function Profile() {
     }
   }, [navigate, hasRequiredParams]);
 
-  if (!hasRequiredParams) {
-    return null;
-  }
-
   // Telegram UI Back Button
   useEffect(() => {
     const handleBackClick = () => {
@@ -56,6 +52,11 @@ export default function Profile() {
 
   const accordionClass = "text-lg font-semibold";
   const accordionTitleClass = "flex items-center gap-2";
+
+  // do not render anything if required parameters are missing
+  if (!hasRequiredParams) {
+    return null;
+  }
 
   return (
     <div className={`app ${sessionStorage.getItem("theme") || "light"}`}>

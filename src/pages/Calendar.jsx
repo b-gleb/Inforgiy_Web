@@ -100,10 +100,6 @@ export default function Calendar() {
     }
   }, [navigate, hasRequiredParams]);
 
-  if (!hasRequiredParams) {
-    return null;
-  }
-
   const valueFormatter = useCallback(params => {
     const value = params.value;
     if (!Array.isArray(value)) return value ?? "";
@@ -115,32 +111,27 @@ export default function Calendar() {
   const cellRenderer = useCallback(
     params => {
       const value = params.value;
+
       if (!Array.isArray(value) || value.length === 0) {
         return value;
       }
 
-      const nicks = value.map(user => {
-        const nickName = user?.nick.split(" ")[0] ?? user.username;
-
-        if (branch === "gp" && user.color === 1) {
-          return (
-            <span key={user.id} className="gp-green">
-              {nickName}
-            </span>
-          );
-        } else {
-          return nickName;
-        }
-      });
-
       return (
         <>
-          {nicks.map((nick, index) => (
-            <React.Fragment key={index}>
-              {index > 0 && ", "}
-              {nick}
-            </React.Fragment>
-          ))}
+          {value.map((user, index) => {
+            const nickName = user?.nick?.split(" ")[0] || user?.username;
+
+            return (
+              <React.Fragment key={user?.id ?? index}>
+                {index > 0 && ", "}
+                {branch === "gp" && user?.color === 1 ? (
+                  <span className="gp-green">{nickName}</span>
+                ) : (
+                  nickName
+                )}
+              </React.Fragment>
+            );
+          })}
         </>
       );
     },
@@ -220,7 +211,9 @@ export default function Calendar() {
   });
 
   const isRotaLoading = useMemo(() => rotaQueries.some(q => q.isLoading), [rotaQueries]);
-  const rotaData = useMemo(() => rotaQueries.map(q => q.data || []), [rotaQueries]);
+  const rotaDataUpdatedAt = rotaQueries.map(q => q.dataUpdatedAt).join(",");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fixing this results in slow rendering of the popup
+  const rotaData = useMemo(() => rotaQueries.map(q => q.data || []), [rotaDataUpdatedAt]);
 
   const formattedDates = useMemo(() => {
     return days.map(date => ({
@@ -271,6 +264,11 @@ export default function Calendar() {
   const closePopup = () => {
     setSelectedCellData(null);
   };
+
+  // do not render anything if required parameters are missing
+  if (!hasRequiredParams) {
+    return null;
+  }
 
   return (
     <div className={`app ${sessionStorage.getItem("theme") || "light"}`}>
@@ -388,9 +386,9 @@ function CellPopUp({
 
             <div>
               {Object.values(selectedCellData.users).length > 0 ? (
-                Object.values(selectedCellData.users).map((user, index) => (
+                Object.values(selectedCellData.users).map(user => (
                   <div
-                    key={index}
+                    key={user.id}
                     className="flex items-center justify-between p-3 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg"
                   >
                     <span className="font-medium">{user.nick}</span>
