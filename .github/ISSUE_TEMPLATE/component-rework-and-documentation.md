@@ -1,4 +1,5 @@
 ---
+
 name: Component rework and documentation
 about: 'Creating tasks for adding/reworking a component '
 title: "`[COMPONENT_NAME]` | Rework and documentation"

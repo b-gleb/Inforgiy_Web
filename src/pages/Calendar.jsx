@@ -88,16 +88,17 @@ export default function Calendar() {
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || {};
-  const requiredParams = [branch, rotaAdmin, maxDuties, initDataUnsafe];
+  const hasRequiredParams =
+    branch !== undefined &&
+    rotaAdmin !== undefined &&
+    maxDuties !== undefined &&
+    initDataUnsafe !== undefined;
+
   useEffect(() => {
-    if (requiredParams.some(param => param === undefined)) {
+    if (!hasRequiredParams) {
       navigate("/Inforgiy_Web/", { replace: true });
     }
-  }, [navigate, requiredParams]);
-
-  if (requiredParams.some(param => param === undefined)) {
-    return null;
-  }
+  }, [navigate, hasRequiredParams]);
 
   const valueFormatter = useCallback(params => {
     const value = params.value;
@@ -110,32 +111,27 @@ export default function Calendar() {
   const cellRenderer = useCallback(
     params => {
       const value = params.value;
+
       if (!Array.isArray(value) || value.length === 0) {
         return value;
       }
 
-      const nicks = value.map(user => {
-        const nickName = user?.nick.split(" ")[0] ?? user.username;
-
-        if (branch === "gp" && user.color === 1) {
-          return (
-            <span key={user.id} className="gp-green">
-              {nickName}
-            </span>
-          );
-        } else {
-          return nickName;
-        }
-      });
-
       return (
         <>
-          {nicks.map((nick, index) => (
-            <React.Fragment key={index}>
-              {index > 0 && ", "}
-              {nick}
-            </React.Fragment>
-          ))}
+          {value.map((user, index) => {
+            const nickName = user?.nick?.split(" ")[0] || user?.username;
+
+            return (
+              <React.Fragment key={user?.id ?? index}>
+                {index > 0 && ", "}
+                {branch === "gp" && user?.color === 1 ? (
+                  <span className="gp-green">{nickName}</span>
+                ) : (
+                  nickName
+                )}
+              </React.Fragment>
+            );
+          })}
         </>
       );
     },
@@ -215,8 +211,8 @@ export default function Calendar() {
   });
 
   const isRotaLoading = useMemo(() => rotaQueries.some(q => q.isLoading), [rotaQueries]);
-
   const rotaDataUpdatedAt = rotaQueries.map(q => q.dataUpdatedAt).join(",");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fixing this results in slow rendering of the popup
   const rotaData = useMemo(() => rotaQueries.map(q => q.data || []), [rotaDataUpdatedAt]);
 
   const formattedDates = useMemo(() => {
@@ -263,11 +259,16 @@ export default function Calendar() {
       window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
     };
-  }, []);
+  }, [navigate]);
 
   const closePopup = () => {
     setSelectedCellData(null);
   };
+
+  // do not render anything if required parameters are missing
+  if (!hasRequiredParams) {
+    return null;
+  }
 
   return (
     <div className={`app ${sessionStorage.getItem("theme") || "light"}`}>
@@ -329,7 +330,7 @@ function CellPopUp({
     updateParams.timeRange = rowIndexToTime(rowIndex);
 
     updateRota.mutate(updateParams, {
-      onSuccess: (data, variable, context) => {
+      onSuccess: (data, _variable, _context) => {
         selectedCellData.rowNode.setDataValue(
           selectedCellData.column,
           data[rowIndex].users
@@ -371,6 +372,7 @@ function CellPopUp({
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold dark:text-white">Дежурные</h2>
               <button
+                type="button"
                 className="pr-2 text-red-500 text-lg font-bold"
                 onClick={closePopup}
               >
@@ -384,15 +386,16 @@ function CellPopUp({
 
             <div>
               {Object.values(selectedCellData.users).length > 0 ? (
-                Object.values(selectedCellData.users).map((user, index) => (
+                Object.values(selectedCellData.users).map(user => (
                   <div
-                    key={index}
+                    key={user.id}
                     className="flex items-center justify-between p-3 mb-2 bg-gray-100 dark:bg-neutral-700 dark:text-gray-400 rounded-lg"
                   >
                     <span className="font-medium">{user.nick}</span>
 
                     {rotaAdmin && (
                       <button
+                        type="button"
                         onClick={() => {
                           handleUpdateCell({
                             type: "remove",

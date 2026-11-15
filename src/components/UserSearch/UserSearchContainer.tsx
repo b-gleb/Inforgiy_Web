@@ -1,5 +1,5 @@
 import { useGetUsers } from "@/hooks/userHooks";
-import UserSearch, { UserSearchProps } from "./UserSearch";
+import UserSearch, { type UserSearchProps } from "./UserSearch";
 
 interface UserSearchContainerProps extends Omit<UserSearchProps, "status" | "users"> {
   department: string;

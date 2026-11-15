@@ -1,7 +1,7 @@
 import { AnimatePresence } from "framer-motion";
 import { Plus, User } from "lucide-react";
 import UserBox from "@/pages/rota/components/UserBox/UserBox";
-import { User as UserType } from "@/types/user";
+import type { User as UserType } from "@/types/user";
 
 export interface RotaSlotProps {
   /** Department slug, used to add users to rota and determine the background of an empty slot */
@@ -76,6 +76,7 @@ export default function RotaSlot({
       <div className="ml-auto shrink-0">
         {canAddOthers && onOpenUserSearch && (
           <button
+            type="button"
             className="p-1"
             onClick={() => onOpenUserSearch(label)}
             aria-label="Assign user"
@@ -86,6 +87,7 @@ export default function RotaSlot({
 
         {canAddSelf && (
           <button
+            type="button"
             className="p-1"
             onClick={() => onAddSelf(label)}
             aria-label="Add yourself"

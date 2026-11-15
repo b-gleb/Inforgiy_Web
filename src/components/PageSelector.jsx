@@ -67,6 +67,7 @@ export default function PageSelector({
         {showStatDropdown && (
           <div className="dropdown-container">
             <button
+              type="button"
               className="dropdown-button"
               onClick={() => {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
@@ -79,6 +80,7 @@ export default function PageSelector({
             <Separator />
 
             <button
+              type="button"
               className="dropdown-button"
               onClick={() => {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");

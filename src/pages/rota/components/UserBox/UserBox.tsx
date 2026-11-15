@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { User } from "@/types/user";
+import type { User } from "@/types/user";
 
 interface UserBoxProps {
   /** Complete user object */
@@ -22,7 +22,7 @@ export default function UserBox({ userObj, canRemove, onRemove }: UserBoxProps) 
       <span>{userObj.nick}</span>
 
       {canRemove && (
-        <button className="ml-2" onClick={onRemove}>
+        <button type="button" className="ml-2" onClick={onRemove}>
           ✕
         </button>
       )}

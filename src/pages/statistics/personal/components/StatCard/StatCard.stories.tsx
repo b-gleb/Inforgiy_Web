@@ -56,6 +56,7 @@ export const Loading: Story = {
   }
 };
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: story name, not used in components
 export const Error: Story = {
   args: {
     status: "error"

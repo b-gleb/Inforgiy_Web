@@ -117,7 +117,7 @@ export default function StatsOverview() {
       window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
     };
-  }, []);
+  }, [navigate]);
 
   // Set Table Theme
   useEffect(() => {
@@ -178,7 +178,7 @@ export default function StatsOverview() {
 
   const doesExternalFilterPass = useCallback(node => {
     if (node.data) {
-      return node.data.user.color == colorFilterRef.current;
+      return node.data.user.color === Number(colorFilterRef.current);
     }
     return true;
   }, []);
@@ -272,7 +272,7 @@ function generateColumnDefs(year) {
         currentWeekStart = addWeeks(currentWeekStart, 1);
       }
 
-      let currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
+      const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
 
       monthChildren.push({
         field: `${format(currentWeekStart, "yyyy-MM-dd")}_${format(currentWeekEnd, "yyyy-MM-dd")}`,

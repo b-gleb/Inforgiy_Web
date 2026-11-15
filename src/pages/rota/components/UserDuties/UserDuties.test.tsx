@@ -26,7 +26,7 @@ vi.mock("@/utils/userDutiesConverter.js", () => ({
   convertToDutyString: vi.fn((hours: number[]) => `Hours: ${hours.join(", ")}`)
 }));
 
-import { ApiStatus } from "@/types/apiStatus";
+import type { ApiStatus } from "@/types/apiStatus";
 import { convertToDutyString } from "@/utils/userDutiesConverter.js";
 
 // --- Fixtures

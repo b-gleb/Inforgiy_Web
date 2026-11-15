@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { OctagonX } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton.jsx";
-import { ApiStatus } from "@/types/apiStatus";
+import type { ApiStatus } from "@/types/apiStatus";
 import { convertToDutyString } from "@/utils/userDutiesConverter.js";
 
 interface UserDutiesProps {
@@ -39,8 +39,8 @@ export default function UserDuties({ status, data }: UserDutiesProps) {
         {status === "success" &&
           (data.length > 0 ? (
             <div className="space-y-1">
-              {data.map((duty, index) => (
-                <p key={index} className="text-sm text-white">
+              {data.map(duty => (
+                <p key={duty.date} className="text-sm text-white">
                   <span className="font-semibold">
                     {format(duty.date, "dd.MM (EEEE)", { locale: ru })}:
                   </span>{" "}

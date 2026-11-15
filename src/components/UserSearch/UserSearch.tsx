@@ -3,8 +3,8 @@ import { OctagonX } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ApiStatus } from "@/types/apiStatus";
-import { User } from "@/types/user";
+import type { ApiStatus } from "@/types/apiStatus";
+import type { User } from "@/types/user";
 
 export interface UserSearchProps {
   /** API Status */
@@ -47,10 +47,16 @@ export default function UserSearch({
           type="text"
           placeholder="Поиск..."
           value={searchQuery}
-          onChange={(e: any) => setSearchQuery(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchQuery(e.target.value)
+          }
           className="mr-2"
         />
-        <button onClick={() => onClose()} className="p-2 text-[#007aff] text-xl">
+        <button
+          type="button"
+          onClick={() => onClose()}
+          className="p-2 text-[#007aff] text-xl"
+        >
           ✕
         </button>
       </div>
@@ -74,9 +80,9 @@ export default function UserSearch({
 
       {status === "pending" && (
         <div className="search_results_container auto-rows-10.5!">
-          {Array.from({ length: 22 }).map((_, i) => (
+          {Array.from({ length: 22 }, (_, i) => `skeleton-${i}`).map((key, i) => (
             <div
-              key={i}
+              key={key}
               className="w-full h-10 rounded-md border border-input bg-muted animate-pulse"
               style={{ animationDelay: `${i * 75}ms` }}
             />

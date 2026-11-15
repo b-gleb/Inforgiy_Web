@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User } from "@/types/user";
+import type { User } from "@/types/user";
 
 const apiUrl = import.meta.env.VITE_PROXY_URL;
 
@@ -58,7 +58,7 @@ export const addRotaMulti = async (params: {
   timeRanges: string[];
   daysOfWeek: number[];
   userId: UserId;
-  allowOccupiedSlots?: Boolean;
+  allowOccupiedSlots?: boolean;
   initDataUnsafe: InitDataUnsafe;
 }) => {
   const response = await api.post("/api/addRotaMulti", params);

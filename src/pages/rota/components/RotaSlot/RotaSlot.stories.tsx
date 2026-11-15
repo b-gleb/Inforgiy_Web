@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "storybook/test";
-import { User } from "@/types/user";
+import type { User } from "@/types/user";
 import RotaSlot from "./RotaSlot";
 
 const defaultUser: User = {

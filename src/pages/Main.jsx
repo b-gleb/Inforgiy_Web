@@ -108,7 +108,7 @@ function Main() {
         state: rest
       });
     }
-  }, [navigate, location.state]);
+  }, [navigate, location.state, location.pathname]);
 
   // Prevent main page from scorlling when a pop-up is open on top
   useEffect(() => {
@@ -133,22 +133,22 @@ function Main() {
     }
   }, [showPersonalStats]);
 
-  const storeLastLogin = () => {
-    const currentDateTime = new Date().toISOString();
-    window.Telegram.WebApp.CloudStorage.setItem(
-      "lastLogin",
-      currentDateTime,
-      (err, success) => {
-        if (err) {
-          console.error("Error storing last login:", err);
-        } else if (success) {
-          console.log("Last login time successfully stored:", currentDateTime);
-        }
-      }
-    );
-  };
-
   useEffect(() => {
+    const storeLastLogin = () => {
+      const currentDateTime = new Date().toISOString();
+      window.Telegram.WebApp.CloudStorage.setItem(
+        "lastLogin",
+        currentDateTime,
+        (err, success) => {
+          if (err) {
+            console.error("Error storing last login:", err);
+          } else if (success) {
+            console.log("Last login time successfully stored:", currentDateTime);
+          }
+        }
+      );
+    };
+
     if (!window.Telegram.WebApp) {
       console.warn("Telegram WebApp is not avaliable");
       return;
@@ -336,7 +336,7 @@ function Main() {
               >
                 {(rotaData ?? []).map((dutyHour, index) => (
                   <RotaSlotContainer
-                    key={index}
+                    key={dutyHour.label}
                     department={branch}
                     date={date}
                     initDataUnsafe={initDataUnsafe}

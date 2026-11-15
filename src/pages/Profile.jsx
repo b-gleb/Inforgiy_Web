@@ -25,16 +25,15 @@ export default function Profile() {
 
   // Checking if all the neccessary location states exist, otherwise redirect
   const { branch, editingUser, initDataUnsafe } = location.state || {};
-  const requiredParams = [branch, editingUser, initDataUnsafe];
+
+  const hasRequiredParams =
+    branch !== undefined && editingUser !== undefined && initDataUnsafe !== undefined;
+
   useEffect(() => {
-    if (requiredParams.some(param => param === undefined)) {
+    if (!hasRequiredParams) {
       navigate("/Inforgiy_Web/", { replace: true });
     }
-  }, [navigate, requiredParams]);
-
-  if (requiredParams.some(param => param === undefined)) {
-    return null;
-  }
+  }, [navigate, hasRequiredParams]);
 
   // Telegram UI Back Button
   useEffect(() => {
@@ -49,10 +48,15 @@ export default function Profile() {
       window.Telegram.WebApp.BackButton.offClick(handleBackClick);
       window.Telegram.WebApp.BackButton.hide();
     };
-  }, [editingUser]);
+  }, [navigate]);
 
   const accordionClass = "text-lg font-semibold";
   const accordionTitleClass = "flex items-center gap-2";
+
+  // do not render anything if required parameters are missing
+  if (!hasRequiredParams) {
+    return null;
+  }
 
   return (
     <div className={`app ${sessionStorage.getItem("theme") || "light"}`}>
