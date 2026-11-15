@@ -38,9 +38,8 @@ export default function PageSelector({
         className="rounded-lg"
         onClick={() => {
           window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
-          navigate("./calendar", {
+          navigate(`./${encodeURIComponent(branch)}/calendar`, {
             state: {
-              branch: branch,
               rotaAdmin: isRotaAdmin,
               maxDuties: userBranches[branch].maxDuties,
               initDataUnsafe: initDataUnsafe

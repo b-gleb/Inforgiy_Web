@@ -16,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/Inforgiy_Web/" element={<Main />} />
         <Route path="/Inforgiy_Web/profile" element={<Profile />} />
-        <Route path="/Inforgiy_Web/calendar" element={<Calendar />} />
+        <Route path="/Inforgiy_Web/:department/calendar" element={<Calendar />} />
         <Route path="/Inforgiy_Web/stats/overview" element={<StatsOverview />} />
       </Routes>
 
