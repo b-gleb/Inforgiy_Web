@@ -17,7 +17,7 @@ function App() {
         <Route path="/Inforgiy_Web/" element={<Main />} />
         <Route path="/Inforgiy_Web/profile" element={<Profile />} />
         <Route path="/Inforgiy_Web/:department/calendar" element={<Calendar />} />
-        <Route path="/Inforgiy_Web/stats/overview" element={<StatsOverview />} />
+        <Route path="/Inforgiy_Web/:department/stats" element={<StatsOverview />} />
       </Routes>
 
       <ToastContainer

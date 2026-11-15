@@ -83,9 +83,8 @@ export default function PageSelector({
               className="dropdown-button"
               onClick={() => {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
-                navigate("./stats/overview", {
+                navigate(`./${branch}/stats`, {
                   state: {
-                    branch: branch,
                     initDataUnsafe: initDataUnsafe
                   }
                 });

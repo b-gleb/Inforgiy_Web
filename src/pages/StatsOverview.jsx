@@ -22,7 +22,7 @@ import {
 } from "date-fns";
 import { ru } from "date-fns/locale";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useGetStats } from "@/hooks/statHooks";
 // API
 import { useGetUsers } from "@/hooks/userHooks";
@@ -45,7 +45,8 @@ ModuleRegistry.registerModules([
 
 export default function StatsOverview() {
   const location = useLocation();
-  const { branch, initDataUnsafe } = location.state || {};
+  const { initDataUnsafe } = location.state || {};
+  const { department: branch } = useParams();
   const navigate = useNavigate();
   const gridRef = useRef(null);
   const queryClient = useQueryClient();
@@ -94,14 +95,11 @@ export default function StatsOverview() {
     cellClass: cellClass
   });
 
-  // Checking if all the neccessary location states exist, otherwise redirect
-  const missingParams = branch === undefined || initDataUnsafe === undefined;
-
   useEffect(() => {
-    if (missingParams) {
+    if (initDataUnsafe === undefined) {
       navigate("/Inforgiy_Web/", { replace: true });
     }
-  }, [navigate, missingParams]);
+  }, [navigate, initDataUnsafe]);
 
   // Telegram UI BackButton
   useEffect(() => {
@@ -201,7 +199,7 @@ export default function StatsOverview() {
     setColorMap(data.colors);
   }, [data, yearlyColumnDefs]);
 
-  if (missingParams) {
+  if (initDataUnsafe === undefined) {
     return null;
   }
 
