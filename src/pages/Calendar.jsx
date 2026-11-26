@@ -4,7 +4,7 @@ import { ru } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserPlus } from "lucide-react";
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Loading from "@/components/loading.jsx";
 // Custom components
 import { Button } from "@/components/ui/button.jsx";
@@ -87,12 +87,10 @@ export default function Calendar() {
   const navigate = useNavigate();
 
   // Checking if all the neccessary location states exist, otherwise redirect
-  const { branch, rotaAdmin, maxDuties, initDataUnsafe } = location.state || {};
+  const { rotaAdmin, maxDuties, initDataUnsafe } = location.state || {};
+  const { department: branch } = useParams();
   const hasRequiredParams =
-    branch !== undefined &&
-    rotaAdmin !== undefined &&
-    maxDuties !== undefined &&
-    initDataUnsafe !== undefined;
+    rotaAdmin !== undefined && maxDuties !== undefined && initDataUnsafe !== undefined;
 
   useEffect(() => {
     if (!hasRequiredParams) {

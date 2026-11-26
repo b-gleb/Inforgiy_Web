@@ -38,9 +38,8 @@ export default function PageSelector({
         className="rounded-lg"
         onClick={() => {
           window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
-          navigate("./calendar", {
+          navigate(`./${encodeURIComponent(branch)}/calendar`, {
             state: {
-              branch: branch,
               rotaAdmin: isRotaAdmin,
               maxDuties: userBranches[branch].maxDuties,
               initDataUnsafe: initDataUnsafe
@@ -84,9 +83,8 @@ export default function PageSelector({
               className="dropdown-button"
               onClick={() => {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
-                navigate("./stats/overview", {
+                navigate(`./${branch}/stats`, {
                   state: {
-                    branch: branch,
                     initDataUnsafe: initDataUnsafe
                   }
                 });
